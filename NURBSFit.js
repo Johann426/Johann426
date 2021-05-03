@@ -7,19 +7,12 @@ On the basis of The NURBS Book / js code by Johann426.github
 
 class NURBSFit {
 
-	constructor( deg, pole, type = 'centripetal' ) {
+	constructor( deg, type = 'centripetal' ) {
 
-		this.pole = pole !== undefined ? pole : [];
+		this.pole = [];
 
 		this.type = type;
 		
-		this.tang = {
-			
-			ind: [],
-			val: []
-
-		}
-
 		this.deg = () => {
 
 			const nm1 = this.pole.length - 1;
@@ -30,21 +23,21 @@ class NURBSFit {
 
 	}
 
-	add( v ) {
+	add( point ) {
 
-		this.pole.push( v );
-
-	}
-
-	mod( i, v ) {
-
-		this.pole.splice( i, 1, v );
+		this.pole.push( { 'point': point } );
 
 	}
 
-	incert( i, v ) {
+	mod( i, point ) {
 
-		this.pole.splice( i, 0, v );
+		this.pole[ i ].point = point;
+
+	}
+
+	incert( i, point ) {
+
+		this.pole.splice( i, 0, { 'point': point } );
 
 	}
 
@@ -56,23 +49,14 @@ class NURBSFit {
 
 	addTangent( i, v ) {
 		
-		if( this.tang.ind.includes( i ) ) {
-
-			const idx = this.tang.ind.indexOf( i );
-			this.tang.val.splice( idx, 1, v );
-
-		} else {
-
-			this.tang.ind.push( i );
-			this.tang.val.push( v );
-
-		}
+		this.pole[ i ].slope = v;
 
 	}
 
 	getKnots() {
 
-		calcKnots( this.type, this.deg(), this.pole );
+		const points = this.pole.map( e => e.point );
+		calcKnots( this.type, this.deg(), points );
 		
 		return this.knots;
 
@@ -81,7 +65,7 @@ class NURBSFit {
 	getCtrlPoints() {
 
 		this._calcCtrlPoints();
-		const p = this.ctrl;
+		const p = this.ctrlPoints;
 		
 		return vector3( p );
 
@@ -179,6 +163,7 @@ class NURBSFit {
 
 		prm[ nm1 ] = 1.0 //last prm to be 1.0 instead of 0.999999..
 		this.para = prm;
+		
 		const knots = [];
 
 		for ( let i = 1; i <= order; i ++ ) {
@@ -192,7 +177,9 @@ class NURBSFit {
 
 		}
 
-		if( !this.tang.ind.length ) {
+		const slope = this.pole.map( e => e.slope ).filter(Boolean);
+
+		if( !slope.length ) {
 
 			for ( let i = 1; i <= prm.length - order; i ++ ) {
 
@@ -226,8 +213,9 @@ class NURBSFit {
 				sum /= degree;
 
 				const idx = degree - 2 + i;
-
-				if ( this.tang.ind.includes(idx) ) {
+				const isEmpty = this.pole[ idx ].slope === undefined
+				
+				if ( !isEmpty ) {
 
 					knots.push( 0.6667 * sum + 0.3333 * prm[ idx - 1 ]);
 					knots.push( 0.6667 * sum + 0.3333 * prm[ idx + 1 ]);
@@ -240,27 +228,31 @@ class NURBSFit {
 				
 			}
 
-			for ( let i = 0; i < this.tang.ind.length; i ++ ) {
+			for ( let i = 0; i < this.pole.length; i ++ ) {
+				
+				const isEmpty = this.pole[ i ].slope === undefined
 
-				const idx = this.tang.ind[i];
+				if ( !isEmpty ) {
 				
-				if ( idx === 0 ) {
-				
-					let t = 0.5 * ( prm[ 0 ] + prm[ 1 ]);
-					knots.push( t );
-				
-				} else if ( idx === nm1 ) {
-				
-					let t = 0.5 * ( prm[ nm1 ] + prm[ nm1 - 1 ]);
-					knots.push( t );
-				
-				} else if ( 1 <= idx <= degree - 2 ) {
+					if ( i === 0 ) {
 					
-					knots.push( prm[ idx ] );
+						let t = 0.5 * ( prm[ 0 ] + prm[ 1 ]);
+						knots.push( t );
+					
+					} else if ( i === nm1 ) {
+					
+						let t = 0.5 * ( prm[ nm1 ] + prm[ nm1 - 1 ]);
+						knots.push( t );
+					
+					} else if ( 1 <= i <= degree - 2 ) {
+						
+						knots.push( prm[ i ] );
 
-				} else if ( nm1 - 1 <= idx <= nm1 - degree + 2 ) {
+					} else if ( nm1 - 1 <= i <= nm1 - degree + 2 ) {
 
-					knots.push( prm[ idx ] );
+						knots.push( prm[ i ] );
+
+					}
 
 				}
 
@@ -276,9 +268,9 @@ class NURBSFit {
 
 	_calcCtrlPoints() {
 
-		this._calcKnots( this.type, this.deg(), this.pole );
-
-        this._globalCurveInterp( this.deg(), this.pole, this.para );
+		const points = this.pole.map( e => e.point );
+		this._calcKnots( this.type, this.deg(), points );
+        this._globalCurveInterp( this.deg(), points, this.para );
 
 	}
 
@@ -290,8 +282,9 @@ class NURBSFit {
 
 		const n = points.length;
 		var arr = [];
+		const slope = this.pole.map( e => e.slope ).filter(Boolean);
 
-		if( !this.tang.ind.length ) {
+		if( !slope.length ) {
 			
 			for ( let i = 0; i < n; i ++ ) {
 
@@ -341,24 +334,24 @@ class NURBSFit {
 
 			}
 
-			this.ctrl = ctrlPoints;
+			this.ctrlPoints = ctrlPoints;
 
 		} else {
 
-			const npt = n + this.tang.ind.length;
+			const nps = n + slope.length;
 			const chord = 0.2;
 			const order = degree + 1;
-			const b = new Array( npt ).fill( new THREE.Vector3() );
+			const b = new Array( nps ).fill( new THREE.Vector3() );
 			
-			for ( let i = 0; i < npt; i ++ ) {
+			for ( let i = 0; i < nps; i ++ ) {
 				
-				arr[ i ] = new Array( npt ).fill( 0.0 );
+				arr[ i ] = new Array( nps ).fill( 0.0 );
 
 			}
 
 			for ( let i = 0; i < n; i ++ ) {
 
-				const span = this._findIndexSpan( degree, this.knots, npt, parameters[ i ] );
+				const span = this._findIndexSpan( degree, this.knots, nps, parameters[ i ] );
 				const nj = this._basisFuncs( degree, this.knots, span, parameters[ i ] );
 				
 	
@@ -376,34 +369,69 @@ class NURBSFit {
 			
 			}
 			
-			for ( let i = 0; i < this.tang.ind.length; i ++ ) {
+			// for ( let i = 0; i < slope.length; i ++ ) {
 				
-				const npi = n + i
+			// 	const npi = n + i
 
-				switch ( this.tang.ind[ i ] ) {
-					case 0:
-						arr[ npi ][ 0 ] = -1.0;
-						arr[ npi ][ 1 ] = 1.0;
-						b[ npi ] = this.tang.val[ i ] // * this.knots[order] / degree * chord
-						break;
-					case n - 1:
-						arr[ npi ][ npt - 2 ] = -1.0
-						arr[ npi ][ npt - 1 ] = 1.0
-						b[ npi ] = this.tang.val[ i ] // * (1 - knots[knots.length - 1 - order]) / degree * chord
-						break;
-					default:
-						const span = this._findIndexSpan( degree, this.knots, npt, this.para[ this.tang.ind[ i ] ] );
-						const nj = this._dersBasisFunc( degree, this.knots, span, 1, this.para[ this.tang.ind[ i ] ] );
-						for ( let j = 0; j <= degree; j ++ ) {
-							arr[npi][span - degree + j] = nj[1][j];
-						}
+			// 	switch ( this.tang.ind[ i ] ) {
+			// 		case 0:
+			// 			arr[ npi ][ 0 ] = -1.0;
+			// 			arr[ npi ][ 1 ] = 1.0;
+			// 			b[ npi ] = this.tang.val[ i ] // * this.knots[order] / degree * chord
+			// 			break;
+			// 		case n - 1:
+			// 			arr[ npi ][ nps - 2 ] = -1.0
+			// 			arr[ npi ][ nps - 1 ] = 1.0
+			// 			b[ npi ] = this.tang.val[ i ] // * (1 - knots[knots.length - 1 - order]) / degree * chord
+			// 			break;
+			// 		default:
+			// 			const span = this._findIndexSpan( degree, this.knots, nps, this.para[ this.tang.ind[ i ] ] );
+			// 			const nj = this._dersBasisFunc( degree, this.knots, span, 1, this.para[ this.tang.ind[ i ] ] );
+			// 			for ( let j = 0; j <= degree; j ++ ) {
+			// 				arr[npi][span - degree + j] = nj[1][j];
+			// 			}
 							
-						b[npi] = this.tang.val[ i ] //* chord;
+			// 			b[npi] = this.tang.val[ i ] //* chord;
+			// 	}
+			// }
+
+			var m = n
+
+			for ( let i = 0; i < this.pole.length; i ++ ) {
+				
+				const noSlope = this.pole[ i ].slope === undefined
+
+				if ( !noSlope ) {
+
+					switch ( i ) {
+						case 0:
+							arr[ m ][ 0 ] = -1.0;
+							arr[ m ][ 1 ] = 1.0;
+							b[ m ] = this.pole[ i ].slope // * this.knots[order] / degree * chord
+							break;
+						case n - 1:
+							arr[ m ][ nps - 2 ] = -1.0;
+							arr[ m ][ nps - 1 ] = 1.0;
+							b[ m ] = this.pole[ i ].slope // * (1 - knots[knots.length - 1 - order]) / degree * chord
+							break;
+						default:
+							const span = this._findIndexSpan( degree, this.knots, nps, this.para[ i ] );
+							const nj = this._dersBasisFunc( degree, this.knots, span, 1, this.para[ i ] );
+							for ( let j = 0; j <= degree; j ++ ) {
+								arr[ m ][span - degree + j] = nj[1][j];
+							}
+								
+							b[m] = this.pole[ i ].slope //* chord;
+					}
+
+					m ++;
+
 				}
+
 			}
 			
 			var index = [];
-			const out = ludcmp( npt, arr, index );
+			const out = ludcmp( nps, arr, index );
 			var p = {
 				x: [],
 				y: [],
@@ -420,9 +448,9 @@ class NURBSFit {
 
 			if ( n >= 3 ) {
 
-				lubksb( npt, arr, index, p.x );
-				lubksb( npt, arr, index, p.y );
-				lubksb( npt, arr, index, p.z );
+				lubksb( nps, arr, index, p.x );
+				lubksb( nps, arr, index, p.y );
+				lubksb( nps, arr, index, p.z );
 
 			}
 
@@ -435,7 +463,7 @@ class NURBSFit {
 
 			}
 
-			this.ctrl = ctrlPoints;
+			this.ctrlPoints = ctrlPoints;
 
 		}
 
@@ -614,16 +642,16 @@ class NURBSFit {
 	*/
 	_curvePointUni( deg, t ) {
 
-		const n = this.ctrl.length
+		const n = this.ctrlPoints.length
 		const span = this._findIndexSpan( deg, this.knots, n, t );
 		const nj = this._basisFuncs( deg, this.knots, span, t );
 		var v = new THREE.Vector3( 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			v.x += nj[ j ] * this.ctrl[ span - deg + j ].x;
-			v.y += nj[ j ] * this.ctrl[ span - deg + j ].y;
-			v.z += nj[ j ] * this.ctrl[ span - deg + j ].z;
+			v.x += nj[ j ] * this.ctrlPoints[ span - deg + j ].x;
+			v.y += nj[ j ] * this.ctrlPoints[ span - deg + j ].y;
+			v.z += nj[ j ] * this.ctrlPoints[ span - deg + j ].z;
 
 		}
 
@@ -636,18 +664,18 @@ class NURBSFit {
 	*/
 	_curvePoint( deg, t ) { // four-dimensional point (wx, wy, wz, w)
 
-		const n = this.ctrl.length
+		const n = this.ctrlPoints.length
 		const span = this._findIndexSpan( deg, this.knots, n, t );
 		const nj = this._basisFuncs( deg, this.knots, span, t );
 		const v = new THREE.Vector4( 0, 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			const wNj = this.ctrl[ span - deg + j ].w * nj[ j ];
+			const wNj = this.ctrlPoints[ span - deg + j ].w * nj[ j ];
 
-			v.x += wNj * this.ctrl[ span - deg + j ].x;
-			v.y += wNj * this.ctrl[ span - deg + j ].y;
-			v.z += wNj * this.ctrl[ span - deg + j ].z;
+			v.x += wNj * this.ctrlPoints[ span - deg + j ].x;
+			v.y += wNj * this.ctrlPoints[ span - deg + j ].y;
+			v.z += wNj * this.ctrlPoints[ span - deg + j ].z;
 			v.w += wNj;
 
 		}
@@ -665,7 +693,7 @@ class NURBSFit {
 		const v = [];
 		// We allow n > degree, although the ders are 0 in this case (for nonrational curves),
 		// but these ders are needed for rational curves
-		const span = this._findIndexSpan( deg, this.knots, this.ctrl.length, t );
+		const span = this._findIndexSpan( deg, this.knots, this.ctrlPoints.length, t );
 		const nders = this._dersBasisFunc( deg, this.knots, span, n, t );
 
 		for ( let k = 0; k <= n; k ++ ) {
@@ -674,9 +702,9 @@ class NURBSFit {
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
-				v[ k ].x += nders[ k ][ j ] * this.ctrl[ span - deg + j ].x;
-				v[ k ].y += nders[ k ][ j ] * this.ctrl[ span - deg + j ].y;
-				v[ k ].z += nders[ k ][ j ] * this.ctrl[ span - deg + j ].z;
+				v[ k ].x += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].x;
+				v[ k ].y += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].y;
+				v[ k ].z += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].z;
 
 			}
 
@@ -694,7 +722,7 @@ class NURBSFit {
 	_curveDers( deg, t, n = 2 ) {
 
 		const v = [];
-		const span = this._findIndexSpan( deg, this.knots, this.ctrl.length, t );
+		const span = this._findIndexSpan( deg, this.knots, this.ctrlPoints.length, t );
 		const nders = this._dersBasisFunc( deg, this.knots, span, n, t );
 
 		for ( let k = 0; k <= n; k ++ ) {
@@ -703,10 +731,10 @@ class NURBSFit {
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
-				v[ k ].x += nders[ k ][ j ] * this.ctrl[ span - deg + j ].x;
-				v[ k ].y += nders[ k ][ j ] * this.ctrl[ span - deg + j ].y;
-				v[ k ].z += nders[ k ][ j ] * this.ctrl[ span - deg + j ].z;
-				v[ k ].w += nders[ k ][ j ] * this.ctrl[ span - deg + j ].w;
+				v[ k ].x += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].x;
+				v[ k ].y += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].y;
+				v[ k ].z += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].z;
+				v[ k ].w += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].w;
 
 			}
 

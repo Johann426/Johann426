@@ -154,7 +154,7 @@
 					raycaster.ray.intersectPlane( plane, intersect );
 					if ( curve.pole !== undefined ) {
 						
-						if( curve.pole.includes( previousIntersect ) ) {
+						if( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
 							
 							curve.remove( curve.pole.length - 1 );
 							
@@ -211,7 +211,7 @@
 				case 'Remove':
 					for( let i = 0; i < curve.pole.length; i ++ ) {
 
-						const v = curve.pole[ i ];
+						const v = curve.pole[ i ].point;
 						const distance = raycaster.ray.distanceToPoint ( v );
 						if ( distance < 0.02 ) {
 							
@@ -228,7 +228,7 @@
 				case 'Tanget':
 					for( let i = 0; i < curve.pole.length; i ++ ) {
 
-						const v = curve.pole[ i ];
+						const v = curve.pole[ i ].point;
 						const distance = raycaster.ray.distanceToPoint ( v );
 						if ( distance < 0.01 ) {
 							
@@ -374,8 +374,8 @@
 		buffer.polygon.geometry.attributes.position.needsUpdate = true;
 
 		buffer.points.geometry.setDrawRange( 0, curve.pole.length );
-		buffer.ctrlPoints.geometry.setDrawRange( 0, curve.ctrl.length );
-		buffer.polygon.geometry.setDrawRange( 0, curve.ctrl.length );
+		buffer.ctrlPoints.geometry.setDrawRange( 0, curve.ctrlPoints.length );
+		buffer.polygon.geometry.setDrawRange( 0, curve.ctrlPoints.length );
 
 	}
 
@@ -385,7 +385,7 @@
 		let index;
 
 		//update design points
-		pts = curve.pole;
+		pts = curve.pole.map( e => e.point );
 		arr = points.geometry.attributes.position.array;
 		index = 0;
 
