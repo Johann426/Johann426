@@ -132,7 +132,7 @@ class NURBSFit {
 			} );
 
 		}
-
+console.log(this)
 		return p;
 
 	}
@@ -179,116 +179,87 @@ class NURBSFit {
 		const n = points.length;
 		const nm1 = n - 1;
 		const order = deg + 1;
-		const knots = [];
+		const knot = [];
 
 		this._parameterize( curveType, points );
 		const prm = this.pole.map( e => e.param );
 
 		for ( let i = 0; i <= deg; i ++ ) {
 
-			knots.push( 0.0 );
+			knot[ i ] = 0.0;
+
+		}
+		
+		var sum = 0.0;
+
+		for ( let i = 1; i <= n - order; i ++ ) {
+
+			sum = 0.0;
+
+			for ( let j = i; j < i + deg; j ++ ) {
+
+				sum += prm[ j ];
+
+			}
+
+			sum /= deg;
+			knot[ i + deg ] = sum;
 
 		}
 
 		for ( let i = 0; i <= deg; i ++ ) {
 
-			knots.push( 1.0 );
+			knot[ i + n ] = 1.0;
 
 		}
 
-		var sum = 0.0;
-		const slope = this.pole.map( e => e.slope ).filter( Boolean );
+		for ( let i = 0; i < n; i ++ ) {
 
-		if ( ! slope.length ) {
+			const hasValue = this.pole[ i ].slope ? true : false;
 
-			for ( let i = 1; i <= prm.length - order; i ++ ) {
+			if ( hasValue ) {
 
-				sum = 0.0;
+				let one3rd, two3rd;
+				//const span = this._findIndexSpan(deg, knot, n , this.pole[ i ].param)
 
-				for ( let j = i; j < i + deg; j ++ ) {
+				switch ( i ) {
 
-					sum += prm[ j ];
+					case 0 :
+						
+						one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
+						knot.splice( i + deg, 0, one3rd );
+						break ;
+
+					case nm1 :
+						
+						one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
+						knot.splice( i + deg, 0, one3rd );
+						break ;
+
+					default :
+
+						one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
+						two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
+						knot.splice( i + deg - 1, 0, one3rd );
+						knot.splice( i + deg, 1, two3rd );
+						console.log(one3rd);
+						console.log(two3rd);
 
 				}
-
-				sum /= deg;
-				knots.splice( deg + i, 0, sum );
+				
+				
 
 			}
-
-			this.knots = knots;
-
-		} else {
-
-			for ( let i = 1; i <= prm.length - order; i ++ ) {
-
-				sum = 0.0;
-
-				for ( let j = i; j < i + deg; j ++ ) {
-
-					sum += prm[ j ];
-
-				}
-
-				sum /= deg;
-
-				const idx = i + deg - 2;
-				const hasValue = this.pole[ idx ].slope ? true : false;
-
-				if ( hasValue ) {
-
-					const one3rd = 0.6667 * sum + 0.3333 * prm[ idx - 1 ];
-					const two3rd = 0.6667 * sum + 0.3333 * prm[ idx + 1 ];
-					knots.splice( deg + i, 0, one3rd );
-					knots.splice( deg + i, 0, two3rd );
-
-				} else {
-
-					knots.splice( deg + i, 0, sum );
-
-				}
-
-			}
-
-			for ( let i = 0; i < this.pole.length; i ++ ) {
-
-				const hasValue = this.pole[ i ].slope ? true : false;
-
-				if ( hasValue ) {
-
-					if ( i === 0 ) {
-
-						let t = 0.5 * ( prm[ 0 ] + prm[ 1 ] );
-						knots.push( t );
-
-					} else if ( i === nm1 ) {
-
-						let t = 0.5 * ( prm[ nm1 ] + prm[ nm1 - 1 ] );
-						knots.push( t );
-
-					} else if ( 1 <= i <= deg - 2 ) {
-
-						knots.push( prm[ i ] );
-
-					} else if ( nm1 - 1 <= i <= nm1 - deg + 2 ) {
-
-						knots.push( prm[ i ] );
-
-					}
-
-				}
-
-			}
-
-			knots.sort( ( a, b ) => {
-
-				return a - b;
-
-			} );
-
-			this.knots = knots;
 
 		}
+
+		// knot.sort( ( a, b ) => {
+
+		// 	return a - b;
+
+		// } );
+
+		this.knots = knot;
 
 	}
 
