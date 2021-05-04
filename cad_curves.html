@@ -173,6 +173,20 @@
 					break;
 
 				case 'Tanget':
+				for( let i = 0; i < curve.pole.length; i ++ ) {
+
+					const v = curve.pole[ i ].point;
+					const distance = raycaster.ray.distanceToPoint ( v );
+					if ( distance < 0.02 ) {
+						
+						raycaster.ray.intersectPlane( plane, intersect );
+						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
+						updateCurveBuffer( curve, buffer );
+						renderer.render( scene, camera );
+
+					}
+
+					}	
 					break;
 
 				default:
@@ -230,9 +244,10 @@
 
 						const v = curve.pole[ i ].point;
 						const distance = raycaster.ray.distanceToPoint ( v );
-						if ( distance < 0.01 ) {
+						if ( distance < 0.02 ) {
 							
-							curve.addTangent( i, v );
+							raycaster.ray.intersectPlane( plane, intersect );
+							curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 							updateCurveBuffer( curve, buffer );
 							renderer.render( scene, camera );
 
@@ -365,7 +380,7 @@
 	function updateCurveBuffer( curve, buffer ) {
 		
 		updateCurve( curve, buffer.lines, buffer.curvature );
-		updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon )
+		updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 		buffer.lines.geometry.attributes.position.needsUpdate = true;
 		buffer.curvature.geometry.attributes.position.needsUpdate = true;
@@ -398,7 +413,7 @@
 		}
 
 		//update control points
-		pts = curve.getCtrlPoints();
+		pts = curve.ctrlPoints
 		arr = ctrlPoints.geometry.attributes.position.array;
 		index = 0;
 

@@ -1,5 +1,5 @@
 
-/* 
+/*
 If the giiven data consists of only points (and derivatives), this class provides a global algorithm, to solve
 the linear equations to evaluate an unknown NURBS, i.e., knot vector, control points, and their parameters.
 On the basis of The NURBS Book / js code by Johann426.github
@@ -7,19 +7,19 @@ On the basis of The NURBS Book / js code by Johann426.github
 
 class NURBSFit {
 
-	constructor( deg, type = 'centripetal' ) {
+	constructor( deg, type = 'chordal' ) {
 
-		this.pole = [];
+		this.pole = []; //to store points, their parameterized value, and directional constraints(optional).
 
 		this.type = type;
-		
+
 		this.deg = () => {
 
 			const nm1 = this.pole.length - 1;
-			
+
 			return ( nm1 > deg ? deg : nm1 );
 
-		}
+		};
 
 	}
 
@@ -48,7 +48,8 @@ class NURBSFit {
 	}
 
 	addTangent( i, v ) {
-		
+
+		v.normalize().multiplyScalar( this.polyL );
 		this.pole[ i ].slope = v;
 
 	}
@@ -57,7 +58,7 @@ class NURBSFit {
 
 		const points = this.pole.map( e => e.point );
 		calcKnots( this.type, this.deg(), points );
-		
+
 		return this.knots;
 
 	}
@@ -66,8 +67,8 @@ class NURBSFit {
 
 		this._calcCtrlPoints();
 		const p = this.ctrlPoints;
-		
-		return vector3( p );
+
+		return toVector3( p );
 
 	}
 
@@ -75,7 +76,7 @@ class NURBSFit {
 
 		this._calcCtrlPoints();
 		const p = this._curvePoint( this.deg(), t );
-		
+
 		return new THREE.Vector3( p.x, p.y, p.z );
 
 	}
@@ -89,180 +90,50 @@ class NURBSFit {
 
 			const t = i / ( n - 1 );
 			//call function curvePointUni(), if you prefer to use B-spline instead of NURBS.
-			p.push( this._curvePoint( this.deg(), t ) );
+			p.push( this._curvePoint( this.deg(), this.knots, this.ctrlPoints, t ) );
 
 		}
 
-		return vector3( p );
+		return toVector3( p );
 
 	}
 
-	getDerivatives( t, k = 2 ) {
+	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		const p = [];
-
 		//call function curveDersUni(), if you prefer to use B-spline instead of NURBS.
-		const ders = this._curveDers( this.deg(), t, k );
+		const ders = this._curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
 
-		return vector3( ders );
+		return toVector3( ders );
 
 	}
 
 	shapeInterrogation( n ) {
 
 		this._calcCtrlPoints();
-	
+
 		const p = [];
-	
+
 		for ( let i = 0; i < n; i ++ ) {
-	
+
 			const t = i / ( n - 1 );
-			const ders = vector3( this._curveDers( this.deg(), t ) );
+			const ders = toVector3( this._curveDers( this.deg(), this.knots, this.ctrlPoints, t ) );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
+
 			p.push( {
+
 				point: ders[ 0 ],
 				curvature: binormal.length() / ders[ 1 ].length() ** 3,
 				tangent: ders[ 1 ].normalize(),
 				normal: normal.normalize(),
 				binormal: binormal.normalize()
+
 			} );
-	
+
 		}
-	
+
 		return p;
-	
-	}
-
-	_calcKnots( curveType, degree, points ) {
-
-		const n = points.length;
-		const nm1 = n - 1;
-		const order = degree + 1
-		var sum = 0.0;
-
-		for ( let i = 1; i < n; i++ ) {
-
-			let del = points[ i ].clone().sub( points[ i - 1 ] );
-			let len = curveType === 'chordal' ? del.length() : Math.sqrt( del.length() );
-			sum += len;
-
-		}
-
-		var prm = [];
-		prm.push( 0.0 );
-
-		for ( let i = 1; i < n; i++ ) {
-
-			let del = points[ i ].clone().sub( points[ i - 1 ] );
-			let len = curveType === 'chordal' ? del.length() : Math.sqrt(del.length());
-			prm.push(prm[i - 1] + len / sum)
-
-		}
-
-		prm[ nm1 ] = 1.0 //last prm to be 1.0 instead of 0.999999..
-		this.para = prm;
-		
-		const knots = [];
-
-		for ( let i = 1; i <= order; i ++ ) {
-
-			knots.push( 0.0 );
-		}
-
-		for ( let i = 1; i <= order; i ++ ) {
-
-			knots.push( 1.0 );
-
-		}
-
-		const slope = this.pole.map( e => e.slope ).filter(Boolean);
-
-		if( !slope.length ) {
-
-			for ( let i = 1; i <= prm.length - order; i ++ ) {
-
-				sum = 0.0;
-
-				for ( let j = i; j < i + degree; j ++ ) {
-
-					sum += prm[ j ];
-
-				}
-
-				sum /= degree;
-				knots.splice( degree + i, 0, sum );
-
-			}
-
-			this.knots = knots;
-
-		} else {
-
-			for ( let i = 1; i <= points.length - order; i ++ ) {
-
-				sum = 0.0;
-
-				for ( let j = i; j < i + degree; j ++ ) {
-
-					sum += prm[ j ];
-
-				}
-
-				sum /= degree;
-
-				const idx = degree - 2 + i;
-				const isEmpty = this.pole[ idx ].slope === undefined
-				
-				if ( !isEmpty ) {
-
-					knots.push( 0.6667 * sum + 0.3333 * prm[ idx - 1 ]);
-					knots.push( 0.6667 * sum + 0.3333 * prm[ idx + 1 ]);
-
-				} else {
-
-					knots.push(sum);
-
-				}
-				
-			}
-
-			for ( let i = 0; i < this.pole.length; i ++ ) {
-				
-				const isEmpty = this.pole[ i ].slope === undefined
-
-				if ( !isEmpty ) {
-				
-					if ( i === 0 ) {
-					
-						let t = 0.5 * ( prm[ 0 ] + prm[ 1 ]);
-						knots.push( t );
-					
-					} else if ( i === nm1 ) {
-					
-						let t = 0.5 * ( prm[ nm1 ] + prm[ nm1 - 1 ]);
-						knots.push( t );
-					
-					} else if ( 1 <= i <= degree - 2 ) {
-						
-						knots.push( prm[ i ] );
-
-					} else if ( nm1 - 1 <= i <= nm1 - degree + 2 ) {
-
-						knots.push( prm[ i ] );
-
-					}
-
-				}
-
-			}
-
-			knots.sort( function( a, b ) { return a - b } );
-
-			this.knots = knots;
-
-		}
 
 	}
 
@@ -270,7 +141,154 @@ class NURBSFit {
 
 		const points = this.pole.map( e => e.point );
 		this._calcKnots( this.type, this.deg(), points );
-        this._globalCurveInterp( this.deg(), points, this.para );
+		this._globalCurveInterp( this.deg(), this.knots, this.pole );
+
+	}
+
+	_parameterize( curveType, points ) {
+		
+		const n = points.length;
+		const nm1 = n - 1;
+		var sum = 0.0;
+
+		for ( let i = 1; i < n; i ++ ) {
+
+			const del = points[ i ].clone().sub( points[ i - 1 ] );
+			const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
+			sum += len;
+
+		}
+
+		this.polyL = sum;
+		this.pole[ 0 ].param = 0.0;
+
+		for ( let i = 1; i < n; i ++ ) {
+
+			const del = points[ i ].clone().sub( points[ i - 1 ] );
+			const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
+			this.pole[ i ].param = this.pole[ i - 1 ].param + len / sum;
+
+		}
+
+		this.pole[ nm1 ].param = 1.0; //last one to be 1.0 instead of 0.999999..
+
+	}
+
+	_calcKnots( curveType, deg, points ) {
+
+		const n = points.length;
+		const nm1 = n - 1;
+		const order = deg + 1;
+		const knots = [];
+
+		this._parameterize( curveType, points );
+		const prm = this.pole.map( e => e.param );
+
+		for ( let i = 0; i <= deg; i ++ ) {
+
+			knots.push( 0.0 );
+
+		}
+
+		for ( let i = 0; i <= deg; i ++ ) {
+
+			knots.push( 1.0 );
+
+		}
+
+		var sum = 0.0;
+		const slope = this.pole.map( e => e.slope ).filter( Boolean );
+
+		if ( ! slope.length ) {
+
+			for ( let i = 1; i <= prm.length - order; i ++ ) {
+
+				sum = 0.0;
+
+				for ( let j = i; j < i + deg; j ++ ) {
+
+					sum += prm[ j ];
+
+				}
+
+				sum /= deg;
+				knots.splice( deg + i, 0, sum );
+
+			}
+
+			this.knots = knots;
+
+		} else {
+
+			for ( let i = 1; i <= prm.length - order; i ++ ) {
+
+				sum = 0.0;
+
+				for ( let j = i; j < i + deg; j ++ ) {
+
+					sum += prm[ j ];
+
+				}
+
+				sum /= deg;
+
+				const idx = i + deg - 2;
+				const hasValue = this.pole[ idx ].slope ? true : false;
+
+				if ( hasValue ) {
+
+					const one3rd = 0.6667 * sum + 0.3333 * prm[ idx - 1 ];
+					const two3rd = 0.6667 * sum + 0.3333 * prm[ idx + 1 ];
+					knots.splice( deg + i, 0, one3rd );
+					knots.splice( deg + i, 0, two3rd );
+
+				} else {
+
+					knots.splice( deg + i, 0, sum );
+
+				}
+
+			}
+
+			for ( let i = 0; i < this.pole.length; i ++ ) {
+
+				const hasValue = this.pole[ i ].slope ? true : false;
+
+				if ( hasValue ) {
+
+					if ( i === 0 ) {
+
+						let t = 0.5 * ( prm[ 0 ] + prm[ 1 ] );
+						knots.push( t );
+
+					} else if ( i === nm1 ) {
+
+						let t = 0.5 * ( prm[ nm1 ] + prm[ nm1 - 1 ] );
+						knots.push( t );
+
+					} else if ( 1 <= i <= deg - 2 ) {
+
+						knots.push( prm[ i ] );
+
+					} else if ( nm1 - 1 <= i <= nm1 - deg + 2 ) {
+
+						knots.push( prm[ i ] );
+
+					}
+
+				}
+
+			}
+
+			knots.sort( ( a, b ) => {
+
+				return a - b;
+
+			} );
+
+			this.knots = knots;
+
+		}
 
 	}
 
@@ -278,192 +296,108 @@ class NURBSFit {
 	Determine control points of interpolated curve. See The NURBS Book, page 369, algorithm A9.1
 	Solve linear algebra of AX = B, Sum( Ni(Ui) * Pi ) = Qi, where i = 0..nm1
 	*/
-	_globalCurveInterp( degree, points, parameters ) {
+	_globalCurveInterp( deg, knot, pole ) {
 
-		const n = points.length;
+		const n = pole.length;
+		const point = this.pole.map( e => e.point );
+		const slope = this.pole.map( e => e.slope ).filter( Boolean );
 		var arr = [];
-		const slope = this.pole.map( e => e.slope ).filter(Boolean);
 
-		if( !slope.length ) {
-			
+		if ( ! slope.length ) {
+
 			for ( let i = 0; i < n; i ++ ) {
 
-				const span = this._findIndexSpan( degree, this.knots, n, parameters[ i ] );
-				const nj = this._basisFuncs( degree, this.knots, span, parameters[ i ] );
+				const span = this._findIndexSpan( deg, knot, n, pole[ i ].param );
+				const nj = this._basisFuncs( deg, knot, span, pole[ i ].param );
 				arr[ i ] = new Array( n ).fill( 0.0 );
 
-				for ( let j = 0; j <= degree; j ++ ) {
+				for ( let j = 0; j <= deg; j ++ ) {
 
-					arr[ i ][ span - degree + j ] = nj[ j ];
+					arr[ i ][ span - deg + j ] = nj[ j ];
 
 				}
 
 			}
-			
+
 			var index = [];
-			const out = ludcmp( n, arr, index );
-
-			var p = {
-				x: [],
-				y: [],
-				z: []
-			};
-
-			for ( let i = 0; i < points.length; i ++ ) {
-
-				p.x.push( points[ i ].x );
-				p.y.push( points[ i ].y );
-				p.z.push( points[ i ].z );
-
-			}
-
-			if ( n >= 3 ) {
-
-				lubksb( n, arr, index, p.x );
-				lubksb( n, arr, index, p.y );
-				lubksb( n, arr, index, p.z );
-
-			}
-
-			var ctrlPoints = [];
-
-			for ( let i = 0; i < points.length; i ++ ) {
-
-				const ctrlPoint = new THREE.Vector4( p.x[ i ], p.y[ i ], p.z[ i ], 1.0 );
-				ctrlPoints.push( ctrlPoint );
-
-			}
-
-			this.ctrlPoints = ctrlPoints;
+			this.ctrlPoints = point.slice();
+			ludcmp( n, arr, index );
+			lubksb4D( n, arr, index, this.ctrlPoints )
 
 		} else {
 
 			const nps = n + slope.length;
-			const chord = 0.2;
-			const order = degree + 1;
 			const b = new Array( nps ).fill( new THREE.Vector3() );
-			
-			for ( let i = 0; i < nps; i ++ ) {
-				
-				arr[ i ] = new Array( nps ).fill( 0.0 );
 
-			}
+			// for ( let i = 0; i < nps; i ++ ) {
 
-			for ( let i = 0; i < n; i ++ ) {
+			// 	arr[ i ] = new Array( nps ).fill( 0.0 );
 
-				const span = this._findIndexSpan( degree, this.knots, nps, parameters[ i ] );
-				const nj = this._basisFuncs( degree, this.knots, span, parameters[ i ] );
-				
-	
-				for ( let j = 0; j <= degree; j ++ ) {
-	
-					arr[ i ][ span - degree + j ] = nj[ j ];
-	
-				}
-	
-			}
-			
-			for ( let i = 0; i < n; i ++ ) {
-			
-				b[i] = points[i]
-			
-			}
-			
-			// for ( let i = 0; i < slope.length; i ++ ) {
-				
-			// 	const npi = n + i
-
-			// 	switch ( this.tang.ind[ i ] ) {
-			// 		case 0:
-			// 			arr[ npi ][ 0 ] = -1.0;
-			// 			arr[ npi ][ 1 ] = 1.0;
-			// 			b[ npi ] = this.tang.val[ i ] // * this.knots[order] / degree * chord
-			// 			break;
-			// 		case n - 1:
-			// 			arr[ npi ][ nps - 2 ] = -1.0
-			// 			arr[ npi ][ nps - 1 ] = 1.0
-			// 			b[ npi ] = this.tang.val[ i ] // * (1 - knots[knots.length - 1 - order]) / degree * chord
-			// 			break;
-			// 		default:
-			// 			const span = this._findIndexSpan( degree, this.knots, nps, this.para[ this.tang.ind[ i ] ] );
-			// 			const nj = this._dersBasisFunc( degree, this.knots, span, 1, this.para[ this.tang.ind[ i ] ] );
-			// 			for ( let j = 0; j <= degree; j ++ ) {
-			// 				arr[npi][span - degree + j] = nj[1][j];
-			// 			}
-							
-			// 			b[npi] = this.tang.val[ i ] //* chord;
-			// 	}
 			// }
 
-			var m = n
 
-			for ( let i = 0; i < this.pole.length; i ++ ) {
-				
-				const noSlope = this.pole[ i ].slope === undefined
+			var m = 0;
 
-				if ( !noSlope ) {
+			for ( let i = 0; i < n; i ++ ) {
 
-					switch ( i ) {
-						case 0:
-							arr[ m ][ 0 ] = -1.0;
-							arr[ m ][ 1 ] = 1.0;
-							b[ m ] = this.pole[ i ].slope // * this.knots[order] / degree * chord
-							break;
-						case n - 1:
-							arr[ m ][ nps - 2 ] = -1.0;
-							arr[ m ][ nps - 1 ] = 1.0;
-							b[ m ] = this.pole[ i ].slope // * (1 - knots[knots.length - 1 - order]) / degree * chord
-							break;
-						default:
-							const span = this._findIndexSpan( degree, this.knots, nps, this.para[ i ] );
-							const nj = this._dersBasisFunc( degree, this.knots, span, 1, this.para[ i ] );
-							for ( let j = 0; j <= degree; j ++ ) {
-								arr[ m ][span - degree + j] = nj[1][j];
-							}
-								
-							b[m] = this.pole[ i ].slope //* chord;
-					}
+				const span = this._findIndexSpan( deg, knot, nps, pole[ i ].param );
+				const nj = this._basisFuncs( deg, knot, span, pole[ i ].param );
+				arr[ i + m ] = new Array( nps ).fill( 0.0 );
+
+				for ( let j = 0; j <= deg; j ++ ) {
+
+					arr[ i + m ][ span - deg + j ] = nj[ j ];
+
+				}
+
+				b[ i + m ] = point[ i ];
+
+				const noSlope = pole[ i ].slope === undefined;
+
+				if ( ! noSlope ) {
 
 					m ++;
+					arr[ i + m ] = new Array( nps ).fill( 0.0 );
+
+					switch ( i ) {
+
+						case 0 :
+
+							arr[ i + m ][ 0 ] = - 1.0;
+							arr[ i + m ][ 1 ] = 1.0;
+							b[ i + m ] = pole[ i ].slope; // * chord
+							break ;
+
+						case n - 1 :
+
+							arr[ i + m ][ nps - 2 ] = - 1.0;
+							arr[ i + m ][ nps - 1 ] = 1.0;
+							b[ i + m ] = pole[ i ].slope; // * chord
+							break ;
+
+						default :
+
+							const span = this._findIndexSpan( deg, knot, nps, pole[ i ].param );
+							const nder = this._dersBasisFunc( deg, knot, span, 1, pole[ i ].param );
+							
+							for ( let j = 0; j <= deg; j ++ ) {
+
+								arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ];
+
+							}
+
+							b[ i + m ] = pole[ i ].slope; // * chord;
+
+					}
 
 				}
 
 			}
-			
+
 			var index = [];
-			const out = ludcmp( nps, arr, index );
-			var p = {
-				x: [],
-				y: [],
-				z: []
-			};
-
-			for ( let i = 0; i < b.length; i ++ ) {
-
-				p.x.push( b[ i ].x );
-				p.y.push( b[ i ].y );
-				p.z.push( b[ i ].z );
-
-			}
-
-			if ( n >= 3 ) {
-
-				lubksb( nps, arr, index, p.x );
-				lubksb( nps, arr, index, p.y );
-				lubksb( nps, arr, index, p.z );
-
-			}
-
-			var ctrlPoints = [];
-
-			for ( let i = 0; i < b.length; i ++ ) {
-
-				const ctrlPoint = new THREE.Vector4( p.x[ i ], p.y[ i ], p.z[ i ], 1.0 );
-				ctrlPoints.push( ctrlPoint );
-
-			}
-
-			this.ctrlPoints = ctrlPoints;
+			this.ctrlPoints = b.slice();
+			ludcmp( nps, arr, index );
+			lubksb4D( nps, arr, index, this.ctrlPoints )
 
 		}
 
@@ -475,26 +409,26 @@ class NURBSFit {
 	_findIndexSpan( deg, knot, n, t ) {
 
 		const nm1 = n - 1;
-	
+
 		//Make sure the parameter t is within the knots range
 		if ( t >= knot[ n ] ) return nm1; //special case of t at the curve end
 		if ( t <= knot[ deg ] ) return deg;
-	
+
 		//Find index of ith knot span(half-open interval)
 		var low = deg;
 		var high = n;
 		var mid = Math.floor( ( high + low ) / 2 );
-	
+
 		//Do binary search
 		while ( t < knot[ mid ] || t >= knot[ mid + 1 ] ) {
-	
+
 			t < knot[ mid ] ? high = mid : low = mid;
 			mid = Math.floor( ( high + low ) / 2 );
-	
+
 		}
-	
+
 		return mid;
-	
+
 	}
 
 	/*
@@ -614,14 +548,14 @@ class NURBSFit {
 				ders[ k ][ r ] = d;
 				const j = s1; s1 = s2; s2 = j; //Switch rows
 
-            }
+			}
 
 		}
 
 		// Multiply through by the correct factors (Eq. [2.9])
 		let r = deg;
 
-        for ( let k = 1; k <= n; k ++ ) {
+		for ( let k = 1; k <= n; k ++ ) {
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
@@ -640,18 +574,17 @@ class NURBSFit {
 	/*
 	Compute B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
 	*/
-	_curvePointUni( deg, t ) {
+	_curvePointUni( deg, knot, ctrl, t ) {
 
-		const n = this.ctrlPoints.length
-		const span = this._findIndexSpan( deg, this.knots, n, t );
-		const nj = this._basisFuncs( deg, this.knots, span, t );
+		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
+		const nj = this._basisFuncs( deg, knot, span, t );
 		var v = new THREE.Vector3( 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			v.x += nj[ j ] * this.ctrlPoints[ span - deg + j ].x;
-			v.y += nj[ j ] * this.ctrlPoints[ span - deg + j ].y;
-			v.z += nj[ j ] * this.ctrlPoints[ span - deg + j ].z;
+			v.x += nj[ j ] * ctrl[ span - deg + j ].x;
+			v.y += nj[ j ] * ctrl[ span - deg + j ].y;
+			v.z += nj[ j ] * ctrl[ span - deg + j ].z;
 
 		}
 
@@ -662,20 +595,18 @@ class NURBSFit {
 	/*
 	Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
 	*/
-	_curvePoint( deg, t ) { // four-dimensional point (wx, wy, wz, w)
+	_curvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
 
-		const n = this.ctrlPoints.length
-		const span = this._findIndexSpan( deg, this.knots, n, t );
-		const nj = this._basisFuncs( deg, this.knots, span, t );
+		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
+		const nj = this._basisFuncs( deg, knot, span, t );
 		const v = new THREE.Vector4( 0, 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			const wNj = this.ctrlPoints[ span - deg + j ].w * nj[ j ];
-
-			v.x += wNj * this.ctrlPoints[ span - deg + j ].x;
-			v.y += wNj * this.ctrlPoints[ span - deg + j ].y;
-			v.z += wNj * this.ctrlPoints[ span - deg + j ].z;
+			const wNj = ctrl[ span - deg + j ].w * nj[ j ];
+			v.x += wNj * ctrl[ span - deg + j ].x;
+			v.y += wNj * ctrl[ span - deg + j ].y;
+			v.z += wNj * ctrl[ span - deg + j ].z;
 			v.w += wNj;
 
 		}
@@ -688,13 +619,13 @@ class NURBSFit {
 	Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
 	n : number of derivatives
 	*/
-	_curveDersUni( deg, t, n = 2 ) {
+	_curveDersUni( deg, knot, ctrl, t, n = 2 ) {
 
 		const v = [];
 		// We allow n > degree, although the ders are 0 in this case (for nonrational curves),
 		// but these ders are needed for rational curves
-		const span = this._findIndexSpan( deg, this.knots, this.ctrlPoints.length, t );
-		const nders = this._dersBasisFunc( deg, this.knots, span, n, t );
+		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
+		const nders = this._dersBasisFunc( deg, knot, span, n, t );
 
 		for ( let k = 0; k <= n; k ++ ) {
 
@@ -702,15 +633,15 @@ class NURBSFit {
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
-				v[ k ].x += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].x;
-				v[ k ].y += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].y;
-				v[ k ].z += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].z;
+				v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
+				v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
+				v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
 
 			}
 
 		}
 
-		return v
+		return v;
 
 	}
 
@@ -719,11 +650,11 @@ class NURBSFit {
 	Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
 	n : number of derivatives
 	*/
-	_curveDers( deg, t, n = 2 ) {
+	_curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 		const v = [];
-		const span = this._findIndexSpan( deg, this.knots, this.ctrlPoints.length, t );
-		const nders = this._dersBasisFunc( deg, this.knots, span, n, t );
+		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
+		const nders = this._dersBasisFunc( deg, knot, span, n, t );
 
 		for ( let k = 0; k <= n; k ++ ) {
 
@@ -731,10 +662,10 @@ class NURBSFit {
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
-				v[ k ].x += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].x;
-				v[ k ].y += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].y;
-				v[ k ].z += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].z;
-				v[ k ].w += nders[ k ][ j ] * this.ctrlPoints[ span - deg + j ].w;
+				v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
+				v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
+				v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
+				v[ k ].w += nders[ k ][ j ] * ctrl[ span - deg + j ].w;
 
 			}
 
@@ -762,13 +693,13 @@ class NURBSFit {
 
 }
 
-function vector3( v4 ) {
+function toVector3( v4 ) {
 
 	const v3 = [];
 
 	for ( let i = 0; i < v4.length; i ++ ) {
 
-		v3.push( new THREE.Vector3( v4[i].x, v4[i].y, v4[i].z ) );
+		v3.push( new THREE.Vector3( v4[ i ].x, v4[ i ].y, v4[ i ].z ) );
 
 	}
 
@@ -846,18 +777,18 @@ function ludcmp( n, a, indx ) {
 		}
 
 		big = 0.0;	//Initialize for the search for largest pivot element.
-		
+
 		//This is i = j of equation (2.3.12) and i = j+1. . .N of equation (2.3.13).
 		for ( let i = j; i <= n - 1; i ++ ) {
 
 			sum = a[ i ][ j ];
-			
+
 			for ( let k = 0; k < j; k ++ ) {
 
 				sum -= a[ i ][ k ] * a[ k ][ j ];
 
 			}
-				
+
 			a[ i ][ j ] = sum;
 
 			if ( vv[ i ] * Math.abs( sum ) >= big ) {
@@ -887,7 +818,7 @@ function ludcmp( n, a, indx ) {
 		}
 
 		indx[ j ] = imax;
-		
+
 		/*If the pivot element is zero the matrix is singular (at least to the precision of the
 			algorithm). For some applications on singular matrices, it is desirable to substitute
 			TINY for zero.*/
@@ -896,7 +827,7 @@ function ludcmp( n, a, indx ) {
 			a[ j ][ j ] = TINY;
 
 		}
-		
+
 		if ( j != n - 1 ) {
 
 			//Now, finally, divide by the pivot element.
@@ -920,7 +851,7 @@ function lubksb( n, a, indx, b ) {
 		and can be left in place for successive calls with different right-hand sides b. This routine takes
 		into account the possibility that b will begin with many zero elements, so it is efficient for use
 		in matrix inversion.*/
-	
+
 	let i, ii, ip, j;
 	let sum;
 	ii = - 1;
@@ -935,13 +866,13 @@ function lubksb( n, a, indx, b ) {
 		ip = indx[ i ];
 		sum = b[ ip ];
 		b[ ip ] = b[ i ];
-		
+
 		if ( ii != - 1 ) {
 
 			for ( j = ii; j <= i - 1; j ++ ) sum -= a[ i ][ j ] * b[ j ];
 
 		} else if ( sum != 0.0 ) {
-			
+
 			ii = i;
 
 		}
@@ -957,10 +888,34 @@ function lubksb( n, a, indx, b ) {
 
 		sum = b[ i ];
 		for ( j = i + 1; j <= n - 1; j ++ ) sum -= a[ i ][ j ] * b[ j ];
-		b[ i ] = sum / a[ i ][ i ];		//Store a component of the solution vector X.
+		b[ i ] = sum / a[ i ][ i ];		//Store a component of the solution vector.
 
 	}
 
-	//All done!
+}
+
+function lubksb4D( n, a, indx, b ) {
+
+	const x = [];
+	const y = [];
+	const z = [];
+
+	for ( let i = 0; i < n; i ++ ) {
+
+		x.push( b[ i ].x );
+		y.push( b[ i ].y );
+		z.push( b[ i ].z );
+
+	}
+
+	lubksb( n, a, indx, x );
+	lubksb( n, a, indx, y );
+	lubksb( n, a, indx, z );
+
+	for ( let i = 0; i < n; i ++ ) {
+
+		b[ i ] = new THREE.Vector4( x[ i ], y[ i ], z[ i ], 1.0 );
+
+	}
 
 }
