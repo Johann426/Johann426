@@ -1,15 +1,16 @@
 
 /*
-If the giiven data consists of only points (and derivatives), this class provides a global algorithm, to solve
-the linear equations to evaluate an unknown NURBS, i.e., knot vector, control points, and their parameters.
-On the basis of The NURBS Book / js code by Johann426.github
+If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
+this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
+i.e., parameterized value, knot vector, and control points.
+js code by Johann426.github
 */
 
 class NURBSFit {
 
 	constructor( deg, type = 'chordal' ) {
 
-		this.pole = []; //to store points, their parameterized value, and directional constraints(optional).
+		this.pole = []; //to store points, their parameterized value, and directional constraints(option).
 
 		this.type = type;
 
@@ -56,8 +57,7 @@ class NURBSFit {
 
 	getKnots() {
 
-		const points = this.pole.map( e => e.point );
-		calcKnots( this.type, this.deg(), points );
+		calcKnots( this.type, this.deg(), this.pole );
 
 		return this.knots;
 
@@ -132,21 +132,20 @@ class NURBSFit {
 			} );
 
 		}
-console.log(this)
+
 		return p;
 
 	}
 
 	_calcCtrlPoints() {
 
-		const points = this.pole.map( e => e.point );
-		this._calcKnots( this.type, this.deg(), points );
+		this._calcKnots( this.type, this.deg(), this.pole );
 		this._globalCurveInterp( this.deg(), this.knots, this.pole );
 
 	}
 
 	_parameterize( curveType, points ) {
-		
+
 		const n = points.length;
 		const nm1 = n - 1;
 		var sum = 0.0;
@@ -174,25 +173,70 @@ console.log(this)
 
 	}
 
-	_calcKnots( curveType, deg, points ) {
+	_calcKnots( curveType, deg, pole ) {
 
-		const n = points.length;
+		const n = pole.length;
 		const nm1 = n - 1;
-		const order = deg + 1;
-		const knot = [];
+		this._parameterize( curveType, pole.map( e => e.point ) );
+		const prm = pole.map( e => e.param );
+		const a = prm.slice();
+		var m = 0;
 
-		this._parameterize( curveType, points );
-		const prm = this.pole.map( e => e.param );
+		for ( let i = 0; i < n; i ++ ) {
+
+			const hasValue = pole[ i ].slope ? true : false;
+
+			if ( hasValue ) {
+
+				let one3rd, two3rd;
+
+				switch ( i ) {
+
+					case 0 :
+
+						one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
+						a.splice( 1, 0, one3rd );
+						break;
+
+					case nm1 :
+
+						one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
+						a.splice( nm1 + m, 0, one3rd );
+						break;
+
+					default :
+
+						one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
+						two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
+						a.splice( i + m, 0, one3rd );
+						a.splice( i + m + 1, 1, two3rd );
+
+				}
+
+				m ++;
+
+			}
+
+		}
+
+		this.knots = this._deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
+
+	}
+
+	_deBoorKnots( deg, prm ) {
+
+		const n = prm.length;
+		const knot = [];
 
 		for ( let i = 0; i <= deg; i ++ ) {
 
 			knot[ i ] = 0.0;
 
 		}
-		
+
 		var sum = 0.0;
 
-		for ( let i = 1; i <= n - order; i ++ ) {
+		for ( let i = 1; i < n - deg; i ++ ) {
 
 			sum = 0.0;
 
@@ -213,53 +257,7 @@ console.log(this)
 
 		}
 
-		for ( let i = 0; i < n; i ++ ) {
-
-			const hasValue = this.pole[ i ].slope ? true : false;
-
-			if ( hasValue ) {
-
-				let one3rd, two3rd;
-				//const span = this._findIndexSpan(deg, knot, n , this.pole[ i ].param)
-
-				switch ( i ) {
-
-					case 0 :
-						
-						one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
-						knot.splice( i + deg, 0, one3rd );
-						break ;
-
-					case nm1 :
-						
-						one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
-						knot.splice( i + deg, 0, one3rd );
-						break ;
-
-					default :
-
-						one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
-						two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
-						knot.splice( i + deg - 1, 0, one3rd );
-						knot.splice( i + deg, 1, two3rd );
-						console.log(one3rd);
-						console.log(two3rd);
-
-				}
-				
-				
-
-			}
-
-		}
-
-		// knot.sort( ( a, b ) => {
-
-		// 	return a - b;
-
-		// } );
-
-		this.knots = knot;
+		return knot;
 
 	}
 
@@ -270,8 +268,8 @@ console.log(this)
 	_globalCurveInterp( deg, knot, pole ) {
 
 		const n = pole.length;
-		const point = this.pole.map( e => e.point );
-		const slope = this.pole.map( e => e.slope ).filter( Boolean );
+		const point = pole.map( e => e.point );
+		const slope = pole.map( e => e.slope ).filter( Boolean );
 		var arr = [];
 
 		if ( ! slope.length ) {
@@ -293,20 +291,12 @@ console.log(this)
 			var index = [];
 			this.ctrlPoints = point.slice();
 			ludcmp( n, arr, index );
-			lubksb4D( n, arr, index, this.ctrlPoints )
+			lubksb4D( n, arr, index, this.ctrlPoints );
 
 		} else {
 
 			const nps = n + slope.length;
 			const b = new Array( nps ).fill( new THREE.Vector3() );
-
-			// for ( let i = 0; i < nps; i ++ ) {
-
-			// 	arr[ i ] = new Array( nps ).fill( 0.0 );
-
-			// }
-
-
 			var m = 0;
 
 			for ( let i = 0; i < n; i ++ ) {
@@ -323,9 +313,9 @@ console.log(this)
 
 				b[ i + m ] = point[ i ];
 
-				const noSlope = pole[ i ].slope === undefined;
+				const hasValue = pole[ i ].slope ? true : false;
 
-				if ( ! noSlope ) {
+				if ( hasValue ) {
 
 					m ++;
 					arr[ i + m ] = new Array( nps ).fill( 0.0 );
@@ -336,28 +326,28 @@ console.log(this)
 
 							arr[ i + m ][ 0 ] = - 1.0;
 							arr[ i + m ][ 1 ] = 1.0;
-							b[ i + m ] = pole[ i ].slope; // * chord
-							break ;
+							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
+							break;
 
 						case n - 1 :
 
 							arr[ i + m ][ nps - 2 ] = - 1.0;
 							arr[ i + m ][ nps - 1 ] = 1.0;
-							b[ i + m ] = pole[ i ].slope; // * chord
-							break ;
+							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nps + deg ] - knot[ nps - 1 ] ) / deg );
+							break;
 
 						default :
 
 							const span = this._findIndexSpan( deg, knot, nps, pole[ i ].param );
 							const nder = this._dersBasisFunc( deg, knot, span, 1, pole[ i ].param );
-							
+
 							for ( let j = 0; j <= deg; j ++ ) {
 
 								arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ];
 
 							}
 
-							b[ i + m ] = pole[ i ].slope; // * chord;
+							b[ i + m ] = pole[ i ].slope;
 
 					}
 
@@ -368,7 +358,7 @@ console.log(this)
 			var index = [];
 			this.ctrlPoints = b.slice();
 			ludcmp( nps, arr, index );
-			lubksb4D( nps, arr, index, this.ctrlPoints )
+			lubksb4D( nps, arr, index, this.ctrlPoints );
 
 		}
 
