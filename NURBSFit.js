@@ -77,7 +77,7 @@ class NURBSFit {
 		this._calcCtrlPoints();
 		const p = this._curvePoint( this.deg(), t );
 
-		return new THREE.Vector3( p.x, p.y, p.z );
+		return new Vector3( p.x, p.y, p.z );
 
 	}
 
@@ -296,7 +296,7 @@ class NURBSFit {
 		} else {
 
 			const nps = n + slope.length;
-			const b = new Array( nps ).fill( new THREE.Vector3() );
+			const b = new Array( nps ).fill( new Vector3() );
 			var m = 0;
 
 			for ( let i = 0; i < n; i ++ ) {
@@ -539,7 +539,7 @@ class NURBSFit {
 
 		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
 		const nj = this._basisFuncs( deg, knot, span, t );
-		var v = new THREE.Vector3( 0, 0, 0 );
+		var v = new Vector3( 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
@@ -560,7 +560,7 @@ class NURBSFit {
 
 		const span = this._findIndexSpan( deg, knot, ctrl.length, t );
 		const nj = this._basisFuncs( deg, knot, span, t );
-		const v = new THREE.Vector4( 0, 0, 0, 0 );
+		const v = new Vector4( 0, 0, 0, 0 );
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
@@ -590,7 +590,7 @@ class NURBSFit {
 
 		for ( let k = 0; k <= n; k ++ ) {
 
-			v[ k ] = new THREE.Vector3( 0, 0, 0 );
+			v[ k ] = new Vector3( 0, 0, 0 );
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
@@ -619,7 +619,7 @@ class NURBSFit {
 
 		for ( let k = 0; k <= n; k ++ ) {
 
-			v[ k ] = new THREE.Vector4( 0, 0, 0, 0 );
+			v[ k ] = new Vector4( 0, 0, 0, 0 );
 
 			for ( let j = 0; j <= deg; j ++ ) {
 
@@ -651,20 +651,6 @@ class NURBSFit {
 		return v;
 
 	}
-
-}
-
-function toVector3( v4 ) {
-
-	const v3 = [];
-
-	for ( let i = 0; i < v4.length; i ++ ) {
-
-		v3.push( new THREE.Vector3( v4[ i ].x, v4[ i ].y, v4[ i ].z ) );
-
-	}
-
-	return v3;
 
 }
 
@@ -875,7 +861,189 @@ function lubksb4D( n, a, indx, b ) {
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		b[ i ] = new THREE.Vector4( x[ i ], y[ i ], z[ i ], 1.0 );
+		b[ i ] = new Vector4( x[ i ], y[ i ], z[ i ], 1.0 );
+
+	}
+
+}
+
+function toVector3( v4 ) {
+
+	const v3 = [];
+
+	for ( let i = 0; i < v4.length; i ++ ) {
+
+		v3.push( new Vector3( v4[ i ].x, v4[ i ].y, v4[ i ].z ) );
+
+	}
+
+	return v3;
+
+}
+
+class Vector3 {
+
+	constructor( x = 0, y = 0, z = 0 ) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+	}
+
+	clone() {
+
+		return new this.constructor( this.x, this.y, this.z );
+
+	}
+
+	add( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+
+		return this;
+
+	}
+
+	sub( v ) {
+
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+
+		return this;
+
+	}
+
+	mul( s ) {
+
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+
+		return this;
+
+	}
+
+	div( s ) {
+
+		return this.mul( 1 / s );
+
+	}
+
+	dot( v ) {
+
+		return this.x * v.x + this.y * v.y + this.z * v.z;
+
+	}
+
+	cross( v ) {
+
+		const u = this.clone();
+		this.x = u.y * v.z - u.z * v.y;
+		this.y = u.z * v.x - u.x * v.z;
+		this.z = u.x * v.y - u.y * v.x;
+
+		return this;
+
+	}
+
+	negate() {
+
+		this.x = - this.x;
+		this.y = - this.y;
+		this.z = - this.z;
+
+		return this;
+
+	}
+
+	length() {
+
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
+
+	}
+
+	normalize() {
+
+		return this.div( this.length() || 1 );
+
+	}
+
+}
+
+class Vector4 {
+
+	constructor( x = 0, y = 0, z = 0, w = 1 ) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+
+	}
+
+	clone() {
+
+		return new this.constructor( this.x, this.y, this.z, this.w );
+
+	}
+
+	add( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		this.w += v.w;
+
+		return this;
+
+	}
+
+	sub( v ) {
+
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+		this.w -= v.w;
+
+		return this;
+
+	}
+
+	mul( s ) {
+
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+		this.w *= s;
+
+		return this;
+
+	}
+
+	div( s ) {
+
+		return this.mul( 1 / s );
+
+	}
+
+	dot( v ) {
+
+		return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+
+	}
+
+	negate() {
+
+		this.x = - this.x;
+		this.y = - this.y;
+		this.z = - this.z;
+		this.w = - this.w;
+
+		return this;
 
 	}
 

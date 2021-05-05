@@ -467,8 +467,8 @@
 				arr[ index ++ ] = pts[ i ].point.y;
 				arr[ index ++ ] = pts[ i ].point.z;
 
-				let tuft = pts[ i ].normal.negate().multiplyScalar( pts[ i ].curvature );
-				tuft = pts[ i ].point.clone().add( tuft );
+				const crvt = pts[ i ].normal.clone().negate().mul( pts[ i ].curvature );
+				const tuft = pts[ i ].point.clone().add( crvt );
 
 				arr[ index ++ ] = tuft.x;
 				arr[ index ++ ] = tuft.y;
@@ -478,7 +478,5 @@
 		}
 
 	}
-
-
 
 </script>
