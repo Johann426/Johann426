@@ -33,7 +33,7 @@ class Propeller {
 	}
 
 	getXYZ() {
-		return calcPropGeom( 3, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
+		return this.calcPropGeom( 3, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
 	}
 	
 	calcPropGeom( NoBlade = 3, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
@@ -41,7 +41,6 @@ class Propeller {
 		const PI = Math.PI;
 		const r = rbyR.map(x => x * 0.5);
 		const s = skew.map(x => x * PI / 180);
-		chord(nj - 1) = Math.max(chord(nj - 1), thick(jm1) / 0.2);
 		const nk = NoBlade;
 		const nj = rbyR.length;
 		const ni = section.xc.length;
@@ -49,6 +48,8 @@ class Propeller {
 		const yc = meanline.yc;
 		if (xc != section.xc) console.log('the data of meanline and that of section are not matched');
 		const ytm = section.ytm;
+		
+		chord(nj - 1) = Math.max(chord(nj - 1), thick(jm1) / 0.2);
 		
 		let max = 0;
 		for (let i = 0; i < ni; i++) {
