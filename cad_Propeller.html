@@ -67,12 +67,12 @@
 		
 		for (let j = 0; j < nj -1 ; j ++ ){
 			for (let i = 0; i < ni; i ++ ){
-				positions[ index ++ ] = prop_geo.x[i][j];
-				positions[ index ++ ] = prop_geo.y[i][j];
-				positions[ index ++ ] = prop_geo.z[i][j];
-				positions[ index ++ ] = prop_geo.x[i][j+1];
-				positions[ index ++ ] = prop_geo.y[i][j+1];
-				positions[ index ++ ] = prop_geo.z[i][j+1];
+				positions[ index ++ ] = prop_geo[0].back.x[i][j];
+				positions[ index ++ ] = prop_geo[0].back.y[i][j];
+				positions[ index ++ ] = prop_geo[0].back.z[i][j];
+				positions[ index ++ ] = prop_geo[0].back.x[i][j+1];
+				positions[ index ++ ] = prop_geo[0].back.y[i][j+1];
+				positions[ index ++ ] = prop_geo[0].back.z[i][j+1];
 			}
 		}
 		
