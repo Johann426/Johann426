@@ -96,6 +96,10 @@
 		normals.push(...vertex.norm);
 		}
 
+		const prop = new Propeller();
+		const ni = prop.meanline.xc.length;
+		const nj = prop.rbyR.length;
+		
 		let index = 0;
 		for (let j = 0; j < nj; j ++ ){
 			for (let i = 0; i < ni; i ++ ){
