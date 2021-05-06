@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>NURBS Interpolation</title>
+        <style>
+            canvas {
+                border: 2px solid black;
+                background-color: black;
+            }
+
+            video {
+                display: none;
+            }
+        </style>
+        <script src="./three.min.js"></script>
+		<script src="./OrbitControls.js"></script>
+		<script src="./NURBSFit.js"></script>
+		<script src="./controlKit.min.js"></script>
+    </head>
+    <body>
+    </body>
+</html>
+
+<script>
+
+	init();
+
+	function init() {
+
+		const scene = new THREE.Scene();
+		scene.add( new THREE.AxesHelper( 1 ) );
+
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10000 );
+		camera.position.set( 0, 0, 1 );
+		
+		const renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.setAnimationLoop( time => {
+
+			controls.update();
+			renderer.render( scene, camera );
+
+		} );
+
+		document.body.appendChild( renderer.domElement );
+
+		const controls = new THREE.OrbitControls( camera, renderer.domElement );
+		controls.enableDamping = true;
+		controls.enabled = false;
+
+		window.addEventListener( 'resize', () => {
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+		} );
+    
+    geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+	  material = new THREE.MeshNormalMaterial();
+
+	  mesh = new THREE.Mesh( geometry, material );
+	  scene.add( mesh );
+
+	}
+
+
+
+</script>
