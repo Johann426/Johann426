@@ -3,17 +3,17 @@ class Propeller {
 	constructor() {
 
 		//Non-dimensional properties
-		const isNondimensional = true;
-		const rbyR = [ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
-		const pitch= [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
-		const chord= [ 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.1 ]
-		const skew = [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-		const rake = [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-		const camber= [ 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.01, 0.00 ]
-		const thick=  [ 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02 ]
+		this.isNondimensional = true;
+		this.rbyR = [ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ]
+		this.pitch= [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
+		this.chord= [ 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.1 ]
+		this.skew = [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+		this.rake = [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+		this.camber= [ 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.01, 0.00 ]
+		this.thick=  [ 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02 ]
 
 
-		const meanline = {
+		this.meanline = {
 
 			name: 'NACA 66 a = 1.0 meanline',
 			xc  : [ 0.0, 0.0050, 0.0075, 0.0125, 0.0250, 0.0500, 0.0750, 0.1000, 0.1500, 0.2000, 0.2500, 0.3000, 0.3500, 0.4000, 0.4500, 0.5000, 0.5500, 0.6000, 0.6500, 0.7000, 0.7500, 0.8000, 0.8500, 0.9000, 0.9500, 1.0000 ],
@@ -22,7 +22,7 @@ class Propeller {
 
 		}
 
-		const section = {
+		this.section = {
 
 			name: 'NACA 66 (mod)',
 			xc  : [ 0.0, 0.0050, 0.0075, 0.0125, 0.0250, 0.0500, 0.0750, 0.1000, 0.1500, 0.2000, 0.2500, 0.3000, 0.3500, 0.4000, 0.4500, 0.5000, 0.5500, 0.6000, 0.6500, 0.7000, 0.7500, 0.8000, 0.8500, 0.9000, 0.9500, 1.0000 ],
@@ -32,7 +32,11 @@ class Propeller {
 		
 	}
 
-	getXYZ( NoBlade = 3, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
+	getXYZ() {
+		return calcPropGeom( 3, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
+	}
+	
+	calcPropGeom( NoBlade = 3, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
 
 		const PI = Math.PI;
 		const r = rbyR.map(x => x * 0.5);
