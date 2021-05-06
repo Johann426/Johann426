@@ -46,6 +46,7 @@ class Propeller {
 		const ni = section.xc.length;
 		const xc = meanline.xc;
 		const yc = meanline.yc;
+		const dydx = meanline.dydx
 		if (xc != section.xc) console.log('the data of meanline and that of section are not matched');
 		const ytm = section.ytm;
 		
