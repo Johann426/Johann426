@@ -74,11 +74,35 @@
 			}
 		}
 		
+		const indices = [];
+		for ( let i = 0; i < position.count; i ++ ) {
+			indices.push( i );
+		}
+		const numberOfTriangles = index.count - 2;
+		const newIndices = [];
+		for ( let i = 0; i < numberOfTriangles; i ++ ) {
+
+			if ( i % 2 === 0 ) {
+
+				newIndices.push( indices.getX( i ) );
+				newIndices.push( indices.getX( i + 1 ) );
+				newIndices.push( indices.getX( i + 2 ) );
+
+			} else {
+
+				newIndices.push( indices.getX( i + 2 ) );
+				newIndices.push( indices.getX( i + 1 ) );
+				newIndices.push( indices.getX( i ) );
+
+			}
+
+		}
+		
 		const geometry = new THREE.BufferGeometry();
 		const positionNumComponents = 3;
 		const normalNumComponents = 3;
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(positions), positionNumComponents));
-		THREE.BufferGeometryUtils.toTrianglesDrawMode( geometry, THREE.TriangleStripDrawMode )
+		geometry.setIndex( newIndices );
 		geometry.computeVertexNormals()
 		
 		material = new THREE.MeshNormalMaterial();
