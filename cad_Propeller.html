@@ -62,10 +62,9 @@
 		const ni = prop.meanline.xc.length;
 		const nj = prop.rbyR.length;
 		const prop_geo = prop.getXYZ();
-		
 		const positions = [];
-		
 		let index = 0;
+		
 		for (let j = 0; j < nj; j ++ ){
 			for (let i = 0; i < ni; i ++ ){
 				positions[ index ++ ] = prop_geo.x[i][j];
@@ -74,12 +73,21 @@
 			}
 		}
 		
+		const geometry = new THREE.BufferGeometry();
+		const positionNumComponents = 3;
+		const normalNumComponents = 3;
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(positions), positionNumComponents));
+		
 		const indices = [];
-		for ( let i = 0; i < positions.count; i ++ ) {
+		const vetices = geometry.getAttribute( 'position' );
+		
+		for ( let i = 0; i < vertices.count; i ++ ) {
 			indices.push( i );
 		}
-		const numberOfTriangles = index.count - 2;
+		
+		const numberOfTriangles = indices.length - 2 //count - 2;
 		const newIndices = [];
+		
 		for ( let i = 0; i < numberOfTriangles; i ++ ) {
 
 			if ( i % 2 === 0 ) {
@@ -98,10 +106,7 @@
 
 		}
 		
-		const geometry = new THREE.BufferGeometry();
-		const positionNumComponents = 3;
-		const normalNumComponents = 3;
-		geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(positions), positionNumComponents));
+		
 		geometry.setIndex( newIndices );
 		geometry.computeVertexNormals()
 		
