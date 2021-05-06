@@ -99,13 +99,14 @@
 		const prop = new Propeller();
 		const ni = prop.meanline.xc.length;
 		const nj = prop.rbyR.length;
+		const prop_geo = prop.getXYZ();
 		
 		let index = 0;
 		for (let j = 0; j < nj; j ++ ){
 			for (let i = 0; i < ni; i ++ ){
-				positions[ index ++ ] = x[i][j];
-				positions[ index ++ ] = y[i][j];
-				positions[ index ++ ] = z[i][j];
+				positions[ index ++ ] = prop_geo.x[i][j];
+				positions[ index ++ ] = prop_geo.y[i][j];
+				positions[ index ++ ] = prop_geo.z[i][j];
 			}
 		}
 		
