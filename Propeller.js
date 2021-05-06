@@ -3,18 +3,15 @@ class Propeller {
 	constructor() {
 
 		//Non-dimensional properties
-		const blade = {
+		isNondimensional: true,
+		rbyR : [ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ],
+		pitch: [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ],
+		chord: [ 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.1 ],
+		skew : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+		rake : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+		camber: [ 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.01, 0.00 ],
+		thick:  [ 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02 ]
 
-			isNondimensional: true,
-			rbyR : [ 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 ],
-			pitch: [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ],
-			chord: [ 0.2, 0.2, 0.2, 0.2, 0.2, 0.3, 0.2, 0.2, 0.1 ],
-			skew : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
-			rake : [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
-			camber: [ 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.01, 0.00 ],
-			thick:  [ 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02 ]
-			
-		}
 
 		const meanline = {
 
@@ -35,7 +32,7 @@ class Propeller {
 		
 	}
 
-	getXYZ( NoBlade, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
+	getXYZ( NoBlade = 3, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
 
 		const PI = Math.PI;
 		const r = rbyR.map(x => x * 0.5);
@@ -85,52 +82,53 @@ class Propeller {
 			}
 		}
 
-		// pressure side
-		for (let j = 0; j < nj; j++) {
+// 		// pressure side
+// 		for (let j = 0; j < nj; j++) {
 
-			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
+// 			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
 
-			for (let i = 0; i < ni; i++) {
+// 			for (let i = 0; i < ni; i++) {
 
-				const camberAngle = Math.atan(dydx[i])
-				const yt = ytm[i] * thick[j];
-				yc[j] = ycc[j] / dmax * camber[j] //?????????
-				const yl = yc[i] * chord[j] - yt * Math.cos(camberAngle);
+// 				const camberAngle = Math.atan(dydx[i])
+// 				const yt = ytm[i] * thick[j];
+// 				yc[j] = ycc[j] / dmax * camber[j] //?????????
+// 				const yl = yc[i] * chord[j] - yt * Math.cos(camberAngle);
 
-				x[i][j] = -( rake[j] + radius[j] * skew[j] * Math.tan(pitchAngle) )
-					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
-					+ yl * Math.cos(pitchAngle);
+// 				x[i][j] = -( rake[j] + radius[j] * skew[j] * Math.tan(pitchAngle) )
+// 					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
+// 					+ yl * Math.cos(pitchAngle);
 
-				y[i][j] = radius[j] * Math.sin(skew[j] 
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yl * Math.sin(pitchAngle) ) / radius[j] );
-				z[i][j] = radius[j] * Math.cos(skew[j] 
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yl * Math.sin(pitchAngle) ) / radius[j] );
+// 				y[i][j] = radius[j] * Math.sin(skew[j] 
+// 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
+// 					- yl * Math.sin(pitchAngle) ) / radius[j] );
+// 				z[i][j] = radius[j] * Math.cos(skew[j] 
+// 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
+// 					- yl * Math.sin(pitchAngle) ) / radius[j] );
 
-				}
-		}
+// 				}
+// 		}
 
 
-		for (let k = 0; k < nk; k++) {
+// 		for (let k = 0; k < nk; k++) {
 
-			phi = 2 * PI * k / (nk - 1);
+// 			phi = 2 * PI * k / (nk - 1);
 
-			for (let j = 0; j < nj; j++) {
+// 			for (let j = 0; j < nj; j++) {
 
-				for (let i = 0; i < ni; i++) {
+// 				for (let i = 0; i < ni; i++) {
 
-					dumy = y[i, j, k];
-					dumz = z[i, j, k];
+// 					dumy = y[i, j, k];
+// 					dumz = z[i, j, k];
 
-					y[i, j, k] = dumy * Math.cos(phi) - dumz * Math.sin(phi);
-					z[i, j, k] = dumy * Math.sin(phi) + dumz * Math.cos(phi);
+// 					y[i][j][k] = dumy * Math.cos(phi) - dumz * Math.sin(phi);
+// 					z[i][j][k] = dumy * Math.sin(phi) + dumz * Math.cos(phi);
 
-				}
-			}
-		}
+// 				}
+// 			}
+// 		}
 
+	return { 'x': x, 'y': y, 'z': z };
+		
 	}
-
 
 }
