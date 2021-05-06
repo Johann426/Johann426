@@ -65,11 +65,14 @@
 		const positions = [];
 		let index = 0;
 		
-		for (let j = 0; j < nj; j ++ ){
+		for (let j = 0; j < nj -1 ; j ++ ){
 			for (let i = 0; i < ni; i ++ ){
 				positions[ index ++ ] = prop_geo.x[i][j];
 				positions[ index ++ ] = prop_geo.y[i][j];
 				positions[ index ++ ] = prop_geo.z[i][j];
+				positions[ index ++ ] = prop_geo.x[i][j+1];
+				positions[ index ++ ] = prop_geo.y[i][j+1];
+				positions[ index ++ ] = prop_geo.z[i][j+1];
 			}
 		}
 		
