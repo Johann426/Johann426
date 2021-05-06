@@ -2,8 +2,10 @@ class Propeller {
 
 	constructor() {
 
-		//Non-dimensional properties
-		this.isNondimensional = true;
+		this.isNondimensional = true; //Non-dimensional properties
+		
+		this.NoBlade = 3;
+
 		this.rbyR = [ 0.1550, 0.2000, 0.2500, 0.3000, 0.4000, 0.5000, 0.6000, 0.7000, 0.8000, 0.8500, 0.9000, 0.9500, 0.9750, 1.000 ]
 		this.pitch= [ 0.8002, 0.8218, 0.8423, 0.8599, 0.8879, 0.9083, 0.9225, 0.9294, 0.9280, 0.9247, 0.9192, 0.9116, 0.9068, 0.9017 ]
 		this.rake = [ 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000 ]
@@ -33,7 +35,7 @@ class Propeller {
 	}
 
 	getXYZ() {
-		return this.calcPropGeom( 3, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
+		return this.calcPropGeom( this.NoBlade, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
 	}
 	
 	calcPropGeom( NoBlade = 2, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
@@ -57,96 +59,40 @@ class Propeller {
 			if (yc[i] > max) max = yc[i];
 		}
 		
-		const x = Array.from( Array(ni), () => new Array(nj) );
-		const y = Array.from( Array(ni), () => new Array(nj) );
-		const z = Array.from( Array(ni), () => new Array(nj) );
-		
-		// Suction side
-		for (let j = 0; j < nj; j++) {
-			
-			const radius = 0.5 * rbyR[j];
-			const skewRad = skew[j] / 180 * PI;
-			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
-
-			for (let i = 0; i < ni; i++) {
-				
-				const camberAngle = Math.atan(dydx[i])
-				const yt = ytm[i] * thick[j];
-				yc[i] = yc[i] / max * camber[j]
-				const yu = yc[i] * chord[j] + yt * Math.cos(camberAngle);
-
-				x[i][j] = -( rake[j] + radius * skewRad * Math.tan(pitchAngle) )
-					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
-					+ yu * Math.cos(pitchAngle);
-
-				y[i][j] = radius * Math.sin( skewRad
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yu * Math.sin(pitchAngle) ) / radius );
-
-				z[i][j] = radius * Math.cos( skewRad
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yu * Math.sin(pitchAngle) ) / radius );
-
-			}
-		}
-		
-		const back = {
-			'name': 'suction side',
-			'x': x,
-			'y': y,
-			'z': z
-		};
-		
-		// pressure side
-		for (let j = 0; j < nj; j++) {
-			
-			const radius = 0.5 * rbyR[j];
-			const skewRad = skew[j] / 180 * PI;
-			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
-
-			for (let i = 0; i < ni; i++) {
-				
-				const camberAngle = Math.atan(dydx[i])
-				const yt = ytm[i] * thick[j];
-				yc[i] = yc[i] / max * camber[j]
-				const yl = yc[i] * chord[j] - yt * Math.cos(camberAngle);
-
-				x[i][j] = -( rake[j] + radius * skewRad * Math.tan(pitchAngle) )
-					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
-					+ yl * Math.cos(pitchAngle);
-
-				y[i][j] = radius * Math.sin( skewRad
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yl * Math.sin(pitchAngle) ) / radius );
-
-				z[i][j] = radius * Math.cos( skewRad
-					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yl * Math.sin(pitchAngle) ) / radius );
-
-			}
-		}
-		
- 		const face = {
-			'name': 'pressure side',
-			'x': x,
-			'y': y,
-			'z': z
-		};
-
 		const blade = [];
-		blade.push( {
-			'name': 'No. 1 blade',
-			'back': back,
-			'face': face
-		} );
 		
-		for (let k = 2; k <= NoBlade; k++) {
+		for (let k = 1; k <= NoBlade; k++) {
+
+			const x = Array.from( Array(ni), () => new Array(nj) );
+			const y = Array.from( Array(ni), () => new Array(nj) );
+			const z = Array.from( Array(ni), () => new Array(nj) );
 
 			const phi = 2 * PI * (k - 1) / NoBlade;
 
+			// Suction side
 			for (let j = 0; j < nj; j++) {
 
+				const radius = 0.5 * rbyR[j];
+				const skewRad = skew[j] / 180 * PI;
+				const pitchAngle = Math.atan(pitch[j] / ( 2 * PI * r[j] ) );
+
 				for (let i = 0; i < ni; i++) {
+
+					const camberAngle = Math.atan(dydx[i])
+					const yt = ytm[i] * thick[j];
+					const yu = yc[i] / max * camber[j] * chord[j] + yt * Math.cos(camberAngle);
+
+					x[i][j] = -(rake[j] + radius * skewRad * Math.tan(pitchAngle))
+						+ (0.5 - xc[i]) * chord[j] * Math.sin(pitchAngle)
+						+ yu * Math.cos(pitchAngle);
+
+					y[i][j] = radius * Math.sin(skewRad
+						- ((0.5 - xc[i]) * chord[j] * Math.cos(pitchAngle)
+							- yu * Math.sin(pitchAngle)) / radius);
+
+					z[i][j] = radius * Math.cos(skewRad
+						- ((0.5 - xc[i]) * chord[j] * Math.cos(pitchAngle)
+							- yu * Math.sin(pitchAngle)) / radius);
 
 					const y1 = y[i][j];
 					const z1 = z[i][j];
@@ -156,13 +102,62 @@ class Propeller {
 
 				}
 			}
-			
-			blade.push( {
-			'name': 'No. ' + k + ' blade',
-			'back': back,
-			'face': face
-			} );
-			
+
+			const back = {
+				'name': 'suction side',
+				'x': x.map( e => { return e.slice() } ),
+				'y': y.map( e => { return e.slice() } ),
+				'z': z.map( e => { return e.slice() } )
+			};
+
+			// pressure side
+			for (let j = 0; j < nj; j++) {
+
+				const radius = 0.5 * rbyR[j];
+				const skewRad = skew[j] / 180 * PI;
+				const pitchAngle = Math.atan(pitch[j] / ( 2 * PI * r[j] ) );
+
+				for (let i = 0; i < ni; i++) {
+
+					const camberAngle = Math.atan(dydx[i])
+					const yt = ytm[i] * thick[j];
+					const yl = yc[i] / max * camber[j] * chord[j] - yt * Math.cos(camberAngle);
+
+					x[i][j] = -(rake[j] + radius * skewRad * Math.tan(pitchAngle))
+						+ (0.5 - xc[i]) * chord[j] * Math.sin(pitchAngle)
+						+ yl * Math.cos(pitchAngle);
+
+					y[i][j] = radius * Math.sin(skewRad
+						- ((0.5 - xc[i]) * chord[j] * Math.cos(pitchAngle)
+							- yl * Math.sin(pitchAngle)) / radius);
+
+					z[i][j] = radius * Math.cos(skewRad
+						- ((0.5 - xc[i]) * chord[j] * Math.cos(pitchAngle)
+							- yl * Math.sin(pitchAngle)) / radius);
+
+					const y1 = y[i][j];
+					const z1 = z[i][j];
+
+					y[i][j] = y1 * Math.cos(phi) - z1 * Math.sin(phi);
+					z[i][j] = y1 * Math.sin(phi) + z1 * Math.cos(phi);
+
+				}
+			}
+
+			const face = {
+				'name': 'pressure side',
+				'x': x,
+				'y': y,
+				'z': z
+			};
+
+
+			blade.push({
+				'name': 'No.' + k + ' blade',
+				'back': back,
+				'face': face
+			});
+
 		}
 
 	return blade;

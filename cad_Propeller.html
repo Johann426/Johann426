@@ -31,7 +31,7 @@
 		scene.add( new THREE.AxesHelper( 1 ) );
 
 		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10000 );
-		camera.position.set( 0, 0, 10 );
+		camera.position.set( 0, 0, 1 );
 
 		const renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( window.innerWidth, window.innerHeight );
@@ -59,61 +59,71 @@
 		
 
 		const prop = new Propeller();
-		const ni = prop.meanline.xc.length;
+		const nk = prop.NoBlade;
 		const nj = prop.rbyR.length;
-		const prop_geo = prop.getXYZ();
+		const ni = prop.meanline.xc.length;
+		const blade = prop.getXYZ();
 		const positions = [];
 		let index = 0;
-		
-		for (let j = 0; j < nj -1 ; j ++ ){
-			for (let i = 0; i < ni; i ++ ){
-				positions[ index ++ ] = prop_geo[0].back.x[i][j];
-				positions[ index ++ ] = prop_geo[0].back.y[i][j];
-				positions[ index ++ ] = prop_geo[0].back.z[i][j];
-				positions[ index ++ ] = prop_geo[0].back.x[i][j+1];
-				positions[ index ++ ] = prop_geo[0].back.y[i][j+1];
-				positions[ index ++ ] = prop_geo[0].back.z[i][j+1];
+		for (let k = 0; k < nk; k++) {
+			for (let j = 0; j < nj - 1; j++) {
+				for (let i = 0; i < ni - 1; i++) {
+					positions[index++] = blade[k].back.x[i][j];
+					positions[index++] = blade[k].back.y[i][j];
+					positions[index++] = blade[k].back.z[i][j];
+					positions[index++] = blade[k].back.x[i][j + 1];
+					positions[index++] = blade[k].back.y[i][j + 1];
+					positions[index++] = blade[k].back.z[i][j + 1];
+					positions[index++] = blade[k].back.x[i + 1][j];
+					positions[index++] = blade[k].back.y[i + 1][j];
+					positions[index++] = blade[k].back.z[i + 1][j];
+
+					positions[index++] = blade[k].back.x[i + 1][j + 1];
+					positions[index++] = blade[k].back.y[i + 1][j + 1];
+					positions[index++] = blade[k].back.z[i + 1][j + 1];
+					positions[index++] = blade[k].back.x[i + 1][j];
+					positions[index++] = blade[k].back.y[i + 1][j];
+					positions[index++] = blade[k].back.z[i + 1][j];
+					positions[index++] = blade[k].back.x[i][j + 1];
+					positions[index++] = blade[k].back.y[i][j + 1];
+					positions[index++] = blade[k].back.z[i][j + 1];
+				}
+			}
+
+			for (let j = 0; j < nj - 1; j++) {
+				for (let i = 0; i < ni - 1; i++) {
+					positions[index++] = blade[k].face.x[i][j];
+					positions[index++] = blade[k].face.y[i][j];
+					positions[index++] = blade[k].face.z[i][j];
+					positions[index++] = blade[k].face.x[i][j + 1];
+					positions[index++] = blade[k].face.y[i][j + 1];
+					positions[index++] = blade[k].face.z[i][j + 1];
+					positions[index++] = blade[k].face.x[i + 1][j];
+					positions[index++] = blade[k].face.y[i + 1][j];
+					positions[index++] = blade[k].face.z[i + 1][j];
+
+					positions[index++] = blade[k].face.x[i + 1][j + 1];
+					positions[index++] = blade[k].face.y[i + 1][j + 1];
+					positions[index++] = blade[k].face.z[i + 1][j + 1];
+					positions[index++] = blade[k].face.x[i + 1][j];
+					positions[index++] = blade[k].face.y[i + 1][j];
+					positions[index++] = blade[k].face.z[i + 1][j];
+					positions[index++] = blade[k].face.x[i][j + 1];
+					positions[index++] = blade[k].face.y[i][j + 1];
+					positions[index++] = blade[k].face.z[i][j + 1];
+				}
 			}
 		}
-		
+
 		const geometry = new THREE.BufferGeometry();
 		const positionNumComponents = 3;
-		const normalNumComponents = 3;
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(positions), positionNumComponents));
 		
-		const indices = [];
-		const vertices = geometry.getAttribute( 'position' );
 		
-		for ( let i = 0; i < vertices.count; i ++ ) {
-			indices.push( i );
-		}
-		
-		const numberOfTriangles = indices.length - 2 //count - 2;
-		const newIndices = [];
-		
-		for ( let i = 0; i < numberOfTriangles; i ++ ) {
-
-			if ( i % 2 === 0 ) {
-
-				newIndices.push( indices[i] );
-				newIndices.push( indices[i + 1] );
-				newIndices.push( indices[i + 2] );
-
-			} else {
-
-				newIndices.push( indices[i + 2] );
-				newIndices.push( indices[i + 1] );
-				newIndices.push( indices[i] );
-
-			}
-
-		}
-		
-		
-		geometry.setIndex( newIndices );
 		geometry.computeVertexNormals()
 		
 		material = new THREE.MeshNormalMaterial();
+		material.side = THREE.DoubleSide;
 		mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
