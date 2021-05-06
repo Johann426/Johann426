@@ -96,6 +96,16 @@
 		normals.push(...vertex.norm);
 		}
 
+		let index = 0;
+		for (let j = 0; j < nj; j ++ ){
+			for (let i = 0; i < ni; i ++ ){
+				positions[ index ++ ] = x[i][j];
+				positions[ index ++ ] = y[i][j];
+				positions[ index ++ ] = z[i][j];
+			}
+		}
+		
+		
 		const geometry = new THREE.BufferGeometry();
 		const positionNumComponents = 3;
 		const normalNumComponents = 3;
