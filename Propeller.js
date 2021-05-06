@@ -56,9 +56,9 @@ class Propeller {
 			if (yc[i] > max) max = yc[i];
 		}
 		
-		const x = [];
-		const y = [];
-		const z = [];
+		const x = Array.from( Array(ni), () => new Array(nj) );
+		const y = Array.from( Array(ni), () => new Array(nj) );
+		const z = Array.from( Array(ni), () => new Array(nj) );
 		
 		// Suction side
 		for (let j = 0; j < nj; j++) {
@@ -67,7 +67,7 @@ class Propeller {
 
 			for (let i = 0; i < ni; i++) {
 
-				const raduis = 0.5 * rbyR[j];
+				const radius = 0.5 * rbyR[j];
 				const camberAngle = Math.atan(dydx[i])
 				const yt = ytm[i] * thick[j];
 				yc[i] = yc[i] / max * camber[j]
