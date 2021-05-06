@@ -142,14 +142,14 @@ class Propeller {
 		
 		for (let k = 2; k <= NoBlade; k++) {
 
-			phi = 2 * PI * (k - 1) / NoBlade;
+			const phi = 2 * PI * (k - 1) / NoBlade;
 
 			for (let j = 0; j < nj; j++) {
 
 				for (let i = 0; i < ni; i++) {
 
-					y1 = y[i][j];
-					z1 = z[i][j];
+					const y1 = y[i][j];
+					const z1 = z[i][j];
 
 					y[i][j] = y1 * Math.cos(phi) - z1 * Math.sin(phi);
 					z[i][j] = y1 * Math.sin(phi) + z1 * Math.cos(phi);
