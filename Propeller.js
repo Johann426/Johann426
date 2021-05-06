@@ -12,7 +12,6 @@ class Propeller {
 		this.camber= [ 0.05, 0.04, 0.04, 0.03, 0.03, 0.02, 0.02, 0.01, 0.00 ]
 		this.thick=  [ 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02 ]
 
-
 		this.meanline = {
 
 			name: 'NACA 66 a = 1.0 meanline',
@@ -68,22 +67,23 @@ class Propeller {
 
 			for (let i = 0; i < ni; i++) {
 
+				const raduis = 0.5 * rbyR[j];
 				const camberAngle = Math.atan(dydx[i])
 				const yt = ytm[i] * thick[j];
 				yc[i] = yc[i] / max * camber[j]
 				const yu = yc[i] * chord[j] + yt * Math.cos(camberAngle);
 
-				x[i][j] = -( rake[j] + radius[j] * skew[j] * Math.tan(pitchAngle) )
+				x[i][j] = -( rake[j] + radius * skew[j] * Math.tan(pitchAngle) )
 					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
 					+ yu * Math.cos(pitchAngle);
 
-				y[i][j] = radius[j] * Math.sin( skew[j]
+				y[i][j] = radius * Math.sin( skew[j]
 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yu * Math.sin(pitchAngle) ) / radius[j] );
+					- yu * Math.sin(pitchAngle) ) / radius );
 
-				z[i][j] = radius[j] * Math.cos( skew[j]
+				z[i][j] = radius * Math.cos( skew[j]
 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-					- yu * Math.sin(pitchAngle) ) / radius[j] );
+					- yu * Math.sin(pitchAngle) ) / radius );
 
 			}
 		}
