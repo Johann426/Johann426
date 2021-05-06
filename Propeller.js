@@ -36,7 +36,7 @@ class Propeller {
 		return this.calcPropGeom( 3, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
 	}
 	
-	calcPropGeom( NoBlade = 3, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
+	calcPropGeom( NoBlade = 2, rbyR, pitch, chord, skew, rake, camber, thick, meanline, section ) {
 
 		const PI = Math.PI;
 		const r = rbyR.map(x => x * 0.5);
@@ -89,53 +89,83 @@ class Propeller {
 
 			}
 		}
+		
+		const back = {
+			'name': 'suction side',
+			'x': x,
+			'y': y,
+			'z': z
+		};
+		
+		// pressure side
+		for (let j = 0; j < nj; j++) {
+			
+			const radius = 0.5 * rbyR[j];
+			const skewRad = skew[j] / 180 * PI;
+			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
 
-// 		// pressure side
-// 		for (let j = 0; j < nj; j++) {
+			for (let i = 0; i < ni; i++) {
+				
+				const camberAngle = Math.atan(dydx[i])
+				const yt = ytm[i] * thick[j];
+				yc[i] = yc[i] / max * camber[j]
+				const yl = yc[i] * chord[j] - yt * Math.cos(camberAngle);
 
-// 			const pitchAngle = Math.atan(pitch[j] / 2 * PI * r[j]);
+				x[i][j] = -( rake[j] + radius * skewRad * Math.tan(pitchAngle) )
+					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
+					+ yl * Math.cos(pitchAngle);
 
-// 			for (let i = 0; i < ni; i++) {
+				y[i][j] = radius * Math.sin( skewRad
+					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
+					- yl * Math.sin(pitchAngle) ) / radius );
 
-// 				const camberAngle = Math.atan(dydx[i])
-// 				const yt = ytm[i] * thick[j];
-// 				yc[j] = ycc[j] / dmax * camber[j] //?????????
-// 				const yl = yc[i] * chord[j] - yt * Math.cos(camberAngle);
+				z[i][j] = radius * Math.cos( skewRad
+					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
+					- yl * Math.sin(pitchAngle) ) / radius );
 
-// 				x[i][j] = -( rake[j] + radius[j] * skew[j] * Math.tan(pitchAngle) )
-// 					+ ( 0.5 - xc[i] ) * chord[j] * Math.sin(pitchAngle)
-// 					+ yl * Math.cos(pitchAngle);
+			}
+		}
+		
+ 		const face = {
+			'name': 'pressure side',
+			'x': x,
+			'y': y,
+			'z': z
+		};
 
-// 				y[i][j] = radius[j] * Math.sin(skew[j] 
-// 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-// 					- yl * Math.sin(pitchAngle) ) / radius[j] );
-// 				z[i][j] = radius[j] * Math.cos(skew[j] 
-// 					- ( ( 0.5 - xc[i] ) * chord[j] * Math.cos(pitchAngle)
-// 					- yl * Math.sin(pitchAngle) ) / radius[j] );
+		const blade = [];
+		blade.push( {
+			'name': 'No. 1 blade',
+			'back': back,
+			'face': face
+		} );
+		
+		for (let k = 2; k <= NoBlade; k++) {
 
-// 				}
-// 		}
+			phi = 2 * PI * (k - 1) / NoBlade;
 
+			for (let j = 0; j < nj; j++) {
 
-// 		for (let k = 0; k < nk; k++) {
+				for (let i = 0; i < ni; i++) {
 
-// 			phi = 2 * PI * k / (nk - 1);
+					y1 = y[i][j];
+					z1 = z[i][j];
 
-// 			for (let j = 0; j < nj; j++) {
+					y[i][j] = y1 * Math.cos(phi) - z1 * Math.sin(phi);
+					z[i][j] = y1 * Math.sin(phi) + z1 * Math.cos(phi);
 
-// 				for (let i = 0; i < ni; i++) {
+				}
+			}
+			
+			blade.push( {
+			'name': 'No. ' + k + ' blade',
+			'back': back,
+			'face': face
+			} );
+			
+		}
 
-// 					dumy = y[i, j, k];
-// 					dumz = z[i, j, k];
-
-// 					y[i][j][k] = dumy * Math.cos(phi) - dumz * Math.sin(phi);
-// 					z[i][j][k] = dumy * Math.sin(phi) + dumz * Math.cos(phi);
-
-// 				}
-// 			}
-// 		}
-
-	return { 'x': x, 'y': y, 'z': z };
+	return blade;
 		
 	}
 
