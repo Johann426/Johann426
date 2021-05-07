@@ -234,11 +234,9 @@ class NURBSFit {
 
 		}
 
-		var sum = 0.0;
-
 		for ( let i = 1; i < n - deg; i ++ ) {
 
-			sum = 0.0;
+			let sum = 0.0;
 
 			for ( let j = i; j < i + deg; j ++ ) {
 
@@ -246,8 +244,7 @@ class NURBSFit {
 
 			}
 
-			sum /= deg;
-			knot[ i + deg ] = sum;
+			knot[ i + deg ] = sum / deg;
 
 		}
 
