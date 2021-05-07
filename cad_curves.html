@@ -15,7 +15,8 @@
         </style>
         <script src="./three.min.js"></script>
 		<script src="./OrbitControls.js"></script>
-		<script src="./NURBSFit.js"></script>
+		<script src="./NurbsUtil.js"></script>
+		<script src="./NurbsCurve.js"></script>
 		<script src="./controlKit.min.js"></script>
     </head>
     <body>
@@ -110,7 +111,7 @@
 					break;
 
 				case 'KeyC':
-					intCurve.push( new NURBSFit( 3 ) );
+					//intCurve.push( new NurbsCurve( 3 ) );
 					break;
 
 				case 'Escape':
@@ -301,7 +302,7 @@
 		scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature );
 
 		const intCurve = [];
-		intCurve.push( new NURBSFit( 3 ) );
+		intCurve.push( new NurbsCurve( 3 ) );
 
 	}
 
