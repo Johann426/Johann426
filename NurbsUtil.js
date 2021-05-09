@@ -8,6 +8,114 @@ js code by Johann426.github
 
 class NurbsUtil {
 
+	/*
+	Determine control points of curve interpolation with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+	deg: degree
+	prm: parameterized value at each point
+	knot: knot vector (knot[i]: knots)
+	pole: to store points having slope constraints(option)
+	*/
+	static globalCurveInterp( deg, prm, knot, pole ) {
+
+		const n = pole.length;
+		const point = pole.map( e => e.point );
+		const slope = pole.map( e => e.slope ).filter( Boolean );
+		var arr = [];
+
+		if ( ! slope.length ) {
+
+			for ( let i = 0; i < n; i ++ ) {
+
+				const span = this.findIndexSpan( deg, knot, n, prm[ i ] );
+				const nj = this.basisFuncs( deg, knot, span, prm[ i ] );
+				arr[ i ] = new Array( n ).fill( 0.0 );
+
+				for ( let j = 0; j <= deg; j ++ ) {
+
+					arr[ i ][ span - deg + j ] = nj[ j ];
+
+				}
+
+			}
+
+			const ctrlp = point.slice();
+			const index = [];
+			ludcmp( n, arr, index );
+			lubksb( n, arr, index, ctrlp );
+			return ctrlp;
+
+		} else {
+
+			const nps = n + slope.length;
+			const b = new Array( nps ).fill( new Vector3() );
+			var m = 0;
+
+			for ( let i = 0; i < n; i ++ ) {
+
+				const span = this.findIndexSpan( deg, knot, nps, prm[ i ] );
+				const nj = this.basisFuncs( deg, knot, span, prm[ i ] );
+				arr[ i + m ] = new Array( nps ).fill( 0.0 );
+
+				for ( let j = 0; j <= deg; j ++ ) {
+
+					arr[ i + m ][ span - deg + j ] = nj[ j ];
+
+				}
+
+				b[ i + m ] = point[ i ];
+
+				const hasValue = pole[ i ].slope ? true : false;
+
+				if ( hasValue ) {
+
+					m ++;
+					arr[ i + m ] = new Array( nps ).fill( 0.0 );
+
+					switch ( i ) {
+
+						case 0 :
+
+							arr[ i + m ][ 0 ] = - 1.0;
+							arr[ i + m ][ 1 ] = 1.0;
+							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
+							break;
+
+						case n - 1 :
+
+							arr[ i + m ][ nps - 2 ] = - 1.0;
+							arr[ i + m ][ nps - 1 ] = 1.0;
+							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nps + deg ] - knot[ nps - 1 ] ) / deg );
+							break;
+
+						default :
+
+							const span = this.findIndexSpan( deg, knot, nps, prm[ i ] );
+							const nder = this.dersBasisFunc( deg, knot, span, 1, prm[ i ] );
+
+							for ( let j = 0; j <= deg; j ++ ) {
+
+								arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ];
+
+							}
+
+							b[ i + m ] = pole[ i ].slope;
+
+					}
+
+				}
+
+			}
+
+			const ctrlp = b.slice();
+			const index = [];
+			ludcmp( nps, arr, index );
+			lubksb( nps, arr, index, ctrlp );
+			return ctrlp;
+
+		}
+
+	}
+
 	static deBoorKnots( deg, prm ) {
 
 		const n = prm.length;
@@ -44,113 +152,11 @@ class NurbsUtil {
 	}
 
 	/*
-	Determine control points of interpolated curve. See The NURBS Book, page 369, algorithm A9.1
-	Solve linear algebra of AX = B, Sum( Ni(Ui) * Pi ) = Qi, where i = 0..nm1
-	*/
-	static globalCurveInterp( deg, knot, pole ) {
-
-		const n = pole.length;
-		const point = pole.map( e => e.point );
-		const param = pole.map( e => e.param );
-		const slope = pole.map( e => e.slope ).filter( Boolean );
-		var arr = [];
-
-		if ( ! slope.length ) {
-
-			for ( let i = 0; i < n; i ++ ) {
-
-				const span = this.findIndexSpan( deg, knot, n, param[ i ] );
-				const nj = this.basisFuncs( deg, knot, span, param[ i ] );
-				arr[ i ] = new Array( n ).fill( 0.0 );
-
-				for ( let j = 0; j <= deg; j ++ ) {
-
-					arr[ i ][ span - deg + j ] = nj[ j ];
-
-				}
-
-			}
-
-			const ctrlp = point.slice();
-			const index = [];
-			ludcmp( n, arr, index );
-			lubksb( n, arr, index, ctrlp );
-			return ctrlp;
-
-		} else {
-
-			const nps = n + slope.length;
-			const b = new Array( nps ).fill( new Vector3() );
-			var m = 0;
-
-			for ( let i = 0; i < n; i ++ ) {
-
-				const span = this.findIndexSpan( deg, knot, nps, param[ i ] );
-				const nj = this.basisFuncs( deg, knot, span, param[ i ] );
-				arr[ i + m ] = new Array( nps ).fill( 0.0 );
-
-				for ( let j = 0; j <= deg; j ++ ) {
-
-					arr[ i + m ][ span - deg + j ] = nj[ j ];
-
-				}
-
-				b[ i + m ] = point[ i ];
-
-				const hasValue = pole[ i ].slope ? true : false;
-
-				if ( hasValue ) {
-
-					m ++;
-					arr[ i + m ] = new Array( nps ).fill( 0.0 );
-
-					switch ( i ) {
-
-						case 0 :
-
-							arr[ i + m ][ 0 ] = - 1.0;
-							arr[ i + m ][ 1 ] = 1.0;
-							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
-							break;
-
-						case n - 1 :
-
-							arr[ i + m ][ nps - 2 ] = - 1.0;
-							arr[ i + m ][ nps - 1 ] = 1.0;
-							b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nps + deg ] - knot[ nps - 1 ] ) / deg );
-							break;
-
-						default :
-
-							const span = this.findIndexSpan( deg, knot, nps, pole[ i ].param );
-							const nder = this.dersBasisFunc( deg, knot, span, 1, pole[ i ].param );
-
-							for ( let j = 0; j <= deg; j ++ ) {
-
-								arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ];
-
-							}
-
-							b[ i + m ] = pole[ i ].slope;
-
-					}
-
-				}
-
-			}
-
-			const ctrlp = b.slice();
-			const index = [];
-			ludcmp( nps, arr, index );
-			lubksb( nps, arr, index, ctrlp );
-			return ctrlp;
-
-		}
-
-	}
-
-	/*
-	Determine the span index of knot vector. See The NURBS Book, page 68, algorithm A2.1
+	Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
+	deg: degree
+	knot: knot vector (knot[i]: knots)
+	n: number of control points
+	t: parameter
 	*/
 	static findIndexSpan( deg, knot, n, t ) {
 
@@ -210,9 +216,8 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute nonzero basis functions and their derivatives. See The NURBS Book, page 72, algorithm A2.3.
+	Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
 		ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
-		n : number of derivatives to calculate
 	*/
 	static dersBasisFunc( deg, knot, span, n, t ) {
 
@@ -318,7 +323,7 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
+	Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
 	*/
 	static _curvePoint( deg, knot, ctrl, t ) {
 
@@ -331,6 +336,37 @@ class NurbsUtil {
 			v.x += nj[ j ] * ctrl[ span - deg + j ].x;
 			v.y += nj[ j ] * ctrl[ span - deg + j ].y;
 			v.z += nj[ j ] * ctrl[ span - deg + j ].z;
+
+		}
+
+		return v;
+
+	}
+
+	/*
+	Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
+	*/
+	static _SurfacePoint( ni, nj, deg, knot, ctrl, t1, t2 ) {
+
+		const ispan = this.findIndexSpan( deg, knot.row, ni, t1 );
+		const nrow = this.basisFuncs( deg, knot.row, ispan, t1 );
+		const jspan = this.findIndexSpan( deg, knot.col, nj, t2 );
+		const ncol = this.basisFuncs( deg, knot.col, jspan, t2 );
+		var v = new Vector3( 0, 0, 0 );
+
+		for ( let j = 0; j <= deg; j ++ ) {
+
+			for ( let i = 0; i <= deg; i ++ ) {
+
+				v.x += nrow[ i ] * ctrl[ ispan - deg + i ].x;
+				v.y += nrow[ i ] * ctrl[ ispan - deg + i ].y;
+				v.z += nrow[ i ] * ctrl[ ispan - deg + i ].z;
+
+			}
+
+			v.x += ncol[ j ] * v.x;
+			v.y += ncol[ j ] * v.y;
+			v.z += ncol[ j ] * v.z;
 
 		}
 
@@ -363,7 +399,6 @@ class NurbsUtil {
 
 	/*
 	Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
-	n : number of derivatives
 	*/
 	static _curveDers( deg, knot, ctrl, t, n = 2 ) {
 
@@ -394,7 +429,6 @@ class NurbsUtil {
 
 	/*
 	Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
-	n : number of derivatives
 	*/
 	static curveDers( deg, knot, ctrl, t, n = 2 ) {
 

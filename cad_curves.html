@@ -144,7 +144,7 @@
 			pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 			raycaster.setFromCamera( pointer, camera );
-			const curve = intCurve[ 0 ]
+			const curve = curves[ 0 ]
 			const intersect = new THREE.Vector3();
 			const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 			//console.log(isDrag);
@@ -207,7 +207,7 @@
 			pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 			
 			raycaster.setFromCamera( pointer, camera );
-			const curve = intCurve[ 0 ];
+			const curve = curves[ 0 ];
 			const intersect = new THREE.Vector3();
 			const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -270,7 +270,6 @@
 
 				case 2:
 
-
 					curve.addTangent( 0, new THREE.Vector3( 0, 0, 0 ) );
 					curve.hasSlope = true;
 					curve._calcCtrlPoints();
@@ -301,8 +300,8 @@
 		const buffer = preBuffer();
 		scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature );
 
-		const intCurve = [];
-		intCurve.push( new NurbsCurve( 3 ) );
+		const curves = [];
+		curves.push( new NurbsCurve( 3 ) );
 
 	}
 

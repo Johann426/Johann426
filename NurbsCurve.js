@@ -1,4 +1,3 @@
-
 /*
 If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
 this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
@@ -10,7 +9,7 @@ class NurbsCurve {
 
 	constructor( deg, type = 'chordal' ) {
 
-		this.pole = []; //to store points, their parameterized value, and directional constraints(option).
+		this.pole = []; 
 
 		this.type = type;
 
@@ -50,16 +49,27 @@ class NurbsCurve {
 
 	addTangent( i, v ) {
 
-		v.normalize().multiplyScalar( this.polyL );
+		const points = this.pole.map( e => e.point )
+		const chordL = this.getChordLength( points )
+		v.normalize().multiplyScalar( chordL );
 		this.pole[ i ].slope = v;
 
 	}
 
-	getKnots() {
+	getChordLength( points ) {
 
-		calcKnots( this.type, this.deg(), this.pole );
+		const n = points.length;
+		var sum = 0.0;
 
-		return this.knots;
+		for ( let i = 1; i < n; i ++ ) {
+
+			const del = points[ i ].clone().sub( points[ i - 1 ] );
+			const len = del.length();
+			sum += len;
+
+		}
+
+		return sum;
 
 	}
 
@@ -139,17 +149,17 @@ class NurbsCurve {
 
 	_calcCtrlPoints() {
 
-		this._calcKnots( this.type, this.deg(), this.pole );
-		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.knots, this.pole );
+		const points = this.pole.map( e => e.point )
+		this.para = this._parameterize( points, this.type );
+		this.knots = this._calcKnots( this.deg(), this.para, this.pole );
+		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.para, this.knots, this.pole );
 
 	}
 
-	_calcKnots( curveType, deg, pole ) {
+	_calcKnots( deg, prm, pole ) {
 
 		const n = pole.length;
 		const nm1 = n - 1;
-		this._parameterize( curveType, pole.map( e => e.point ) );
-		const prm = pole.map( e => e.param );
 		const a = prm.slice();
 		var m = 0;
 
@@ -190,14 +200,14 @@ class NurbsCurve {
 
 		}
 
-		this.knots = NurbsUtil.deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
+		return NurbsUtil.deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
 
 	}
 
-	_parameterize( curveType, points ) {
+	_parameterize( points, curveType ) {
 
 		const n = points.length;
-		const nm1 = n - 1;
+		const prm = [];
 		var sum = 0.0;
 
 		for ( let i = 1; i < n; i ++ ) {
@@ -205,21 +215,20 @@ class NurbsCurve {
 			const del = points[ i ].clone().sub( points[ i - 1 ] );
 			const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
 			sum += len;
+			prm[ i ] = sum;
 
 		}
 
-		this.polyL = sum;
-		this.pole[ 0 ].param = 0.0;
+		prm[ 0 ] = 0.0;
 
 		for ( let i = 1; i < n; i ++ ) {
 
-			const del = points[ i ].clone().sub( points[ i - 1 ] );
-			const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
-			this.pole[ i ].param = this.pole[ i - 1 ].param + len / sum;
+			prm[ i ] /= sum;
 
 		}
 
-		this.pole[ nm1 ].param = 1.0; //last one to be 1.0 instead of 0.999999..
+		prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
+		return prm;
 
 	}
 
