@@ -379,7 +379,7 @@
 
 	function updateCurveBuffer( curve, buffer ) {
 		
-		updateCurve( curve, buffer.lines, buffer.curvature );
+		updateLines( curve, buffer.lines, buffer.curvature );
 		updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 	}
@@ -439,7 +439,7 @@
 
 	}
 
-	function updateCurve( curve, lines, curvature ) {
+	function updateLines( curve, lines, curvature ) {
 
 		let pts, pos, arr, index;
 
