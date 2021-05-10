@@ -689,11 +689,31 @@ function lubksb( n, a, indx, b ) {
 // Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
 function mapHomogeious( v4 ) {
 
-	const w = v4[ i ].w;
-	const x = v4[ i ].x / w;
-	const y = v4[ i ].t / w;
-	const z = v4[ i ].z / w;
-	return new Vector3( x, y, z );
+	if ( isArray( v4 ) ) {
+
+		const v3 = [];
+
+		for ( let i = 0; i < v4.length; i ++ ) {
+
+			const w = v4[ i ].w;
+			const x = v4[ i ].x / w;
+			const y = v4[ i ].y / w;
+			const z = v4[ i ].z / w;
+			v3.push( new Vector3( x, y, z );
+
+		}
+
+		return v3
+
+	} else {
+
+		const w = v4[ i ].w;
+		const x = v4[ i ].x / w;
+		const y = v4[ i ].y / w;
+		const z = v4[ i ].z / w;
+		return new Vector3( x, y, z );
+
+	}
 
 }
 
