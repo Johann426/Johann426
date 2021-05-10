@@ -470,6 +470,37 @@ class NurbsUtil {
 		return v;
 
 	}
+	
+	// Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
+	static mapHomogeious( v4 ) {
+
+		if ( Array.isArray( v4 ) ) {
+
+			const v3 = [];
+
+			for ( let i = 0; i < v4.length; i ++ ) {
+
+				const w = v4[ i ].w;
+				const x = v4[ i ].x / w;
+				const y = v4[ i ].y / w;
+				const z = v4[ i ].z / w;
+				v3.push( new Vector3( x, y, z ) );
+
+			}
+
+			return v3
+
+		} else {
+
+			const w = v4[ i ].w;
+			const x = v4[ i ].x / w;
+			const y = v4[ i ].y / w;
+			const z = v4[ i ].z / w;
+			return new Vector3( x, y, z );
+
+		}
+
+	}
 
 }
 
@@ -681,37 +712,6 @@ function lubksb( n, a, indx, b ) {
 	for ( let i = 0; i < n; i ++ ) {
 
 		b[ i ] = new Vector4( x[ i ], y[ i ], z[ i ], 1.0 );
-
-	}
-
-}
-
-// Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
-function mapHomogeious( v4 ) {
-
-	if ( isArray( v4 ) ) {
-
-		const v3 = [];
-
-		for ( let i = 0; i < v4.length; i ++ ) {
-
-			const w = v4[ i ].w;
-			const x = v4[ i ].x / w;
-			const y = v4[ i ].y / w;
-			const z = v4[ i ].z / w;
-			v3.push( new Vector3( x, y, z ) );
-
-		}
-
-		return v3
-
-	} else {
-
-		const w = v4[ i ].w;
-		const x = v4[ i ].x / w;
-		const y = v4[ i ].y / w;
-		const z = v4[ i ].z / w;
-		return new Vector3( x, y, z );
 
 	}
 
