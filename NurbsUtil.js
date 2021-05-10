@@ -346,27 +346,30 @@ class NurbsUtil {
 	/*
 	Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
 	*/
-	static _SurfacePoint( ni, nj, deg, knot, ctrl, t1, t2 ) {
+	static _SurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, u, v ) {
 
-		const ispan = this.findIndexSpan( deg, knot.row, ni, t1 );
-		const nrow = this.basisFuncs( deg, knot.row, ispan, t1 );
-		const jspan = this.findIndexSpan( deg, knot.col, nj, t2 );
-		const ncol = this.basisFuncs( deg, knot.col, jspan, t2 );
+		//const ni = knotU.length - degU - 2;
+		//const nj = knotV.length - degV - 2;
+
+		const spanU = this.findIndexSpan( degU, knotU, n, u );
+		const spanV = this.findIndexSpan( degV, knotV, m, v );
+		const ni = this.basisFuncs( degU, knotU, spanU, u );
+		const nj = this.basisFuncs( degV, knotV, spanV, v );
 		var v = new Vector3( 0, 0, 0 );
 
-		for ( let j = 0; j <= deg; j ++ ) {
+		for ( let j = 0; j <= degV; j ++ ) {
 
 			for ( let i = 0; i <= deg; i ++ ) {
 
-				v.x += nrow[ i ] * ctrl[ ispan - deg + i ].x;
-				v.y += nrow[ i ] * ctrl[ ispan - deg + i ].y;
-				v.z += nrow[ i ] * ctrl[ ispan - deg + i ].z;
+				v.x += ni[ i ] * ctrl[ spanU - degU + i ].x;
+				v.y += ni[ i ] * ctrl[ spanU - degU + i ].y;
+				v.z += ni[ i ] * ctrl[ spanU - degU + i ].z;
 
 			}
 
-			v.x += ncol[ j ] * v.x;
-			v.y += ncol[ j ] * v.y;
-			v.z += ncol[ j ] * v.z;
+			v.x += nj[ j ] * v.x;
+			v.y += nj[ j ] * v.y;
+			v.z += nj[ j ] * v.z;
 
 		}
 

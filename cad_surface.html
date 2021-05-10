@@ -57,7 +57,6 @@
 
 		const controls = new THREE.OrbitControls( camera, renderer.domElement );
 		controls.enableDamping = true;
-		controls.enabled = false;
 
 		window.addEventListener( 'resize', () => {
 
@@ -108,7 +107,7 @@
 					break;
 
 				case 'ControlLeft':
-					controls.enabled = true;
+					//controls.enabled = true;
 					break;
 
 				case 'KeyC':
@@ -129,7 +128,7 @@
 
 			if ( e.code === 'ControlLeft' ) {
 
-				controls.enabled = false;
+				//controls.enabled = false;
 
 			}
 
@@ -144,11 +143,6 @@
 			pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 			pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
-			raycaster.setFromCamera( pointer, camera );
-			const curve = curves[ 0 ]
-			const intersect = new THREE.Vector3();
-			const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-			//console.log(isDrag);
 			switch ( mode.curve ) {
 				
 				case 'Add':
@@ -272,12 +266,6 @@
 
 		} );
 
-		const buffer = preBuffer();
-		scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature );
-
-		const curves = [];
-		curves.push( new NurbsCurve( 3 ) );
-
 		// Surface temp code
 		const points = [];
 		points.push( [ new THREE.Vector3( -0.5, 0.1, 0.0 ), new THREE.Vector3( -0.3, 0.2, 0.0 ), new THREE.Vector3( -0.1, 0.3, 0.0 ), new THREE.Vector3( 0.1, 0.4, 0.0 ), new THREE.Vector3( 0.3, 0.5, 0.0 ) ] );
@@ -335,8 +323,9 @@
 
 	}
 
-	function preBuffer() {
-		
+
+	function preSurfBuffer() {
+
 		let geometry, positions, material;
 
 		// geometry
@@ -344,169 +333,27 @@
 
 		// attributes
 		positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-		geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) ); //geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-
-		// material
-		material = new THREE.ShaderMaterial( {
-			transparent: true,
-			uniforms: {
-				size: { value: 10 },
-				scale: { value: 1 },
-				color: { value: new THREE.Color( 'DimGray' ) }
-			},
-			vertexShader: THREE.ShaderLib.points.vertexShader,
-			fragmentShader: `
-					uniform vec3 color;
-					void main() {
-						vec2 xy = gl_PointCoord.xy - vec2(0.5);
-						float ll = length(xy);
-						gl_FragColor = vec4(color, step(ll, 0.5));
-				}
-				`
-		} );
-
-		// control points
-		const ctrlPoints = new THREE.Points( geometry, material );
-
-		// design points
-		const points = new THREE.Points( geometry.clone(), material.clone() );
-
-		// material
-		material = new THREE.LineBasicMaterial( { color: 0xffffff } );
-
-		// polygon
-		const polygon = new THREE.Line( geometry.clone(), material );
-
-		// lines
-		const lines = new THREE.Line( geometry.clone(), material.clone() );
-		
-		// geometry
-		geometry = new THREE.BufferGeometry();
-
-		// attributes
-		positions = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+		// material
+		material = new THREE.MeshNormalMaterial();
+		material.side = THREE.DoubleSide;
 		
-		// curvature
-		const curvature = new THREE.LineSegments( geometry, material.clone() );
-		
-		points.material.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
-		polygon.material.color.set(0x808080);
-		lines.material.color.set(0xffff00);
-		curvature.material.color.set(0x800000);
+		const surface = new THREE.Mesh( geometry, material );
 
 		return {
 
-			points: points,
-			ctrlPoints: ctrlPoints,
-			lines: lines,
-			polygon: polygon,
-			curvature: curvature
+			'surface': surface,
 
 		}
 
 	}
 
-	function updateCurveBuffer( curve, buffer ) {
+	function updateTriangles( surf, buffer ) {
+
 		
-		updateCurve( curve, buffer.lines, buffer.curvature );
-		updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
-
-		buffer.lines.geometry.attributes.position.needsUpdate = true;
-		buffer.curvature.geometry.attributes.position.needsUpdate = true;
-		buffer.points.geometry.attributes.position.needsUpdate = true;
-		buffer.ctrlPoints.geometry.attributes.position.needsUpdate = true;
-		buffer.polygon.geometry.attributes.position.needsUpdate = true;
-
-		buffer.points.geometry.setDrawRange( 0, curve.pole.length );
-		buffer.ctrlPoints.geometry.setDrawRange( 0, curve.ctrlPoints.length );
-		buffer.polygon.geometry.setDrawRange( 0, curve.ctrlPoints.length );
 
 	}
-
-	function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
-		
-		let pts = arr = [];
-		let index;
-
-		//update design points
-		pts = curve.pole.map( e => e.point );
-		arr = points.geometry.attributes.position.array;
-		index = 0;
-
-		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-			arr[ index ++ ] = i < l ? pts[ i ].x : null;
-			arr[ index ++ ] = i < l ? pts[ i ].y : null;
-			arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-		}
-
-		//update control points
-		pts = curve.ctrlPoints
-		arr = ctrlPoints.geometry.attributes.position.array;
-		index = 0;
-
-		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-			arr[ index ++ ] = i < l ? pts[ i ].x : null;
-			arr[ index ++ ] = i < l ? pts[ i ].y : null;
-			arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-		}
-
-		arr = polygon.geometry.attributes.position.array;
-		index = 0;
-
-		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-			arr[ index ++ ] = i < l ? pts[ i ].x : null;
-			arr[ index ++ ] = i < l ? pts[ i ].y : null;
-			arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-		}
-
-	}
-
-	function updateCurve( curve, lines, curvature ) {
-
-		let pts, arr, index;
-
-		//update curve
-		pts = curve.getPoints( MAX_POINTS );
-		arr = lines.geometry.attributes.position.array;
-		index = 0;
-
-		for ( let i = 0; i < MAX_POINTS; i ++ ) {
-
-			arr[ index ++ ] = pts[ i ].x;
-			arr[ index ++ ] = pts[ i ].y;
-			arr[ index ++ ] = pts[ i ].z;
-
-		}
-
-		if ( curvature !== undefined ) {
-			
-			pts = curve.shapeInterrogation( MAX_SEG );
-			arr = curvature.geometry.attributes.position.array;
-			index = 0;
-
-			for ( let i = 0; i < MAX_SEG; i ++ ) {
-
-				arr[ index ++ ] = pts[ i ].point.x;
-				arr[ index ++ ] = pts[ i ].point.y;
-				arr[ index ++ ] = pts[ i ].point.z;
-
-				const crvt = pts[ i ].normal.clone().negate().mul( pts[ i ].curvature );
-				const tuft = pts[ i ].point.clone().add( crvt );
-
-				arr[ index ++ ] = tuft.x;
-				arr[ index ++ ] = tuft.y;
-				arr[ index ++ ] = tuft.z;
-				
-			}
-		}
-
-	}
+	
 
 </script>

@@ -101,7 +101,6 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			//call function curvePointUni(), if you prefer to use B-spline instead of NURBS.
 			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t )
 
 		}

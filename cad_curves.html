@@ -367,11 +367,11 @@
 
 		return {
 
-			points: points,
-			ctrlPoints: ctrlPoints,
-			lines: lines,
-			polygon: polygon,
-			curvature: curvature
+			'points': points,
+			'ctrlPoints': ctrlPoints,
+			'lines': lines,
+			'polygon': polygon,
+			'curvature': curvature
 
 		}
 
@@ -382,26 +382,19 @@
 		updateCurve( curve, buffer.lines, buffer.curvature );
 		updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
-		buffer.lines.geometry.attributes.position.needsUpdate = true;
-		buffer.curvature.geometry.attributes.position.needsUpdate = true;
-		buffer.points.geometry.attributes.position.needsUpdate = true;
-		buffer.ctrlPoints.geometry.attributes.position.needsUpdate = true;
-		buffer.polygon.geometry.attributes.position.needsUpdate = true;
-
-		buffer.points.geometry.setDrawRange( 0, curve.pole.length );
-		buffer.ctrlPoints.geometry.setDrawRange( 0, curve.ctrlPoints.length );
-		buffer.polygon.geometry.setDrawRange( 0, curve.ctrlPoints.length );
-
 	}
 
 	function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 		
-		let pts = arr = [];
-		let index;
+		let pts, geo, pos, arr, index;
 
 		//update design points
 		pts = curve.pole.map( e => e.point );
-		arr = points.geometry.attributes.position.array;
+		geo = points.geometry;
+		geo.setDrawRange( 0, pts.length );
+		pos = geo.attributes.position;
+		pos.needsUpdate = true;
+		arr = pos.array;
 		index = 0;
 
 		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
@@ -413,8 +406,12 @@
 		}
 
 		//update control points
-		pts = curve.getCtrlPoints()
-		arr = ctrlPoints.geometry.attributes.position.array;
+		pts = curve.getCtrlPoints();
+		geo = ctrlPoints.geometry;
+		geo.setDrawRange( 0, pts.length );
+		pos = geo.attributes.position;
+		pos.needsUpdate = true;
+		arr = pos.array;
 		index = 0;
 
 		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
@@ -425,7 +422,11 @@
 
 		}
 
-		arr = polygon.geometry.attributes.position.array;
+		geo = polygon.geometry;
+		geo.setDrawRange( 0, pts.length );
+		pos = geo.attributes.position;
+		pos.needsUpdate = true;
+		arr = pos.array;
 		index = 0;
 
 		for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
@@ -440,11 +441,13 @@
 
 	function updateCurve( curve, lines, curvature ) {
 
-		let pts, arr, index;
+		let pts, pos, arr, index;
 
 		//update curve
 		pts = curve.getPoints( MAX_POINTS );
-		arr = lines.geometry.attributes.position.array;
+		pos = lines.geometry.attributes.position;
+		pos.needsUpdate = true;
+		arr = pos.array;
 		index = 0;
 
 		for ( let i = 0; i < MAX_POINTS; i ++ ) {
@@ -456,9 +459,11 @@
 		}
 
 		if ( curvature !== undefined ) {
-			
+
 			pts = curve.shapeInterrogation( MAX_SEG );
-			arr = curvature.geometry.attributes.position.array;
+			pos = curvature.geometry.attributes.position;
+			pos.needsUpdate = true;
+			arr = pos.array;
 			index = 0;
 
 			for ( let i = 0; i < MAX_SEG; i ++ ) {
@@ -473,8 +478,9 @@
 				arr[ index ++ ] = tuft.x;
 				arr[ index ++ ] = tuft.y;
 				arr[ index ++ ] = tuft.z;
-				
+
 			}
+
 		}
 
 	}
