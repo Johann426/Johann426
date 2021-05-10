@@ -77,7 +77,7 @@ class NurbsCurve {
 
 		this._calcCtrlPoints();
 		const p = this.ctrlPoints;
-		return NurbsUtil.mapHomogeious( p );
+		return mapHomogeious( p );
 
 	}
 
@@ -85,7 +85,11 @@ class NurbsCurve {
 
 		this._calcCtrlPoints();
 		const p = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
-		return NurbsUtil.mapHomogeious( p );
+		const w = p.w;
+		const x = p.x / w;
+		const y = p.y / w;
+		const z = p.z / w;
+		return new Vector3( x, y, z );
 
 	}
 
@@ -102,17 +106,16 @@ class NurbsCurve {
 
 		}
 
-		return NurbsUtil.mapHomogeious( p );
+		return mapHomogeious( p );
 
 	}
 
 	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		//call function curveDersUni(), if you prefer to use B-spline instead of NURBS.
-		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
-
-		return NurbsUtil.mapHomogeious( ders );
+		const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
+		const ders = v4.map( e => new Vector3( e.x, e.y, e.z ) );
+		return ders;
 
 	}
 
@@ -125,7 +128,8 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = NurbsUtil.mapHomogeious( NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 ) );
+			const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 )
+			const ders = v4.map( e => new Vector3( e.x, e.y, e.z ) );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
