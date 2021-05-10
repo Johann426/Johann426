@@ -687,7 +687,7 @@ function lubksb( n, a, indx, b ) {
 }
 
 // Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
-function toVector3( v4 ) {
+function mapH( v4 ) {
 
 	const v3 = [];
 
