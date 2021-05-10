@@ -393,7 +393,7 @@ class NurbsUtil {
 
 		}
 
-		return v;
+		return mapHomogeious( v );
 
 	}
 
@@ -467,7 +467,7 @@ class NurbsUtil {
 
 		}
 
-		return v;
+		return mapHomogeious( v );
 
 	}
 
@@ -687,7 +687,7 @@ function lubksb( n, a, indx, b ) {
 }
 
 // Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
-function mapH( v4 ) {
+function mapHomogeious( v4 ) {
 
 	const v3 = [];
 
