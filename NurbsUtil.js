@@ -699,7 +699,7 @@ function mapHomogeious( v4 ) {
 			const x = v4[ i ].x / w;
 			const y = v4[ i ].y / w;
 			const z = v4[ i ].z / w;
-			v3.push( new Vector3( x, y, z );
+			v3.push( new Vector3( x, y, z ) );
 
 		}
 
