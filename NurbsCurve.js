@@ -78,16 +78,12 @@ class NurbsCurve {
 		this._calcCtrlPoints();
 		const p = this.ctrlPoints;
 
-		return toVector3( p );
-
 	}
 
 	getPointAt( t ) {
 
 		this._calcCtrlPoints();
 		const p = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
-
-		return new Vector3( p.x, p.y, p.z );
 
 	}
 
@@ -104,7 +100,7 @@ class NurbsCurve {
 
 		}
 
-		return toVector3( p );
+		return p;
 
 	}
 
@@ -114,7 +110,7 @@ class NurbsCurve {
 		//call function curveDersUni(), if you prefer to use B-spline instead of NURBS.
 		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
 
-		return toVector3( ders );
+		return ders;
 
 	}
 
@@ -127,7 +123,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = toVector3( NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t ) );
+			const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
