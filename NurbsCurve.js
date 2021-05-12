@@ -9,7 +9,7 @@ class NurbsCurve {
 
 	constructor( deg, type = 'chordal' ) {
 
-		this.pole = []; 
+		this.pole = [];
 
 		this.type = type;
 
@@ -49,8 +49,8 @@ class NurbsCurve {
 
 	addTangent( i, v ) {
 
-		const points = this.pole.map( e => e.point )
-		const chordL = this.getChordLength( points )
+		const points = this.pole.map( e => e.point );
+		const chordL = this.getChordLength( points );
 		v.normalize().multiplyScalar( chordL );
 		this.pole[ i ].slope = v;
 
@@ -101,7 +101,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t )
+			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
 
 		}
 
@@ -127,7 +127,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 )
+			const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
 			const ders = v4.map( e => new Vector3( e.x, e.y, e.z ) );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
@@ -150,7 +150,7 @@ class NurbsCurve {
 
 	_calcCtrlPoints() {
 
-		const points = this.pole.map( e => e.point )
+		const points = this.pole.map( e => e.point );
 		this.para = this._parameterize( points, this.type );
 		this.knots = this._calcKnots( this.deg(), this.para, this.pole );
 		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.para, this.knots, this.pole );
