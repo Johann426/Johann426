@@ -1,20 +1,19 @@
-
 /*
-If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
-this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
-i.e., parameterized value, knot vector, and control points.
-js code by Johann426.github
-*/
+ * If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
+ * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
+ * i.e., parameterized value, knot vector, and control points.
+ * js code by Johann426.github
+ */
 
 class NurbsUtil {
 
 	/*
-	Determine control points of curve interpolation with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
-	deg: degree
-	prm: parameterized value at each point
-	knot: knot vector (knot[i]: knots)
-	pole: to store points having slope constraints(option)
-	*/
+	 * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+	 * deg: degree
+	 * prm: parameterized value at each point
+	 * knot: knot vector (knot[i]: knots)
+	 * pole: to store points having slope constraints(option)
+	 */
 	static globalCurveInterp( deg, prm, knot, pole ) {
 
 		const n = pole.length;
@@ -152,12 +151,12 @@ class NurbsUtil {
 	}
 
 	/*
-	Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
-	deg: degree
-	knot: knot vector (knot[i]: knots)
-	n: number of control points
-	t: parameter
-	*/
+	 * Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
+	 * deg: degree
+	 * knot: knot vector (knot[i]: knots)
+	 * n: number of control points
+	 * t: parameter
+	 */
 	static findIndexSpan( deg, knot, n, t ) {
 
 		const nm1 = n - 1;
@@ -184,8 +183,8 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute nonvanishing basis functions. See The NURBS Book, page 70, algorithm A2.2
-	*/
+	 * Compute nonvanishing basis functions. See The NURBS Book, page 70, algorithm A2.2
+	 */
 	static basisFuncs( deg, knot, span, t ) {
 
 		const left = [];
@@ -216,9 +215,9 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
-		ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
-	*/
+	 * Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
+	 * ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
+	 */
 	static dersBasisFunc( deg, knot, span, n, t ) {
 
 		const order = deg + 1;
@@ -323,8 +322,8 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
-	*/
+	 * Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
+	 */
 	static _curvePoint( deg, knot, ctrl, t ) {
 
 		const span = this.findIndexSpan( deg, knot, ctrl.length, t );
@@ -344,8 +343,8 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
-	*/
+	 * Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
+	 */
 	static _SurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, u, v ) {
 
 		//const ni = knotU.length - degU - 2;
@@ -378,8 +377,8 @@ class NurbsUtil {
 	}
 
 	/*
-	Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
-	*/
+	 * Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
+	 */
 	static curvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
 
 		const span = this.findIndexSpan( deg, knot, ctrl.length, t );
@@ -396,13 +395,13 @@ class NurbsUtil {
 
 		}
 
-		return v;
+		return deWeight( v );
 
 	}
 
 	/*
-	Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
-	*/
+	 * Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+	 */
 	static _curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 		const v = [];
@@ -431,8 +430,8 @@ class NurbsUtil {
 
 
 	/*
-	Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
-	*/
+	 * Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
+	 */
 	static curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 		const v = [];
@@ -470,15 +469,17 @@ class NurbsUtil {
 
 		}
 
-		return v;
+		const ders = v.map( e => new Vector3( e.x, e.y, e.z ) );
+
+		return ders;
 
 	}
 	
 }
 
 /*
-Compute binomial coefficient, k! / ( i! * ( k - i )! )
-*/
+ * Compute binomial coefficient, k! / ( i! * ( k - i )! )
+ */
 function binomial( k, i ) {
 
 	let nom = 1;
@@ -690,21 +691,36 @@ function lubksb( n, a, indx, b ) {
 }
 
 // Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
-function mapHomogeious( v4 ) {
+function deWeight( v4 ) {
 
-	const v3 = [];
+	const isArray = Array.isArray( v4 );
+	
+	if ( isArray ) {
 
-	for ( let i = 0; i < v4.length; i ++ ) {
+		const v3 = []
 
-		const w = v4[ i ].w;
-		const x = v4[ i ].x / w;
-		const y = v4[ i ].y / w;
-		const z = v4[ i ].z / w;
-		v3.push( new Vector3( x, y, z ) );
+		for ( let i = 0; i < v4.length; i ++ ) {
+
+			const w = v4[ i ].w;
+			const x = v4[ i ].x / w;
+			const y = v4[ i ].y / w;
+			const z = v4[ i ].z / w;
+			v3.push( new Vector3( x, y, z ) );
+	
+		}
+	
+		return v3
+
+	} else {
+
+		const w = v4.w;
+		const x = v4.x / w;
+		const y = v4.y / w;
+		const z = v4.z / w;
+
+		return new Vector3( x, y, z );
 
 	}
-
-	return v3
 
 }
 
@@ -875,3 +891,5 @@ class Vector4 {
 	}
 
 }
+
+export { NurbsUtil, Vector3 };

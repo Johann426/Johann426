@@ -1,9 +1,11 @@
 /*
-If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
-this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
-i.e., parameterized value, knot vector, and control points.
-js code by Johann426.github
-*/
+ * If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
+ * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
+ * i.e., parameterized value, knot vector, and control points.
+ * js code by Johann426.github
+ */
+
+import { NurbsUtil, Vector3 } from './NurbsUtil.js';
 
 class NurbsCurve {
 
@@ -76,8 +78,8 @@ class NurbsCurve {
 	getCtrlPoints() {
 
 		this._calcCtrlPoints();
-		const p = this.ctrlPoints;
-		return mapHomogeious( p );
+		const v = this.ctrlPoints;
+		return v.map( e => new Vector3( e.x / e.w, e.y / e.w, e.z / e.w ) );
 
 	}
 
@@ -105,16 +107,14 @@ class NurbsCurve {
 
 		}
 
-		return mapHomogeious( p );
+		return p;
 
 	}
 
 	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
-		const ders = v4.map( e => new Vector3( e.x, e.y, e.z ) );
-		return ders;
+		return NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
 
 	}
 
@@ -127,8 +127,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const v4 = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
-			const ders = v4.map( e => new Vector3( e.x, e.y, e.z ) );
+			const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -234,3 +233,5 @@ class NurbsCurve {
 	}
 
 }
+
+export { NurbsCurve };
