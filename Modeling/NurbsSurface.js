@@ -17,8 +17,8 @@ class NurbsSurface {
 		this.pole = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
-			
-			this.pole[j] = [];
+
+			this.pole[ j ] = [];
 
 			for ( let i = 0; i < ni; i ++ ) {
 
@@ -44,14 +44,14 @@ class NurbsSurface {
 
 		const ni = this.ni;
 		const nj = this.nj;
-		const points = this.points //this.pole.map( e => e.point )
+		const points = this.points; //this.pole.map( e => e.point )
 		this.para = this._parameterize( ni, nj, points, this.type );
 		this.knots = this._calcKnots( ni, nj, this.deg(), this.para, this.pole );
 		this.ctrlPoints = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlPoints[ j ] = NurbsUtil.globalCurveInterp( this.deg(), this.para.row, this.knots.row, this.pole[j] );
+			this.ctrlPoints[ j ] = NurbsUtil.globalCurveInterp( this.deg(), this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -60,7 +60,7 @@ class NurbsSurface {
 			const r = [];
 
 			for ( let j = 0; j < nj; j ++ ) {
-			
+
 				r[ j ] = { 'point': this.ctrlPoints[ j ][ i ] };
 
 			}
@@ -124,7 +124,7 @@ class NurbsSurface {
 			'row': [],
 			'col': []
 
-		}
+		};
 
 		knot.row = NurbsUtil.deBoorKnots( deg, prm.row ); //.sort( ( a, b ) => { return a - b } );
 		knot.col = NurbsUtil.deBoorKnots( deg, prm.col );
@@ -140,7 +140,7 @@ class NurbsSurface {
 			'row': [],
 			'col': []
 
-		}
+		};
 
 		for ( let j = 0; j < nj; j ++ ) {
 

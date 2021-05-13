@@ -13,8 +13,7 @@
   },
   "author": "Johann426",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Johann426/Johann426/issues"
-  },
-  "homepage": "https://github.com/Johann426/Johann426#readme"
+  "devDependencies": {
+
+  }
 }

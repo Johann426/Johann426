@@ -1,3 +1,5 @@
+
+import { Container } from './GUI/container.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
 const MAX_POINTS = 500;
@@ -27,7 +29,10 @@ function init() {
 
 	} );
 
-	document.body.appendChild( renderer.domElement );
+	//document.body.appendChild( renderer.domElement );
+	let container = new Container('mainCanvas', document.body, renderer.domElement);
+	container.create();
+	container.createList();
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;

@@ -474,7 +474,7 @@ class NurbsUtil {
 		return ders;
 
 	}
-	
+
 }
 
 /*
@@ -694,10 +694,10 @@ function lubksb( n, a, indx, b ) {
 function deWeight( v4 ) {
 
 	const isArray = Array.isArray( v4 );
-	
+
 	if ( isArray ) {
 
-		const v3 = []
+		const v3 = [];
 
 		for ( let i = 0; i < v4.length; i ++ ) {
 
@@ -706,10 +706,10 @@ function deWeight( v4 ) {
 			const y = v4[ i ].y / w;
 			const z = v4[ i ].z / w;
 			v3.push( new Vector3( x, y, z ) );
-	
+
 		}
-	
-		return v3
+
+		return v3;
 
 	} else {
 
