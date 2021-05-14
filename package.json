@@ -14,6 +14,8 @@
   "author": "Johann426",
   "license": "ISC",
   "devDependencies": {
-
-  }
+    "eslint": "^7.26.0",
+    "eslint-config-mdcs": "^5.0.0"
+  },
+  "dependencies": {}
 }
