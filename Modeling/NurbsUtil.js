@@ -358,7 +358,7 @@ class NurbsUtil {
 
 		for ( let j = 0; j <= degV; j ++ ) {
 
-			for ( let i = 0; i <= deg; i ++ ) {
+			for ( let i = 0; i <= degU; i ++ ) {
 
 				v.x += ni[ i ] * ctrl[ spanU - degU + i ].x;
 				v.y += ni[ i ] * ctrl[ spanU - degU + i ].y;
