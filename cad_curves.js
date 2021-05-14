@@ -19,7 +19,7 @@ function init() {
 
 	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10000 );
 	camera.position.set( 0, 0, 1 );
-	
+
 	const renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setAnimationLoop( time => {
@@ -30,7 +30,7 @@ function init() {
 	} );
 
 	//document.body.appendChild( renderer.domElement );
-	let container = new Container('mainCanvas', document.body, renderer.domElement);
+	let container = new Container( 'mainCanvas', document.body, renderer.domElement );
 	container.create();
 	container.createList();
 
@@ -47,31 +47,31 @@ function init() {
 	} );
 
 	window.addEventListener( 'load', () => {
-		
+
 		var obj = {
 			//str : 'abc',
 			//number: 0,
 			//value: 0,
 			//valueRange : [-1,1],
 			//bool: false,
-			select : ['Add', 'Remove', 'Tanget']
+			select: [ 'Add', 'Remove', 'Tanget' ]
 		};
 
 		var controlKit = new ControlKit();
 
-		controlKit.addPanel({label: 'Panel'})
-			.addSubGroup({label: 'Curve'})
-				//.addStringInput(obj,'str',{label: 'String'})
-				//.addNumberInput(obj,'number',{label: 'Number'})
-				//.addSlider(obj,'value','valueRange',{label: 'Value'})
-				//.addRange(obj,'valueRange',{label : 'Value Range'})
-				//.addCheckbox(obj, 'bool', {label: 'Bool'})
-				.addSelect( obj, 'select', { label: 'Points', onChange: e => {
-					
-					mode.curve = obj.select[e]
-					console.log(mode.curve)
+		controlKit.addPanel( { label: 'Panel' } )
+			.addSubGroup( { label: 'Curve' } )
+		//.addStringInput(obj,'str',{label: 'String'})
+		//.addNumberInput(obj,'number',{label: 'Number'})
+		//.addSlider(obj,'value','valueRange',{label: 'Value'})
+		//.addRange(obj,'valueRange',{label : 'Value Range'})
+		//.addCheckbox(obj, 'bool', {label: 'Bool'})
+			.addSelect( obj, 'select', { label: 'Points', onChange: e => {
 
-				} } );
+				mode.curve = obj.select[ e ];
+				console.log( mode.curve );
+
+			} } );
 
 	} );
 
@@ -81,9 +81,9 @@ function init() {
 	document.addEventListener( 'keydown', e => {
 
 		switch ( e.code ) {
-			
+
 			case 'ShiftLeft':
-				mode.curve = 'Add'
+				mode.curve = 'Add';
 				break;
 
 			case 'ControlLeft':
@@ -95,9 +95,9 @@ function init() {
 				break;
 
 			case 'Escape':
-				mode.curve = null
+				mode.curve = null;
 				break;
-			
+
 			default :
 
 		}
@@ -124,109 +124,43 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ 0 ]
+		const curve = curves[ 0 ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 		//console.log(isDrag);
 		switch ( mode.curve ) {
-			
+
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
-					
-					if( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
-						
+
+					if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
+
 						curve.remove( curve.pole.length - 1 );
-						
+
 					}
 
 				}
+
 				curve.add( intersect );
 				previousIntersect = intersect;
 
 				updateCurveBuffer( curve, buffer );
 				renderer.render( scene, camera );
-				
+
 				break;
 
 			case 'Remove':
 				break;
 
 			case 'Tanget':
-			for( let i = 0; i < curve.pole.length; i ++ ) {
-
-				const v = curve.pole[ i ].point;
-				const distance = raycaster.ray.distanceToPoint ( v );
-				if ( distance < 0.02 ) {
-					
-					raycaster.ray.intersectPlane( plane, intersect );
-					curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
-					updateCurveBuffer( curve, buffer );
-					renderer.render( scene, camera );
-
-				}
-
-				}	
-				break;
-
-			default:
-
-		}
-
-		if( isDrag ) {
-					
-		}
-		
-	} );
-
-	document.addEventListener( 'mousedown', e => {
-
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-		
-		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ 0 ];
-		const intersect = new THREE.Vector3();
-		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-
-		switch ( mode.curve ) {
-			
-			case 'Add':
-				
-				raycaster.ray.intersectPlane( plane, intersect );
-				curve.add( intersect );
-				updateCurveBuffer( curve, buffer );
-				renderer.render( scene, camera );
-
-				
-				break;
-			
-			case 'Remove':
-				for( let i = 0; i < curve.pole.length; i ++ ) {
+				for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint ( v );
+					const distance = raycaster.ray.distanceToPoint( v );
 					if ( distance < 0.02 ) {
-						
-						curve.remove( i );
-						updateCurveBuffer( curve, buffer );
-						renderer.render( scene, camera );
 
-					}
-
-				}
-				
-				break;
-
-			case 'Tanget':
-				for( let i = 0; i < curve.pole.length; i ++ ) {
-
-					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint ( v );
-					if ( distance < 0.02 ) {
-						
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
@@ -235,6 +169,75 @@ function init() {
 					}
 
 				}
+
+				break;
+
+			default:
+
+		}
+
+		if ( isDrag ) {
+
+		}
+
+	} );
+
+	document.addEventListener( 'mousedown', e => {
+
+		const pointer = new THREE.Vector2();
+		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		raycaster.setFromCamera( pointer, camera );
+		const curve = curves[ 0 ];
+		const intersect = new THREE.Vector3();
+		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
+
+		switch ( mode.curve ) {
+
+			case 'Add':
+
+				raycaster.ray.intersectPlane( plane, intersect );
+				curve.add( intersect );
+				updateCurveBuffer( curve, buffer );
+				renderer.render( scene, camera );
+
+
+				break;
+
+			case 'Remove':
+				for ( let i = 0; i < curve.pole.length; i ++ ) {
+
+					const v = curve.pole[ i ].point;
+					const distance = raycaster.ray.distanceToPoint( v );
+					if ( distance < 0.02 ) {
+
+						curve.remove( i );
+						updateCurveBuffer( curve, buffer );
+						renderer.render( scene, camera );
+
+					}
+
+				}
+
+				break;
+
+			case 'Tanget':
+				for ( let i = 0; i < curve.pole.length; i ++ ) {
+
+					const v = curve.pole[ i ].point;
+					const distance = raycaster.ray.distanceToPoint( v );
+					if ( distance < 0.02 ) {
+
+						raycaster.ray.intersectPlane( plane, intersect );
+						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
+						updateCurveBuffer( curve, buffer );
+						renderer.render( scene, camera );
+
+					}
+
+				}
+
 				break;
 
 			default:
@@ -244,8 +247,8 @@ function init() {
 		switch ( e.which ) {
 
 			case 1:
-				
-				
+
+
 				break;
 
 			case 2:
@@ -253,24 +256,24 @@ function init() {
 				curve.addTangent( 0, new THREE.Vector3( 0, 0, 0 ) );
 				curve.hasSlope = true;
 				curve._calcCtrlPoints();
-				
+
 				break;
 
 			case 3:
 
-				
-				
+
+
 				break;
 
 			default:
 
 		}
-		
-		
+
+
 		isDrag = true;
 
 	} );
-	
+
 	document.addEventListener( 'mouseup', e => {
 
 		isDrag = false;
@@ -286,7 +289,7 @@ function init() {
 }
 
 function preBuffer() {
-	
+
 	let geometry, positions, material;
 
 	// geometry
@@ -329,21 +332,21 @@ function preBuffer() {
 
 	// lines
 	const lines = new THREE.Line( geometry.clone(), material.clone() );
-	
+
 	// geometry
 	geometry = new THREE.BufferGeometry();
 
 	// attributes
 	positions = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
 	geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-	
+
 	// curvature
 	const curvature = new THREE.LineSegments( geometry, material.clone() );
-	
+
 	points.material.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
-	polygon.material.color.set(0x808080);
-	lines.material.color.set(0xffff00);
-	curvature.material.color.set(0x800000);
+	polygon.material.color.set( 0x808080 );
+	lines.material.color.set( 0xffff00 );
+	curvature.material.color.set( 0x800000 );
 
 	return {
 
@@ -353,19 +356,19 @@ function preBuffer() {
 		'polygon': polygon,
 		'curvature': curvature
 
-	}
+	};
 
 }
 
 function updateCurveBuffer( curve, buffer ) {
-	
+
 	updateLines( curve, buffer.lines, buffer.curvature );
 	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 }
 
 function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
-	
+
 	let pts, geo, pos, arr, index;
 
 	//update design points
