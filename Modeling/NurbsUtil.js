@@ -612,7 +612,7 @@ function ludcmp( n, a, indx ) {
 
 }
 
-function _lubksb( n, a, indx, b ) {
+function lubksb( n, a, indx, b ) {
 
 	/*Solves the set of n linear equations A dot X = B. Here a[1..n][1..n] is input, not as the matrix
 		A but rather as its LU decomposition, determined by the routine ludcmp. indx[1..n] is input
@@ -664,7 +664,7 @@ function _lubksb( n, a, indx, b ) {
 
 }
 
-function lubksb( n, a, indx, b ) {
+function lubksbV4( n, a, indx, b ) {
 
 	const x = [];
 	const y = [];
