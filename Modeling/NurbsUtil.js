@@ -678,9 +678,9 @@ function lubksbV4( n, a, indx, b ) {
 
 	}
 
-	_lubksb( n, a, indx, x );
-	_lubksb( n, a, indx, y );
-	_lubksb( n, a, indx, z );
+	lubksb( n, a, indx, x );
+	lubksb( n, a, indx, y );
+	lubksb( n, a, indx, z );
 
 	for ( let i = 0; i < n; i ++ ) {
 
