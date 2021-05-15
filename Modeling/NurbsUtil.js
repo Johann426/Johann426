@@ -40,7 +40,7 @@ class NurbsUtil {
 			const ctrlp = point.slice();
 			const index = [];
 			ludcmp( n, arr, index );
-			lubksb( n, arr, index, ctrlp );
+			lubksbV4( n, arr, index, ctrlp );
 			return ctrlp;
 
 		} else {
@@ -108,7 +108,7 @@ class NurbsUtil {
 			const ctrlp = b.slice();
 			const index = [];
 			ludcmp( nps, arr, index );
-			lubksb( nps, arr, index, ctrlp );
+			lubksbV4( nps, arr, index, ctrlp );
 			return ctrlp;
 
 		}
