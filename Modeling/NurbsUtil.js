@@ -1,5 +1,5 @@
 /*
- * If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
+ * If the given data consists of only points (and constraints), on the basis of The NURBS Book,
  * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
  * i.e., parameterized value, knot vector, and control points.
  * js code by Johann426.github
@@ -8,7 +8,7 @@
 class NurbsUtil {
 
 	/*
-	 * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+	 * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
 	 * deg: degree
 	 * prm: parameterized value at each point
 	 * knot: knot vector (knot[i]: knots)
