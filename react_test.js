@@ -32,4 +32,4 @@ class MyForm extends React.Component {
   }
 }
 
-ReactDOM.render(<Car/>, document.getElementById('root'));
+ReactDOM.render(<MyForm />, document.getElementById('root'));
