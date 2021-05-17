@@ -1,24 +1,31 @@
-class Car extends React.Component {
+class MyForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      brand: "Ford",
-      model: "Mustang",
-      color: "red",
-      year: 1964
+      username: '',
+      age: null,
     };
   }
-  changeHandler = (event) => {
-    this.setState({brand: event.target.value});
+  myChangeHandler = (event) => {
+    let nam = event.target.name;
+    let val = event.target.value;
+    this.setState({[nam]: val});
   }
   render() {
     return (
       <form>
-      <h1>Hello {this.state.brand} {this.state.model} {this.state.color} </h1>
-      <p>Enter your brand:</p>
+      <h1>Hello {this.state.username} {this.state.age}</h1>
+      <p>Enter your name:</p>
       <input
         type='text'
-        onChange={this.changeHandler}
+        name='username'
+        onChange={this.myChangeHandler}
+      />
+      <p>Enter your age:</p>
+      <input
+        type='text'
+        name='age'
+        onChange={this.myChangeHandler}
       />
       </form>
     );
