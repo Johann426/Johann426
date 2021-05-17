@@ -9,7 +9,7 @@ class Car extends React.Component {
     };
   }
   changeHandler = (event) => {
-    this.setState({username: event.target.value});
+    this.setState({brand: event.target.value});
   }
   render() {
     return (
