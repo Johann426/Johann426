@@ -22,7 +22,7 @@ function init() {
 
 	const renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setAnimationLoop( time => {
+	renderer.setAnimationLoop( () => {
 
 		controls.update();
 		renderer.render( scene, camera );
@@ -49,23 +49,15 @@ function init() {
 	window.addEventListener( 'load', () => {
 
 		var obj = {
-			//str : 'abc',
-			//number: 0,
-			//value: 0,
-			//valueRange : [-1,1],
-			//bool: false,
+
 			select: [ 'Add', 'Remove', 'Tanget' ]
+
 		};
 
 		var controlKit = new ControlKit();
 
 		controlKit.addPanel( { label: 'Panel' } )
 			.addSubGroup( { label: 'Curve' } )
-		//.addStringInput(obj,'str',{label: 'String'})
-		//.addNumberInput(obj,'number',{label: 'Number'})
-		//.addSlider(obj,'value','valueRange',{label: 'Value'})
-		//.addRange(obj,'valueRange',{label : 'Value Range'})
-		//.addCheckbox(obj, 'bool', {label: 'Bool'})
 			.addSelect( obj, 'select', { label: 'Points', onChange: e => {
 
 				mode.curve = obj.select[ e ];
@@ -127,7 +119,6 @@ function init() {
 		const curve = curves[ 0 ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-		//console.log(isDrag);
 		switch ( mode.curve ) {
 
 			case 'Add':
@@ -244,38 +235,15 @@ function init() {
 
 		}
 
-		switch ( e.which ) {
-
-			case 1:
-
-
-				break;
-
-			case 2:
-
-				curve.addTangent( 0, new THREE.Vector3( 0, 0, 0 ) );
-				curve.hasSlope = true;
-				curve._calcCtrlPoints();
-
-				break;
-
-			case 3:
-
-
-
-				break;
-
-			default:
-
-		}
-
-
 		isDrag = true;
 
 	} );
 
 	document.addEventListener( 'mouseup', e => {
 
+		const pointer = new THREE.Vector2();
+		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 		isDrag = false;
 
 	} );
@@ -290,17 +258,14 @@ function init() {
 
 function preBuffer() {
 
-	let geometry, positions, material;
+	let geo, pos, mat;
 
-	// geometry
-	geometry = new THREE.BufferGeometry();
+	geo = new THREE.BufferGeometry();
+	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 
-	// attributes
-	positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-	geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) ); //geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+	mat = new THREE.ShaderMaterial( {
 
-	// material
-	material = new THREE.ShaderMaterial( {
 		transparent: true,
 		uniforms: {
 			size: { value: 10 },
@@ -316,45 +281,32 @@ function preBuffer() {
 					gl_FragColor = vec4(color, step(ll, 0.5));
 			}
 			`
+
 	} );
 
-	// control points
-	const ctrlPoints = new THREE.Points( geometry, material );
+	const ctrlPoints = new THREE.Points( geo.clone(), mat.clone() );
 
-	// design points
-	const points = new THREE.Points( geometry.clone(), material.clone() );
+	mat.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
+	const points = new THREE.Points( geo.clone(), mat.clone() );
 
-	// material
-	material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+	mat = new THREE.LineBasicMaterial( { color: 0x808080 } );
+	const polygon = new THREE.Line( geo.clone(), mat.clone() );
 
-	// polygon
-	const polygon = new THREE.Line( geometry.clone(), material );
+	mat.color.set( 0xffff00 );
+	const lines = new THREE.Line( geo.clone(), mat.clone() );
 
-	// lines
-	const lines = new THREE.Line( geometry.clone(), material.clone() );
-
-	// geometry
-	geometry = new THREE.BufferGeometry();
-
-	// attributes
-	positions = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
-	geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
-	// curvature
-	const curvature = new THREE.LineSegments( geometry, material.clone() );
-
-	points.material.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
-	polygon.material.color.set( 0x808080 );
-	lines.material.color.set( 0xffff00 );
-	curvature.material.color.set( 0x800000 );
+	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	mat.color.set( 0x800000 );
+	const curvature = new THREE.LineSegments( geo, mat );
 
 	return {
 
-		'points': points,
-		'ctrlPoints': ctrlPoints,
-		'lines': lines,
-		'polygon': polygon,
-		'curvature': curvature
+		points: points,
+		ctrlPoints: ctrlPoints,
+		lines: lines,
+		polygon: polygon,
+		curvature: curvature
 
 	};
 
@@ -441,9 +393,10 @@ function updateLines( curve, lines, curvature ) {
 
 	}
 
+	//update curvature
 	if ( curvature !== undefined ) {
 
-		pts = curve.shapeInterrogation( MAX_SEG );
+		pts = curve.interrogating( MAX_SEG );
 		pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;
 		arr = pos.array;

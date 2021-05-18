@@ -27,7 +27,7 @@ class NurbsCurve {
 
 	add( point ) {
 
-		this.pole.push( { 'point': point } );
+		this.pole.push( { point: point } );
 
 	}
 
@@ -39,7 +39,7 @@ class NurbsCurve {
 
 	incert( i, point ) {
 
-		this.pole.splice( i, 0, { 'point': point } );
+		this.pole.splice( i, 0, { point: point } );
 
 	}
 
@@ -118,7 +118,7 @@ class NurbsCurve {
 
 	}
 
-	shapeInterrogation( n ) {
+	interrogating( n ) {
 
 		this._calcCtrlPoints();
 
