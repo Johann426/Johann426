@@ -6,9 +6,9 @@ class MyForm extends React.Component {
       age: null,
     };
   }
-  myChangeHandler = (event) => {
-    let nam = event.target.name;
-    let val = event.target.value;
+  myChangeHandler = ( e ) => {
+    let nam = e.target.name;
+    let val = e.target.value;
     this.setState({[nam]: val});
   }
   render() {
