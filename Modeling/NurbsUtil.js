@@ -1,5 +1,5 @@
 /*
- * If the giiven data consists of only points (and constraints), on the basis of The NURBS Book,
+ * If the given data consists of only points (and constraints), on the basis of The NURBS Book,
  * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
  * i.e., parameterized value, knot vector, and control points.
  * js code by Johann426.github
@@ -8,7 +8,7 @@
 class NurbsUtil {
 
 	/*
-	 * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+	 * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
 	 * deg: degree
 	 * prm: parameterized value at each point
 	 * knot: knot vector (knot[i]: knots)
@@ -40,7 +40,7 @@ class NurbsUtil {
 			const ctrlp = point.slice();
 			const index = [];
 			ludcmp( n, arr, index );
-			lubksb( n, arr, index, ctrlp );
+			lubksbV4( n, arr, index, ctrlp );
 			return ctrlp;
 
 		} else {
@@ -108,7 +108,7 @@ class NurbsUtil {
 			const ctrlp = b.slice();
 			const index = [];
 			ludcmp( nps, arr, index );
-			lubksb( nps, arr, index, ctrlp );
+			lubksbV4( nps, arr, index, ctrlp );
 			return ctrlp;
 
 		}
@@ -612,7 +612,7 @@ function ludcmp( n, a, indx ) {
 
 }
 
-function _lubksb( n, a, indx, b ) {
+function lubksb( n, a, indx, b ) {
 
 	/*Solves the set of n linear equations A dot X = B. Here a[1..n][1..n] is input, not as the matrix
 		A but rather as its LU decomposition, determined by the routine ludcmp. indx[1..n] is input
@@ -664,7 +664,7 @@ function _lubksb( n, a, indx, b ) {
 
 }
 
-function lubksb( n, a, indx, b ) {
+function lubksbV4( n, a, indx, b ) {
 
 	const x = [];
 	const y = [];
@@ -678,9 +678,9 @@ function lubksb( n, a, indx, b ) {
 
 	}
 
-	_lubksb( n, a, indx, x );
-	_lubksb( n, a, indx, y );
-	_lubksb( n, a, indx, z );
+	lubksb( n, a, indx, x );
+	lubksb( n, a, indx, y );
+	lubksb( n, a, indx, z );
 
 	for ( let i = 0; i < n; i ++ ) {
 
