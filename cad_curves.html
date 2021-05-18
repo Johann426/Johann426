@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>NURBS Interpolation</title>
-        <style>
-            canvas {
+	<head>
+		<meta charset="utf-8">
+		<title>NURBS Interpolation</title>
+		<style>
+			canvas {
 				width: 100vw;
 				height: 100vh;
 				display: block;
@@ -12,17 +12,22 @@
 				top: 0;
 				left: 0;
 				z-index: -1;
-            }
+			}
 
-            video {
-                display: none;
-            }
-        </style>
-        <script src="./Rendering/three.min.js"></script>
+			video {
+				display: none;
+			}
+		</style>
+		<script src="./Rendering/three.min.js"></script>
 		<script src="./Rendering/OrbitControls.js"></script>
 		<script src="./controlKit.min.js"></script>
 		<script type="module" src="./cad_curves.js"></script>
-    </head>
-    <body>
-    </body>
+	</head>
+	<body>
+		<script src="./React/react.production.min.js"></script>
+		<script src="./React/react-dom.production.min.js"></script>
+		<script src="./React/babel.min.js"></script>
+		<script type="text/babel" src="react_test.js"></script>
+		<div id="root"></div>
+	</body>
 </html>
