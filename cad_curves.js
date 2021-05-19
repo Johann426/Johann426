@@ -1,4 +1,3 @@
-
 import { Container } from './GUI/container.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
@@ -46,27 +45,6 @@ function init() {
 
 	} );
 
-	window.addEventListener( 'load', () => {
-
-		var obj = {
-
-			select: [ 'Add', 'Remove', 'Tanget' ]
-
-		};
-
-		var controlKit = new ControlKit();
-
-		controlKit.addPanel( { label: 'Panel' } )
-			.addSubGroup( { label: 'Curve' } )
-			.addSelect( obj, 'select', { label: 'Points', onChange: e => {
-
-				mode.curve = obj.select[ e ];
-				console.log( mode.curve );
-
-			} } );
-
-	} );
-
 	const raycaster = new THREE.Raycaster();
 	raycaster.params.Points.threshold = 0.05;
 
@@ -111,6 +89,8 @@ function init() {
 
 	document.addEventListener( 'mousemove', e => {
 
+		const state = document.getElementById( 'state' ).innerHTML;
+
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -119,7 +99,8 @@ function init() {
 		const curve = curves[ 0 ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-		switch ( mode.curve ) {
+		console.log( state );
+		switch ( state ) {
 
 			case 'Add':
 
@@ -145,7 +126,7 @@ function init() {
 			case 'Remove':
 				break;
 
-			case 'Tanget':
+			case 'Tangent':
 				for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
@@ -175,6 +156,9 @@ function init() {
 
 	document.addEventListener( 'mousedown', e => {
 
+		//get dom created by react
+		const state = document.getElementById( 'state' );
+
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -184,7 +168,7 @@ function init() {
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
-		switch ( mode.curve ) {
+		switch ( state.innerHTML ) {
 
 			case 'Add':
 
@@ -213,7 +197,7 @@ function init() {
 
 				break;
 
-			case 'Tanget':
+			case 'Tangent':
 				for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
