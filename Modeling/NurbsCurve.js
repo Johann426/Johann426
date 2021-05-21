@@ -86,33 +86,23 @@ class NurbsCurve {
 	getPointAt( t ) {
 
 		this._calcCtrlPoints();
-		const p = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
-		const w = p.w;
-		const x = p.x / w;
-		const y = p.y / w;
-		const z = p.z / w;
-		return new Vector3( x, y, z );
+		return NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
 
 	}
 
 	getPoints( n ) {
 
 		this._calcCtrlPoints();
-		const pts = [];
+		const p = [];
 
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const p = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
-			const w = p.w;
-			const x = p.x / w;
-			const y = p.y / w;
-			const z = p.z / w;
-			pts[ i ] = new Vector3( x, y, z );
+			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
 
 		}
 
-		return pts;
+		return p;
 
 	}
 
