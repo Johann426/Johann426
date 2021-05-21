@@ -82,6 +82,14 @@ class UIElement {
 
 	}
 
+	addClass( name ) {
+
+		this.dom.classList.add( name );
+
+		return this;
+
+	}
+
 	removeClass( name ) {
 
 		this.dom.classList.remove( name );
@@ -123,27 +131,20 @@ class UIElement {
 		return Array.prototype.indexOf.call( this.dom.children, element.dom );
 
 	}
+	
+	addEventListener( name, func ) {
+
+		this.dom.addEventListener( name, func );
+
+	}
+	
+	removeEventListener( name, func ) {
+
+		this.dom.removeEventListener( name, func );
+
+	}
 
 }
-
-
-// events
-
-const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change', 'Input' ];
-
-events.forEach( function ( event ) {
-
-	const method = 'on' + event;
-
-	UIElement.prototype[ method ] = function ( callback ) {
-
-		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
-
-		return this;
-
-	};
-
-} );
 
 class UISpan extends UIElement {
 
