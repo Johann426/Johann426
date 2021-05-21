@@ -103,7 +103,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
+			p[ i ] = getPointAt( t )
 
 		}
 
