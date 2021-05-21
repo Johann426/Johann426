@@ -98,16 +98,21 @@ class NurbsCurve {
 	getPoints( n ) {
 
 		this._calcCtrlPoints();
-		const p = [];
+		const pts = [];
 
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = getPointAt( t )
+			const p = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
+			const w = p.w;
+			const x = p.x / w;
+			const y = p.y / w;
+			const z = p.z / w;
+			pts[ i ] = new Vector3( x, y, z );
 
 		}
 
-		return p;
+		return pts;
 
 	}
 
