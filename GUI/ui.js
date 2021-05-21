@@ -131,13 +131,13 @@ class UIElement {
 		return Array.prototype.indexOf.call( this.dom.children, element.dom );
 
 	}
-	
+
 	addEventListener( name, func ) {
 
 		this.dom.addEventListener( name, func );
 
 	}
-	
+
 	removeEventListener( name, func ) {
 
 		this.dom.removeEventListener( name, func );
@@ -172,7 +172,7 @@ class UIRow extends UIDiv {
 
 		super();
 
-		this.setClass('Row');
+		this.setClass( 'Row' );
 
 	}
 
@@ -184,7 +184,7 @@ class UIPanel extends UIDiv {
 
 		super();
 
-		this.setClass('Panel');
+		this.setClass( 'Panel' );
 
 	}
 
@@ -196,7 +196,7 @@ class UIText extends UISpan {
 
 		super();
 
-		this.setClass('Text');
+		this.setClass( 'Text' );
 		this.setValue( text );
 
 	}
@@ -211,7 +211,7 @@ class UIText extends UISpan {
 
 		if ( value !== undefined ) {
 
-			this.setTextContent(value);
+			this.setTextContent( value );
 
 		}
 

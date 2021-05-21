@@ -1,4 +1,5 @@
-import { Container } from './GUI/container.js';
+import { Menubar } from './GUI/Menubar.js';
+import { UIElement, UIDiv } from './GUI/ui.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
 const MAX_POINTS = 500;
@@ -28,10 +29,9 @@ function init() {
 
 	} );
 
-	//document.body.appendChild( renderer.domElement );
-	let container = new Container( 'mainCanvas', document.body, renderer.domElement );
-	container.create();
-	container.createList();
+	document.body.appendChild( renderer.domElement );
+	const menubar = new Menubar();
+	document.body.appendChild( menubar.getDom() );
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
