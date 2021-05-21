@@ -82,14 +82,6 @@ class UIElement {
 
 	}
 
-	addClass( name ) {
-
-		this.dom.classList.add( name );
-
-		return this;
-
-	}
-
 	removeClass( name ) {
 
 		this.dom.classList.remove( name );
@@ -134,25 +126,6 @@ class UIElement {
 
 }
 
-// properties
-
-const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
-
-properties.forEach( function ( property ) {
-
-	const method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
-
-	UIElement.prototype[ method ] = function () {
-
-		this.setStyle( property, arguments );
-
-		return this;
-
-	};
-
-} );
 
 // events
 
