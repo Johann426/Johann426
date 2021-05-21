@@ -172,7 +172,7 @@ class UIRow extends UIDiv {
 
 		super();
 
-		this.dom.className = 'Row';
+		this.setClass('Row');
 
 	}
 
@@ -184,7 +184,7 @@ class UIPanel extends UIDiv {
 
 		super();
 
-		this.dom.className = 'Panel';
+		this.setClass('Panel');
 
 	}
 
@@ -196,11 +196,7 @@ class UIText extends UISpan {
 
 		super();
 
-		this.dom.className = 'Text';
-		this.dom.style.cursor = 'default';
-		this.dom.style.display = 'inline-block';
-		this.dom.style.verticalAlign = 'middle';
-
+		this.setClass('Text');
 		this.setValue( text );
 
 	}
@@ -215,7 +211,7 @@ class UIText extends UISpan {
 
 		if ( value !== undefined ) {
 
-			this.dom.textContent = value;
+			this.setTextContent(value);
 
 		}
 
