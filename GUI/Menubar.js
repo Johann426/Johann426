@@ -1,17 +1,18 @@
 import { UIElement, UIPanel, UIRow } from './ui.js';
 //import { MenubarAdd } from './Menubar.Add.js';
 
-class Menubar {
+class Menubar extends UIElement {
 
 	constructor() {
 
+		super( document.createElement( 'div' ) );
+		this.setId( 'menubar' );
 		this.init();
 
 	}
 
 	init() {
 
-		const menubar = new UIPanel().setId( 'menubar' );
 		const curve = this.menu();
 		curve.add( this.menuHeader( "Curve" ) );
 		const items = this.menuItems();
@@ -19,11 +20,10 @@ class Menubar {
 		items.add( this.menuItem( "Remove" ) );
 		items.add( this.menuItem( "Tangent" ) );
 		curve.add( items );
-		menubar.add( curve );
+		this.add( curve );
 		const surf = this.menu();
 		surf.add( this.menuHeader( "Surface" ) );
-		menubar.add( surf );
-		this.menubar = menubar;
+		this.add( surf );
 
 	}
 
@@ -77,7 +77,7 @@ class Menubar {
 
 	getDom() {
 
-		return this.menubar.dom;
+		return this.dom;
 
 	}
 
