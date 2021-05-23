@@ -14,11 +14,11 @@ class Menubar extends UIElement {
 	init() {
 
 		const curve = this.menu();
-		curve.add( this.menuHeader( "Curve" ) );
+		curve.add( this.menuHeader( "Lines" ) );
 		const items = this.menuItems();
-		items.add( this.menuItem( "Add" ) );
-		items.add( this.menuItem( "Remove" ) );
-		items.add( this.menuItem( "Tangent" ) );
+		items.add( this.menuItem( "line" ) );
+		items.add( this.menuItem( "Curve" ) );
+		items.add( this.menuItem( "Circle" ) );
 		curve.add( items );
 		this.add( curve );
 		const surf = this.menu();
