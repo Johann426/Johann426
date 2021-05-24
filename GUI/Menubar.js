@@ -1,11 +1,11 @@
-import { UIElement, UIPanel, UIRow } from './ui.js';
+import { UIElement } from './ui.js';
 //import { MenubarAdd } from './Menubar.Add.js';
 
 class Menubar extends UIElement {
 
 	constructor() {
 
-		super( document.createElement( 'div' ) );
+		super( 'div' );
 		this.setId( 'menubar' );
 		this.init();
 
@@ -13,76 +13,122 @@ class Menubar extends UIElement {
 
 	init() {
 
-		const curve = this.menu();
-		curve.add( this.menuHeader( "Lines" ) );
-		const items = this.menuItems();
-		items.add( this.menuItem( "line" ) );
-		items.add( this.menuItem( "Curve" ) );
-		items.add( this.menuItem( "Circle" ) );
-		curve.add( items );
-		this.add( curve );
-		const surf = this.menu();
-		surf.add( this.menuHeader( "Surface" ) );
-		this.add( surf );
+		this.add( this.file() );
+		this.add( this.edit() );
+		this.add( this.curve() );
+		this.add( this.surface() );
 
 	}
 
-	menu( ) {
+	file() {
 
-		const div = new UIElement( document.createElement( 'div' ) );
-		div.setClass( 'menu' );
+		const menu = new Menu();
+		menu.add( new MenuHeader( 'File' ) );
+		const items = new MenuItems();
+		menu.add( items );
 
-		return div;
-
-	}
-
-	menuHeader( name ) {
-
-		const div = new UIElement( document.createElement( 'div' ) );
-		div.setTextContent( name );
-		div.setClass( 'head' );
-
-		return div;
+		return menu;
 
 	}
 
-	menuItems() {
+	edit() {
 
-		const div = new UIElement( document.createElement( 'div' ) );
-		div.setTextContent( name );
-		div.setClass( 'items' );
+		const menu = new Menu();
+		menu.add( new MenuHeader( 'Edit' ) );
+		const items = new MenuItems();
+		items.add( new MenuItem( 'Add point' ) );
+		items.add( new MenuItem( 'Add tangent' ) );
+		items.add( new MenuItem( 'Remove point' ) );
+		menu.add( items );
 
-		return div;
-
-	}
-
-	menuItem( name ) {
-
-		const div = new UIElement( document.createElement( 'div' ) );
-		div.setTextContent( name );
-		div.setClass( 'item' );
-
-		return div;
+		return menu;
 
 	}
 
-	menuDivider() {
+	curve() {
 
-		const hr = document.createElement( 'hr' );
-		const divider = new UIElement( hr );
+		const menu = new Menu();
+		menu.add( new MenuHeader( 'Lines' ) );
+		const items = new MenuItems();
+		items.add( new MenuItem( 'line' ) );
+		items.add( new MenuItem( 'Circle' ) );
+		items.add( new MenuDivider() );
+		items.add( new MenuItem( 'Curve' ) );
+		menu.add( items );
 
-		return divider;
+		return menu;
 
 	}
 
-	getDom() {
+	surface() {
 
-		return this.dom;
+		const menu = new Menu();
+		menu.add( new MenuHeader( 'Surface' ) );
+		const items = new MenuItems();
+		menu.add( items );
+
+		return menu;
+
+	}
+
+}
+
+class Menu extends UIElement {
+
+	constructor() {
+
+		super( 'div' );
+		this.setClass( 'menu' );
+
+	}
+
+}
+
+class MenuHeader extends UIElement {
+
+	constructor( name ) {
+
+		super( 'div' );
+		this.setClass( 'head' );
+		this.setTextContent( name );
+
+	}
+
+}
+
+class MenuItems extends UIElement {
+
+	constructor() {
+
+		super( 'div' );
+		this.setClass( 'items' );
 
 	}
 
 }
 
 
+class MenuItem extends UIElement {
+
+	constructor( name ) {
+
+		super( 'div' );
+		this.setClass( 'item' );
+		this.setTextContent( name );
+
+	}
+
+}
+
+class MenuDivider extends UIElement {
+
+	constructor() {
+
+		super( 'hr' );
+		this.setClass( 'divider' );
+
+	}
+
+}
 
 export { Menubar };

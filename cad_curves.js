@@ -1,5 +1,5 @@
 import { Menubar } from './GUI/Menubar.js';
-import { UIElement, UIDiv } from './GUI/ui.js';
+import { UIElement } from './GUI/ui.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
 const MAX_POINTS = 500;
@@ -29,9 +29,10 @@ function init() {
 
 	} );
 
+	// Create menubar
 	document.body.appendChild( renderer.domElement );
 	const menubar = new Menubar();
-	document.body.appendChild( menubar.getDom() );
+	document.body.appendChild( menubar.dom );
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
