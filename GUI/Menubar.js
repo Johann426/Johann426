@@ -7,16 +7,11 @@ class Menubar extends UIElement {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.init();
-
-	}
-
-	init() {
-
 		this.add( this.file() );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
+		this.state = 'view';
 
 	}
 
@@ -40,6 +35,25 @@ class Menubar extends UIElement {
 		items.add( new MenuItem( 'Add tangent' ) );
 		items.add( new MenuItem( 'Remove point' ) );
 		menu.add( items );
+
+		items.dom.children[ 0 ].addEventListener( 'click', () => {
+
+			this.state = 'Add';
+			console.log( ' clicked' );
+
+		} );
+
+		items.dom.children[ 1 ].addEventListener( 'click', () => {
+
+			this.state = 'Tangent';
+
+		} );
+
+		items.dom.children[ 2 ].addEventListener( 'click', () => {
+
+			this.state = 'Remove';
+
+		} );
 
 		return menu;
 

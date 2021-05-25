@@ -12,6 +12,8 @@ const mode = {
 
 init();
 
+var state;
+
 function init() {
 
 	const scene = new THREE.Scene();
@@ -90,8 +92,6 @@ function init() {
 
 	document.addEventListener( 'mousemove', e => {
 
-		const state = document.getElementById( 'state' ).innerHTML;
-
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -100,7 +100,10 @@ function init() {
 		const curve = curves[ 0 ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-		console.log( state );
+
+		state = menubar.state;
+		console.log(state)
+
 		switch ( state ) {
 
 			case 'Add':
@@ -157,9 +160,6 @@ function init() {
 
 	document.addEventListener( 'mousedown', e => {
 
-		//get dom created by react
-		const state = document.getElementById( 'state' );
-
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
@@ -169,7 +169,9 @@ function init() {
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
-		switch ( state.innerHTML ) {
+		state = menubar.state;
+
+		switch ( state ) {
 
 			case 'Add':
 
