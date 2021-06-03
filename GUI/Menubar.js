@@ -39,7 +39,6 @@ class Menubar extends UIElement {
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
 			this.state = 'Add';
-			console.log( ' clicked' );
 
 		} );
 

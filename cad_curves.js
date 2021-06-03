@@ -1,5 +1,4 @@
 import { Menubar } from './GUI/Menubar.js';
-import { UIElement } from './GUI/ui.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
 const MAX_POINTS = 500;
@@ -31,8 +30,9 @@ function init() {
 
 	} );
 
-	// Create menubar
 	document.body.appendChild( renderer.domElement );
+
+	// Create menubar
 	const menubar = new Menubar();
 	document.body.appendChild( menubar.dom );
 
@@ -56,7 +56,7 @@ function init() {
 		switch ( e.code ) {
 
 			case 'ShiftLeft':
-				mode.curve = 'Add';
+				menubar.state = 'Add';
 				break;
 
 			case 'ControlLeft':
@@ -68,7 +68,7 @@ function init() {
 				break;
 
 			case 'Escape':
-				mode.curve = null;
+				menubar.state = 'view';
 				break;
 
 			default :
@@ -101,10 +101,7 @@ function init() {
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
-		state = menubar.state;
-		console.log(state)
-
-		switch ( state ) {
+		switch ( menubar.state ) {
 
 			case 'Add':
 
@@ -169,9 +166,7 @@ function init() {
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
-		state = menubar.state;
-
-		switch ( state ) {
+		switch ( menubar.state ) {
 
 			case 'Add':
 
