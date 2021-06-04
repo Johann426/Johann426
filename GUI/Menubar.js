@@ -63,11 +63,29 @@ class Menubar extends UIElement {
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'Lines' ) );
 		const items = new MenuItems();
-		items.add( new MenuItem( 'line' ) );
+		items.add( new MenuItem( 'Line' ) );
 		items.add( new MenuItem( 'Circle' ) );
 		items.add( new MenuDivider() );
 		items.add( new MenuItem( 'Curve' ) );
 		menu.add( items );
+
+		items.dom.children[ 0 ].addEventListener( 'click', () => {
+
+			this.state = 'Line';
+
+		} );
+
+		items.dom.children[ 1 ].addEventListener( 'click', () => {
+
+			this.state = 'Circle';
+
+		} );
+
+		items.dom.children[ 2 ].addEventListener( 'click', () => {
+
+			this.state = 'Curve';
+
+		} );
 
 		return menu;
 

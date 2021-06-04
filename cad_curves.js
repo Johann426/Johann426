@@ -64,7 +64,7 @@ function init() {
 				break;
 
 			case 'KeyC':
-				//intCurve.push( new NurbsCurve( 3 ) );
+
 				break;
 
 			case 'Escape':
@@ -168,6 +168,12 @@ function init() {
 
 		switch ( menubar.state ) {
 
+			case 'Curve':
+
+				curves.push( new NurbsCurve( 3 ) );
+
+				break;
+
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
@@ -175,10 +181,10 @@ function init() {
 				updateCurveBuffer( curve, buffer );
 				renderer.render( scene, camera );
 
-
 				break;
 
 			case 'Remove':
+
 				for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
@@ -196,6 +202,7 @@ function init() {
 				break;
 
 			case 'Tangent':
+
 				for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
