@@ -58,6 +58,12 @@ class NurbsCurve {
 
 	}
 
+	removeTangent( i ) {
+
+		this.pole[ i ].slope = undefined;
+
+	}
+
 	getChordLength( points ) {
 
 		const n = points.length;

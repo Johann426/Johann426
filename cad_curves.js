@@ -168,12 +168,6 @@ function init() {
 
 		switch ( menubar.state ) {
 
-			case 'Curve':
-
-				curves.push( new NurbsCurve( 3 ) );
-
-				break;
-
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
@@ -211,6 +205,24 @@ function init() {
 
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
+						updateCurveBuffer( curve, buffer );
+						renderer.render( scene, camera );
+
+					}
+
+				}
+
+				break;
+
+			case 'Remove tangent':
+
+				for ( let i = 0; i < curve.pole.length; i ++ ) {
+
+					const v = curve.pole[ i ].point;
+					const distance = raycaster.ray.distanceToPoint( v );
+					if ( distance < 0.02 ) {
+
+						curve.removeTangent( i );
 						updateCurveBuffer( curve, buffer );
 						renderer.render( scene, camera );
 

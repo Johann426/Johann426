@@ -34,6 +34,7 @@ class Menubar extends UIElement {
 		items.add( new MenuItem( 'Add point' ) );
 		items.add( new MenuItem( 'Add tangent' ) );
 		items.add( new MenuItem( 'Remove point' ) );
+		items.add( new MenuItem( 'Remove tangent' ) );
 		menu.add( items );
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
@@ -54,6 +55,12 @@ class Menubar extends UIElement {
 
 		} );
 
+		items.dom.children[ 3 ].addEventListener( 'click', () => {
+
+			this.state = 'Remove tangent';
+
+		} );
+
 		return menu;
 
 	}
@@ -71,19 +78,19 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
-			this.state = 'Line';
+
 
 		} );
 
 		items.dom.children[ 1 ].addEventListener( 'click', () => {
 
-			this.state = 'Circle';
+
 
 		} );
 
-		items.dom.children[ 2 ].addEventListener( 'click', () => {
+		items.dom.children[ 3 ].addEventListener( 'click', () => {
 
-			this.state = 'Curve';
+			this.state = 'Add';
 
 		} );
 
