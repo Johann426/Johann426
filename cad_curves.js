@@ -1,17 +1,11 @@
 import { Menubar } from './GUI/Menubar.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
+import { Vector3 } from './Modeling/NurbsUtil.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
-const mode = {
-
-	curve: ''
-
-};
 
 init();
-
-var state;
 
 function init() {
 
@@ -57,6 +51,8 @@ function init() {
 
 			case 'ShiftLeft':
 				menubar.state = 'Add';
+				const curve = curves[ 0 ];
+				curve.add( new Vector3( 0, 0, 0 ) );
 				break;
 
 			case 'ControlLeft':
