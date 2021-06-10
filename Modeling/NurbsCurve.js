@@ -148,6 +148,44 @@ class NurbsCurve {
 
 	}
 
+	closestPoint( v ) {
+
+		this._calcCtrlPoints();
+		const t0 = 0.5;
+		var i = 0;
+		var t = t0;
+		var isOrthogonal = false;
+		var isConverged = false;
+		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
+		while ( ! ( isOrthogonal || isConverged ) ) {
+
+			const sub = ders[ 0 ].clone().sub( v );
+			console.log( sub );
+			if ( sub < 1E-9 ) break;
+			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
+			t -= del;
+
+			if ( t > 1.0 ) {
+
+				t = 1.0;
+
+			}
+
+			if ( t < 0.0 ) {
+
+				t = 0.0;
+
+			}
+
+			isOrthogonal = Math.abt( ders[ 1 ].dot( sub ) ) < 1E-9;
+			isConverged = ( ders[ 1 ].mul( t - t0 ) ) < 1E-9;
+			i ++;
+			if ( i > 20 ) break;
+
+		}
+
+	}
+
 	_calcCtrlPoints() {
 
 		const points = this.pole.map( e => e.point );
