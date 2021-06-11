@@ -84,7 +84,7 @@ class NurbsCurve {
 	getCtrlPoints() {
 
 		this._calcCtrlPoints();
-		const v = this.ctrlPoints;
+		const v = this.ctrlp;
 		return v.map( e => new Vector3( e.x / e.w, e.y / e.w, e.z / e.w ) );
 
 	}
@@ -92,7 +92,7 @@ class NurbsCurve {
 	getPointAt( t ) {
 
 		this._calcCtrlPoints();
-		return NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
+		return NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 	}
 
@@ -104,7 +104,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlPoints, t );
+			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 		}
 
@@ -115,7 +115,7 @@ class NurbsCurve {
 	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		return NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, k );
+		return NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, k );
 
 	}
 
@@ -128,7 +128,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
+			const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -191,7 +191,7 @@ class NurbsCurve {
 		const points = this.pole.map( e => e.point );
 		this.param = this._parameterize( points, this.type );
 		this.knots = this._calcKnots( this.deg(), this.param, this.pole );
-		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
+		this.ctrlp = NurbsUtil.globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
 
 	}
 
