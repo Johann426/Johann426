@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { NurbsUtil, Vector3 } from './NurbsUtil.js';
+import { curvePoint, curveDers, globalCurveInterp, deBoorKnots, deWeight } from './NurbsUtil.js';
 
 class NurbsCurve {
 
@@ -84,15 +84,14 @@ class NurbsCurve {
 	getCtrlPoints() {
 
 		this._calcCtrlPoints();
-		const v = this.ctrlp;
-		return v.map( e => new Vector3( e.x / e.w, e.y / e.w, e.z / e.w ) );
+		return deWeight( this.ctrlp );
 
 	}
 
 	getPointAt( t ) {
 
 		this._calcCtrlPoints();
-		return NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlp, t );
+		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 	}
 
@@ -104,7 +103,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = NurbsUtil.curvePoint( this.deg(), this.knots, this.ctrlp, t );
+			p[ i ] = curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 		}
 
@@ -115,7 +114,7 @@ class NurbsCurve {
 	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		return NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, k );
+		return curveDers( this.deg(), this.knots, this.ctrlp, t, k );
 
 	}
 
@@ -128,7 +127,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -156,7 +155,7 @@ class NurbsCurve {
 		var t = t0;
 		var isOrthogonal = false;
 		var isConverged = false;
-		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+		const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
 			const sub = ders[ 0 ].clone().sub( v );
@@ -191,7 +190,7 @@ class NurbsCurve {
 		const points = this.pole.map( e => e.point );
 		this.param = this._parameterize( points, this.type );
 		this.knots = this._calcKnots( this.deg(), this.param, this.pole );
-		this.ctrlp = NurbsUtil.globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
+		this.ctrlp = globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
 
 	}
 
@@ -239,7 +238,7 @@ class NurbsCurve {
 
 		}
 
-		return NurbsUtil.deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
+		return deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
 
 	}
 
