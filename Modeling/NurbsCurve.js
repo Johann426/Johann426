@@ -156,7 +156,7 @@ class NurbsCurve {
 		var t = t0;
 		var isOrthogonal = false;
 		var isConverged = false;
-		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlPoints, t, 2 );
+		const ders = NurbsUtil.curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
 			const sub = ders[ 0 ].clone().sub( v );
