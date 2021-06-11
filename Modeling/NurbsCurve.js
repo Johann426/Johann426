@@ -189,9 +189,9 @@ class NurbsCurve {
 	_calcCtrlPoints() {
 
 		const points = this.pole.map( e => e.point );
-		this.para = this._parameterize( points, this.type );
-		this.knots = this._calcKnots( this.deg(), this.para, this.pole );
-		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.para, this.knots, this.pole );
+		this.param = this._parameterize( points, this.type );
+		this.knots = this._calcKnots( this.deg(), this.param, this.pole );
+		this.ctrlPoints = NurbsUtil.globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
 
 	}
 
