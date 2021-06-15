@@ -56,10 +56,13 @@ function createModel() {
   model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
 
   //hidden layer
-  model.add(tf.layers.dense({units: 50, activation: 'sigmoid'}));
+  model.add(tf.layers.dense({units: 16, activation: 'tanh'}));
+  model.add(tf.layers.dense({units: 8, activation: 'relu'}));
+  model.add(tf.layers.dense({units: 4, activation: 'sigmoid'}));
 
   // Add an output layer
-  model.add(tf.layers.dense({units: 1, useBias: true}));
+  //model.add(tf.layers.dense({units: 1, useBias: true}));
+  model.add(tf.layers.dense({units: 1, activation: 'linear'}));
 
   return model;
 }
