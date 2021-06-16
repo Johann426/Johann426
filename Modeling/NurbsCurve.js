@@ -159,7 +159,7 @@ class NurbsCurve {
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
 			const sub = ders[ 0 ].clone().sub( v );
-			if ( sub < 1E-9 ) break;
+			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
 			t -= del;
 
