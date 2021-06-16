@@ -229,6 +229,9 @@ function init() {
 				break;
 
 			default:
+				
+				raycaster.ray.intersectPlane( plane, intersect );
+				console.log( curve.closestPoint( intersect ) );
 
 		}
 
