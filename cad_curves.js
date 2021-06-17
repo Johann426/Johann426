@@ -32,7 +32,6 @@ function init() {
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
-	controls.enabled = false;
 
 	window.addEventListener( 'resize', () => {
 
@@ -51,12 +50,11 @@ function init() {
 
 			case 'ShiftLeft':
 				menubar.state = 'Add';
-				const curve = curves[ 0 ];
-				curve.add( new THREE.Vector3( 0, 0, 0 ) );
+				controls.enabled = false;
 				break;
 
 			case 'ControlLeft':
-				controls.enabled = true;
+				
 				break;
 
 			case 'KeyC':
@@ -75,9 +73,14 @@ function init() {
 
 	document.addEventListener( 'keyup', e => {
 
-		if ( e.code === 'ControlLeft' ) {
+		switch ( e.code ) {
 
-			controls.enabled = false;
+			case 'ShiftLeft':
+
+				controls.enabled = true;
+				break;
+				
+			default :
 
 		}
 
