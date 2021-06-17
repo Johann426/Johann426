@@ -37,8 +37,9 @@ function init() {
 
 	document.body.appendChild( renderer.domElement );
 
-	// Create menubar
-	const menubar = new Menubar();
+	// Create model and menubar
+	const curves = [];
+	const menubar = new Menubar( curves );
 	document.body.appendChild( menubar.dom );
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -264,9 +265,6 @@ function init() {
 
 	const buffer = preBuffer();
 	scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature, buffer.distance );
-
-	const curves = [];
-	curves.push( new NurbsCurve( 3 ) );
 
 }
 
