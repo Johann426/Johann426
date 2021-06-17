@@ -22,6 +22,17 @@ function init() {
 		controls.update();
 		renderer.render( scene, camera );
 
+		switch ( menubar.state ) {
+
+			case 'view':
+				controls.enabled = true;
+				break;
+
+			default :
+				controls.enabled = false;
+
+		}
+
 	} );
 
 	document.body.appendChild( renderer.domElement );
@@ -50,7 +61,6 @@ function init() {
 
 			case 'ShiftLeft':
 				menubar.state = 'Add';
-				controls.enabled = false;
 				break;
 
 			case 'ControlLeft':
@@ -77,7 +87,6 @@ function init() {
 
 			case 'ShiftLeft':
 
-				controls.enabled = true;
 				break;
 				
 			default :
