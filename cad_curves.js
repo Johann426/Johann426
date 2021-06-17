@@ -231,7 +231,7 @@ function init() {
 			default:
 				
 				raycaster.ray.intersectPlane( plane, intersect );
-				console.log( curve.closestPoint( intersect ) );
+				updateDistance( curve, buffer.distance, intersect );
 
 		}
 
@@ -249,7 +249,7 @@ function init() {
 	} );
 
 	const buffer = preBuffer();
-	scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature );
+	scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature, buffer.distance );
 
 	const curves = [];
 	curves.push( new NurbsCurve( 3 ) );
@@ -298,7 +298,11 @@ function preBuffer() {
 	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	mat.color.set( 0x800000 );
-	const curvature = new THREE.LineSegments( geo, mat );
+	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
+	
+	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 2 * 3 ), 3 ) );
+	mat.color.set( 0x00ff00 );
+	const distance = new THREE.Line( geo, mat );
 
 	return {
 
@@ -306,7 +310,8 @@ function preBuffer() {
 		ctrlPoints: ctrlPoints,
 		lines: lines,
 		polygon: polygon,
-		curvature: curvature
+		curvature: curvature,
+		distance: distance
 
 	};
 
@@ -419,4 +424,24 @@ function updateLines( curve, lines, curvature ) {
 
 	}
 
+}
+
+
+function updateDistance( curve, distance, v ) {
+
+	let pts, pos, arr, index;
+	pts = [ v, curve.closestPoint( v ) ];
+	pos = distance.geometry.attribute.position;
+	pos.needsUpdate = true;
+	arr = pos.array;
+	index = 0
+	
+	for (let i = 0; i < 2; i++ ) {
+		
+		arr[ index ++ ] = pts[ i ].x;
+		arr[ index ++ ] = pts[ i ].y;
+		arr[ index ++ ] = pts[ i ].z;
+		
+	}
+	
 }
