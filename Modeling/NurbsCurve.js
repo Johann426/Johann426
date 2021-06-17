@@ -155,9 +155,10 @@ class NurbsCurve {
 		var t = t0;
 		var isOrthogonal = false;
 		var isConverged = false;
-		const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+		
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
+			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
 			const sub = ders[ 0 ].clone().sub( v );
 			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
