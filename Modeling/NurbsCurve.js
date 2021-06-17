@@ -150,9 +150,23 @@ class NurbsCurve {
 	closestPoint( v ) {
 
 		this._calcCtrlPoints();
-		const t0 = 0.5;
+		var t = 0;
+		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
+
+		for ( let i = 1; i <= 20; i++ ) {
+
+			const len = curvePoint( this.deg(), this.knots, this.ctrlp, i / 20 ).sub( v ).length();
+			
+			if ( len < l ) {
+
+				t = i / 20;
+				l = len;
+
+			}
+
+		}
+
 		var i = 0;
-		var t = t0;
 		var isOrthogonal = false;
 		var isConverged = false;
 		
@@ -177,7 +191,7 @@ class NurbsCurve {
 			}
 
 			isOrthogonal = Math.abs( ders[ 1 ].dot( sub ) ) < 1E-9;
-			isConverged = ( ders[ 1 ].mul( t - t0 ) ) < 1E-9;
+			isConverged = ( ders[ 1 ].clone().mul( del ) ) < 1E-9;
 			i ++;
 			if ( i > 20 ) break;
 
