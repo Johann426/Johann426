@@ -431,7 +431,7 @@ function updateDistance( curve, distance, v ) {
 
 	let pts, pos, arr, index;
 	pts = [ v, curve.closestPoint( v ) ];
-	pos = distance.geometry.attribute.position;
+	pos = distance.geometry.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
 	index = 0
