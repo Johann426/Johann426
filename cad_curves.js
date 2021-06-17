@@ -154,6 +154,9 @@ function init() {
 				break;
 
 			default:
+				
+				raycaster.ray.intersectPlane( plane, intersect );
+				updateDistance( curve, buffer.distance, intersect );
 
 		}
 
@@ -242,8 +245,7 @@ function init() {
 
 			default:
 				
-				raycaster.ray.intersectPlane( plane, intersect );
-				updateDistance( curve, buffer.distance, intersect );
+				
 
 		}
 
