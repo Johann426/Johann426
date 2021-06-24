@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, globalCurveInterp, deBoorKnots, deWeight } from './NurbsUtil.js';
+import { curvePoint, curveDers, globalCurveInterp, deWeight } from './NurbsUtil.js';
 
 class NurbsCurve {
 
@@ -204,87 +204,87 @@ class NurbsCurve {
 	_calcCtrlPoints() {
 
 		const points = this.pole.map( e => e.point );
-		this.param = this._parameterize( points, this.type );
-		this.knots = this._calcKnots( this.deg(), this.param, this.pole );
+		this.param = parameterize( points, this.type );
+		this.knots = calcKnots( this.deg(), this.param, this.pole );
 		this.ctrlp = globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
 
 	}
 
-	_calcKnots( deg, prm, pole ) {
+}
 
-		const n = pole.length;
-		const nm1 = n - 1;
-		const a = prm.slice();
-		var m = 0;
+function calcKnots( deg, prm, pole ) {
 
-		for ( let i = 0; i < n; i ++ ) {
+	const n = pole.length;
+	const nm1 = n - 1;
+	const a = prm.slice();
+	var m = 0;
 
-			const hasValue = pole[ i ].slope ? true : false;
+	for ( let i = 0; i < n; i ++ ) {
 
-			if ( hasValue ) {
+		const hasValue = pole[ i ].slope ? true : false;
 
-				let one3rd, two3rd;
+		if ( hasValue ) {
 
-				switch ( i ) {
+			let one3rd, two3rd;
 
-					case 0 :
+			switch ( i ) {
 
-						one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
-						a.splice( 1, 0, one3rd );
-						break;
+				case 0 :
 
-					case nm1 :
+					one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
+					a.splice( 1, 0, one3rd );
+					break;
 
-						one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
-						a.splice( nm1 + m, 0, one3rd );
-						break;
+				case nm1 :
 
-					default :
+					one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
+					a.splice( nm1 + m, 0, one3rd );
+					break;
 
-						one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
-						two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
-						a.splice( i + m, 0, one3rd );
-						a.splice( i + m + 1, 1, two3rd );
+				default :
 
-				}
-
-				m ++;
+					one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
+					two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
+					a.splice( i + m, 0, one3rd );
+					a.splice( i + m + 1, 1, two3rd );
 
 			}
 
-		}
+			m ++;
 
-		return deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
+		}
 
 	}
 
-	_parameterize( points, curveType ) {
+	return deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
 
-		const n = points.length;
-		const prm = [];
-		var sum = 0.0;
+}
 
-		for ( let i = 1; i < n; i ++ ) {
+function parameterize( points, curveType ) {
 
-			const del = points[ i ].clone().sub( points[ i - 1 ] );
-			const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
-			sum += len;
-			prm[ i ] = sum;
+	const n = points.length;
+	const prm = [];
+	var sum = 0.0;
 
-		}
+	for ( let i = 1; i < n; i ++ ) {
 
-		prm[ 0 ] = 0.0;
-
-		for ( let i = 1; i < n; i ++ ) {
-
-			prm[ i ] /= sum;
-
-		}
-
-		prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-		return prm;
+		const del = points[ i ].clone().sub( points[ i - 1 ] );
+		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
+		sum += len;
+		prm[ i ] = sum;
 
 	}
+
+	prm[ 0 ] = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		prm[ i ] /= sum;
+
+	}
+
+	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
+	return prm;
 
 }
 
