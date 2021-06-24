@@ -850,4 +850,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, globalCurveInterp, deBoorKnots, deWeight };
+export { curvePoint, curveDers, globalCurveInterp, deWeight };
