@@ -212,6 +212,34 @@ class NurbsCurve {
 
 }
 
+function parameterize( points, curveType ) {
+
+	const n = points.length;
+	const prm = [];
+	var sum = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		const del = points[ i ].clone().sub( points[ i - 1 ] );
+		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
+		sum += len;
+		prm[ i ] = sum;
+
+	}
+
+	prm[ 0 ] = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		prm[ i ] /= sum;
+
+	}
+
+	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
+	return prm;
+
+}
+
 function calcKnots( deg, prm, pole ) {
 
 	const n = pole.length;
@@ -260,31 +288,38 @@ function calcKnots( deg, prm, pole ) {
 
 }
 
-function parameterize( points, curveType ) {
+function deBoorKnots( deg, prm ) {
 
-	const n = points.length;
-	const prm = [];
-	var sum = 0.0;
+	const n = prm.length;
+	const knot = [];
 
-	for ( let i = 1; i < n; i ++ ) {
+	for ( let i = 0; i <= deg; i ++ ) {
 
-		const del = points[ i ].clone().sub( points[ i - 1 ] );
-		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
-		sum += len;
-		prm[ i ] = sum;
+		knot[ i ] = 0.0;
 
 	}
 
-	prm[ 0 ] = 0.0;
+	for ( let i = 1; i < n - deg; i ++ ) {
 
-	for ( let i = 1; i < n; i ++ ) {
+		let sum = 0.0;
 
-		prm[ i ] /= sum;
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			sum += prm[ j ];
+
+		}
+
+		knot[ i + deg ] = sum / deg;
 
 	}
 
-	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-	return prm;
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i + n ] = 1.0;
+
+	}
+
+	return knot;
 
 }
 
