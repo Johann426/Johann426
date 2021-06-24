@@ -1,38 +1,4 @@
 
-function deBoorKnots( deg, prm ) {
-
-	const n = prm.length;
-	const knot = [];
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i ] = 0.0;
-
-	}
-
-	for ( let i = 1; i < n - deg; i ++ ) {
-
-		let sum = 0.0;
-
-		for ( let j = i; j < i + deg; j ++ ) {
-
-			sum += prm[ j ];
-
-		}
-
-		knot[ i + deg ] = sum / deg;
-
-	}
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i + n ] = 1.0;
-
-	}
-
-	return knot;
-
-}
 
 /*
 * Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
