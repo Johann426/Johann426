@@ -65,7 +65,7 @@ function init() {
 				break;
 
 			case 'ControlLeft':
-				
+
 				break;
 
 			case 'KeyC':
@@ -89,7 +89,7 @@ function init() {
 			case 'ShiftLeft':
 
 				break;
-				
+
 			default :
 
 		}
@@ -155,7 +155,7 @@ function init() {
 				break;
 
 			default:
-				
+
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
@@ -245,8 +245,7 @@ function init() {
 				break;
 
 			default:
-				
-				
+
 
 		}
 
@@ -311,7 +310,7 @@ function preBuffer() {
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	mat.color.set( 0x800000 );
 	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
-	
+
 	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 2 * 3 ), 3 ) );
 	mat.color.set( 0x00ff00 );
 	const distance = new THREE.Line( geo, mat );
@@ -446,14 +445,14 @@ function updateDistance( curve, distance, v ) {
 	pos = distance.geometry.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
-	index = 0
-	
-	for (let i = 0; i < 2; i++ ) {
-		
+	index = 0;
+
+	for ( let i = 0; i < 2; i ++ ) {
+
 		arr[ index ++ ] = pts[ i ].x;
 		arr[ index ++ ] = pts[ i ].y;
 		arr[ index ++ ] = pts[ i ].z;
-		
+
 	}
-	
+
 }
