@@ -55,7 +55,7 @@ function init() {
 
 	const raycaster = new THREE.Raycaster();
 	raycaster.params.Points.threshold = 0.05;
-	raycaster.params.Line.threshold = 0.5;
+	raycaster.params.Line.threshold = 0.2;
 
 	document.addEventListener( 'keydown', e => {
 
@@ -464,6 +464,7 @@ function updateDistance( curve, distance, v ) {
 
 	let pts, pos, arr, index;
 	pts = [ v, curve.closestPoint( v ) ];
+	console.log( "distance=", v.clone().sub( curve.closestPoint( v ) ).length() );
 	pos = distance.geometry.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
