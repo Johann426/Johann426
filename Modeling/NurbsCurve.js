@@ -153,10 +153,10 @@ class NurbsCurve {
 		var t = 0;
 		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
 
-		for ( let i = 1; i <= 20; i++ ) {
+		for ( let i = 1; i <= 20; i ++ ) {
 
 			const len = curvePoint( this.deg(), this.knots, this.ctrlp, i / 20 ).sub( v ).length();
-			
+
 			if ( len < l ) {
 
 				t = i / 20;
@@ -169,7 +169,7 @@ class NurbsCurve {
 		var i = 0;
 		var isOrthogonal = false;
 		var isConverged = false;
-		
+
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
 			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
@@ -196,8 +196,8 @@ class NurbsCurve {
 			if ( i > 20 ) break;
 
 		}
-		
-		return curvePoint(this.deg(), this.knots, this.ctrlp, t);
+
+		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 	}
 

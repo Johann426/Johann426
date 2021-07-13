@@ -25,7 +25,7 @@ function init() {
 		switch ( menubar.state ) {
 
 			case 'view':
-				controls.enabled = true;
+				//controls.enabled = true;
 				break;
 
 			default :
@@ -55,6 +55,7 @@ function init() {
 
 	const raycaster = new THREE.Raycaster();
 	raycaster.params.Points.threshold = 0.05;
+	raycaster.params.Line.threshold = 0.5;
 
 	document.addEventListener( 'keydown', e => {
 
@@ -158,6 +159,19 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
+
+				const intersects = raycaster.intersectObjects( parentGeo.children, true );
+				if ( intersects.length > 0 ) {
+
+					sphereInter.visible = true;
+					sphereInter.position.copy( intersects[ 0 ].point );
+					console.log( intersects[ 0 ] );
+
+				} else {
+
+					sphereInter.visible = false;
+
+				}
 
 		}
 
@@ -263,7 +277,15 @@ function init() {
 	} );
 
 	const buffer = preBuffer();
-	scene.add( buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.lines, buffer.curvature, buffer.distance );
+	const parentGeo = new THREE.Object3D();
+	parentGeo.add( buffer.lines );
+	scene.add( parentGeo, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+
+	const geometry = new THREE.SphereGeometry( 0.01 );
+	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+	const sphereInter = new THREE.Mesh( geometry, material );
+	sphereInter.visible = false;
+	scene.add( sphereInter );
 
 }
 
