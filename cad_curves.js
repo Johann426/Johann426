@@ -13,7 +13,7 @@ function init() {
 	scene.add( new THREE.AxesHelper( 1 ) );
 
 	const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.01, 10000 );
-	camera.position.set( 0, 0, 1 );
+	camera.position.set( 0, 0, 10 );
 
 	const renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -25,7 +25,7 @@ function init() {
 		switch ( menubar.state ) {
 
 			case 'view':
-				//controls.enabled = true;
+				controls.enabled = true;
 				break;
 
 			default :
@@ -55,7 +55,7 @@ function init() {
 
 	const raycaster = new THREE.Raycaster();
 	raycaster.params.Points.threshold = 0.05;
-	raycaster.params.Line.threshold = 0.2;
+	raycaster.params.Line.threshold = 1;
 
 	document.addEventListener( 'keydown', e => {
 
@@ -160,7 +160,8 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
-				const intersects = raycaster.intersectObjects( parentGeo.children, true );
+				raycaster.setFromCamera( pointer, camera );
+				const intersects = raycaster.intersectObjects( pickable.children, true );
 				if ( intersects.length > 0 ) {
 
 					sphereInter.visible = true;
@@ -276,18 +277,22 @@ function init() {
 
 	} );
 
+	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
-	const parentGeo = new THREE.Object3D();
-	parentGeo.add( buffer.lines );
-	scene.add( parentGeo, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+	pickable.add( buffer.lines );
+	scene.add( pickable, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
-	const geometry = new THREE.SphereGeometry( 0.01 );
+	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
 	scene.add( sphereInter );
 
 }
+
+
+
+
 
 function preBuffer() {
 
@@ -326,6 +331,15 @@ function preBuffer() {
 	const polygon = new THREE.Line( geo.clone(), mat.clone() );
 
 	mat.color.set( 0xffff00 );
+
+	const ps = [];
+	for ( let i = 0; i < MAX_POINTS; i ++ ) {
+
+		ps.push( Math.random() * 100, Math.random() * 100, Math.random() * 100 );
+
+	}
+
+	geo.setAttribute( 'position', new THREE.Float32BufferAttribute( ps, 3 ) );
 	const lines = new THREE.Line( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
