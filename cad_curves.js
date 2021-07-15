@@ -38,9 +38,8 @@ function init() {
 	document.body.appendChild( renderer.domElement );
 
 	// Create model and menubar
+	var selected;
 	const curves = [];
-	const menubar = new Menubar( curves );
-	document.body.appendChild( menubar.dom );
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
@@ -142,7 +141,7 @@ function init() {
 
 					const v = curve.pole[ i ].point;
 					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.02 ) {
+					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
@@ -210,7 +209,7 @@ function init() {
 
 					const v = curve.pole[ i ].point;
 					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.02 ) {
+					if ( distance < 0.1 ) {
 
 						curve.remove( i );
 						updateCurveBuffer( curve, buffer );
@@ -228,7 +227,7 @@ function init() {
 
 					const v = curve.pole[ i ].point;
 					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.02 ) {
+					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
@@ -247,7 +246,7 @@ function init() {
 
 					const v = curve.pole[ i ].point;
 					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.02 ) {
+					if ( distance < 0.1 ) {
 
 						curve.removeTangent( i );
 						updateCurveBuffer( curve, buffer );
@@ -287,6 +286,9 @@ function init() {
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
 	scene.add( sphereInter );
+	
+	const menubar = new Menubar( scene, curves, buffer.lines );
+	document.body.appendChild( menubar.dom );
 
 }
 
