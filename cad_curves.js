@@ -331,15 +331,12 @@ function preBuffer() {
 	const polygon = new THREE.Line( geo.clone(), mat.clone() );
 
 	mat.color.set( 0xffff00 );
-
-	const ps = [];
-	for ( let i = 0; i < MAX_POINTS; i ++ ) {
-
-		ps.push( Math.random() * 100, Math.random() * 100, Math.random() * 100 );
-
-	}
-
-	geo.setAttribute( 'position', new THREE.Float32BufferAttribute( ps, 3 ) );
+	pos[0] = -10000;
+	pos[1] = -10000;
+	pos[2] = -10000;
+	pos[3] = 10000;
+	pos[4] = 10000;
+	pos[5] = 10000;
 	const lines = new THREE.Line( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
