@@ -35,10 +35,6 @@ function init() {
 
 	document.body.appendChild( renderer.domElement );
 
-	// Create model and menubar
-	var selected;
-	const curves = [];
-
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
 
@@ -104,7 +100,7 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ 0 ];
+		const curve = curves[ selected.curve ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -127,6 +123,7 @@ function init() {
 				previousIntersect = intersect;
 
 				updateCurveBuffer( curve, buffer );
+				updateLines( curve, pickable.children[ selected.curve ] );
 				renderer.render( scene, camera );
 
 				break;
@@ -144,6 +141,7 @@ function init() {
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
+						updateLines( curve, pickable.children[ selected.curve ] );
 						renderer.render( scene, camera );
 
 					}
@@ -157,19 +155,19 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
-				raycaster.setFromCamera( pointer, camera );
-				const intersects = raycaster.intersectObjects( pickable.children, true );
-				if ( intersects.length > 0 ) {
+				// raycaster.setFromCamera( pointer, camera );
+				// const intersects = raycaster.intersectObjects( pickable.children, true );
+				// if ( intersects.length > 0 ) {
 
-					sphereInter.visible = true;
-					sphereInter.position.copy( intersects[ 0 ].point );
-					console.log( intersects[ 0 ] );
+				// 	sphereInter.visible = true;
+				// 	sphereInter.position.copy( intersects[ 0 ].point );
+				// 	console.log( intersects[ 0 ] );
 
-				} else {
+				// } else {
 
-					sphereInter.visible = false;
+				// 	sphereInter.visible = false;
 
-				}
+				// }
 
 		}
 
@@ -179,14 +177,14 @@ function init() {
 
 	} );
 
-	document.addEventListener( 'mousedown', e => {
+	document.addEventListener( 'pointerdown', e => {
 
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ 0 ];
+		const curve = curves[ selected.curve ];
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -197,6 +195,7 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				curve.add( intersect );
 				updateCurveBuffer( curve, buffer );
+				updateLines( curve, pickable.children[ selected.curve ] );
 				renderer.render( scene, camera );
 
 				break;
@@ -211,6 +210,7 @@ function init() {
 
 						curve.remove( i );
 						updateCurveBuffer( curve, buffer );
+						updateLines( curve, pickable.children[ selected.curve ] );
 						renderer.render( scene, camera );
 
 					}
@@ -220,21 +220,6 @@ function init() {
 				break;
 
 			case 'Tangent':
-
-				for ( let i = 0; i < curve.pole.length; i ++ ) {
-
-					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.2 ) {
-
-						raycaster.ray.intersectPlane( plane, intersect );
-						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
-						updateCurveBuffer( curve, buffer );
-						renderer.render( scene, camera );
-
-					}
-
-				}
 
 				break;
 
@@ -248,6 +233,7 @@ function init() {
 
 						curve.removeTangent( i );
 						updateCurveBuffer( curve, buffer );
+						updateLines( curve, pickable.children[ selected.curve ] );
 						renderer.render( scene, camera );
 
 					}
@@ -258,6 +244,16 @@ function init() {
 
 			default:
 
+				raycaster.setFromCamera( pointer, camera );
+				const intersects = raycaster.intersectObjects( pickable.children, true );
+				if ( intersects.length > 0 ) {
+
+					sphereInter.position.copy( intersects[ 0 ].point );
+					console.log( intersects[ 0 ] );
+
+				}
+
+				console.log( selected );
 
 		}
 
@@ -274,10 +270,19 @@ function init() {
 
 	} );
 
+	// Create model and menubar
+	const selected = {
+
+		curve: 0,
+		surface: 0
+
+	};
+
+	const curves = [];
+
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
-	pickable.add( buffer.lines );
-	scene.add( pickable, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+	scene.add( pickable, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -285,7 +290,7 @@ function init() {
 	sphereInter.visible = false;
 	scene.add( sphereInter );
 
-	const menubar = new Menubar( scene, curves, buffer.lines );
+	const menubar = new Menubar( scene, curves, preBuffer(), pickable, selected );
 	document.body.appendChild( menubar.dom );
 
 }
@@ -363,7 +368,8 @@ function preBuffer() {
 
 function updateCurveBuffer( curve, buffer ) {
 
-	updateLines( curve, buffer.lines, buffer.curvature );
+	updateLines( curve, buffer.lines );
+	updateCurvature( curve, buffer.curvature );
 	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 }
@@ -423,15 +429,15 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 
 }
 
-function updateLines( curve, lines, curvature ) {
+function updateLines( curve, lines ) {
 
-	let pts, pos, arr, index;
+	let index;
 
 	//update curve
-	pts = curve.getPoints( MAX_POINTS );
-	pos = lines.geometry.attributes.position;
+	const pts = curve.getPoints( MAX_POINTS );
+	const pos = lines.geometry.attributes.position;
 	pos.needsUpdate = true;
-	arr = pos.array;
+	const arr = pos.array;
 	index = 0;
 
 	for ( let i = 0; i < MAX_POINTS; i ++ ) {
@@ -442,13 +448,19 @@ function updateLines( curve, lines, curvature ) {
 
 	}
 
+}
+
+function updateCurvature( curve, curvature ) {
+
+	let index;
+
 	//update curvature
 	if ( curvature !== undefined ) {
 
-		pts = curve.interrogating( MAX_SEG );
-		pos = curvature.geometry.attributes.position;
+		const pts = curve.interrogating( MAX_SEG );
+		const pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;
-		arr = pos.array;
+		const arr = pos.array;
 		index = 0;
 
 		for ( let i = 0; i < MAX_SEG; i ++ ) {
@@ -469,7 +481,6 @@ function updateLines( curve, lines, curvature ) {
 	}
 
 }
-
 
 function updateDistance( curve, distance, v ) {
 

@@ -1,9 +1,9 @@
-import { UIElement } from './ui.js';
+import { UIElement } from './UIElement.js';
 import { NurbsCurve } from '../Modeling/NurbsCurve.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, curves, buffer ) {
+	constructor( scene, curves, buffer, pickable, selected ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
@@ -15,6 +15,8 @@ class Menubar extends UIElement {
 		this.scene = scene;
 		this.curves = curves;
 		this.buffer = buffer;
+		this.pickable = pickable;
+		this.selected = selected;
 
 	}
 
@@ -82,7 +84,9 @@ class Menubar extends UIElement {
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
 			this.curves.push( new NurbsCurve( 3 ) );
-			this.scene.add( buffer.clone() );
+			const clone = new THREE.Line( this.buffer.lines.geometry.clone(), this.buffer.lines.material.clone() );
+			this.pickable.add( clone );
+			this.selected.curve = this.curves.length - 1;
 
 		} );
 
