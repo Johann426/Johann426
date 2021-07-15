@@ -3,7 +3,7 @@ import { NurbsCurve } from '../Modeling/NurbsCurve.js';
 
 class Menubar extends UIElement {
 
-	constructor( curves ) {
+	constructor( scene, curves, buffer ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
@@ -12,7 +12,9 @@ class Menubar extends UIElement {
 		this.add( this.curve() );
 		this.add( this.surface() );
 		this.state = 'view';
+		this.scene = scene;
 		this.curves = curves;
+		this.buffer = buffer;
 
 	}
 
@@ -80,6 +82,7 @@ class Menubar extends UIElement {
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
 			this.curves.push( new NurbsCurve( 3 ) );
+			this.scene.add( buffer.clone() );
 
 		} );
 
