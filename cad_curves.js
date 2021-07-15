@@ -1,6 +1,4 @@
 import { Menubar } from './GUI/Menubar.js';
-import { NurbsCurve } from './Modeling/NurbsCurve.js';
-//import { Vector3 } from './Modeling/NurbsUtil.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -286,7 +284,7 @@ function init() {
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
 	scene.add( sphereInter );
-	
+
 	const menubar = new Menubar( scene, curves, buffer.lines );
 	document.body.appendChild( menubar.dom );
 
@@ -333,12 +331,12 @@ function preBuffer() {
 	const polygon = new THREE.Line( geo.clone(), mat.clone() );
 
 	mat.color.set( 0xffff00 );
-	pos[0] = -10000;
-	pos[1] = -10000;
-	pos[2] = -10000;
-	pos[3] = 10000;
-	pos[4] = 10000;
-	pos[5] = 10000;
+	pos[ 0 ] = - 10000;
+	pos[ 1 ] = - 10000;
+	pos[ 2 ] = - 10000;
+	pos[ 3 ] = 10000;
+	pos[ 4 ] = 10000;
+	pos[ 5 ] = 10000;
 	const lines = new THREE.Line( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
