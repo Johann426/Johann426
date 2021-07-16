@@ -249,7 +249,7 @@ function init() {
 				if ( intersects.length > 0 ) {
 
 					selected.buffer = intersects[ 0 ].object;
-					updateLines( selected.buffer.curve, buffer );
+					updateCurveBuffer( selected.buffer.curve, buffer );
 
 				}
 
