@@ -100,7 +100,7 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ selected.curve ];
+		const curve = selected.buffer.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -123,7 +123,7 @@ function init() {
 				previousIntersect = intersect;
 
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, pickable.children[ selected.curve ] );
+				updateLines( curve, selected.buffer );
 				renderer.render( scene, camera );
 
 				break;
@@ -141,7 +141,7 @@ function init() {
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, pickable.children[ selected.curve ] );
+						updateLines( curve, selected.buffer );
 						renderer.render( scene, camera );
 
 					}
@@ -184,7 +184,7 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = curves[ selected.curve ];
+		const curve = selected.buffer.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -195,7 +195,7 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				curve.add( intersect );
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, pickable.children[ selected.curve ] );
+				updateLines( curve, selected.buffer );
 				renderer.render( scene, camera );
 
 				break;
@@ -210,7 +210,7 @@ function init() {
 
 						curve.remove( i );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, pickable.children[ selected.curve ] );
+						updateLines( curve, selected.buffer );
 						renderer.render( scene, camera );
 
 					}
@@ -233,7 +233,7 @@ function init() {
 
 						curve.removeTangent( i );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, pickable.children[ selected.curve ] );
+						updateLines( curve, selected.buffer );
 						renderer.render( scene, camera );
 
 					}
@@ -248,12 +248,10 @@ function init() {
 				const intersects = raycaster.intersectObjects( pickable.children, true );
 				if ( intersects.length > 0 ) {
 
-					sphereInter.position.copy( intersects[ 0 ].point );
-					console.log( intersects[ 0 ] );
+					selected.buffer = intersects[ 0 ].object;
+					updateLines( selected.buffer.curve, buffer );
 
 				}
-
-				console.log( selected );
 
 		}
 
@@ -273,12 +271,9 @@ function init() {
 	// Create model and menubar
 	const selected = {
 
-		curve: 0,
-		surface: 0
+		buffer: 0
 
 	};
-
-	const curves = [];
 
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
@@ -290,7 +285,7 @@ function init() {
 	sphereInter.visible = false;
 	scene.add( sphereInter );
 
-	const menubar = new Menubar( scene, curves, preBuffer(), pickable, selected );
+	const menubar = new Menubar( scene, preBuffer(), pickable, selected );
 	document.body.appendChild( menubar.dom );
 
 }
