@@ -82,10 +82,10 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
-			const buffer = new THREE.Line( this.buffer.lines.geometry.clone(), this.buffer.lines.material.clone() );
-			Object.defineProperty( buffer, 'curve', { value: new NurbsCurve( 3 ) } );
-			this.pickable.add( buffer );
-			this.selected.buffer = buffer;
+			const newLines = new THREE.Line( this.buffer.lines.geometry.clone(), this.buffer.lines.material.clone() );
+			Object.defineProperty( newLines, 'curve', { value: new NurbsCurve( 3 ) } );
+			this.pickable.add( newLines );
+			this.selected.buffer = newLines;
 
 		} );
 
