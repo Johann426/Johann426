@@ -33,6 +33,7 @@ function init() {
 
 	} );
 
+	rederer.domElement.id = 'canvas';
 	document.body.appendChild( renderer.domElement );
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
