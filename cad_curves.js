@@ -1,4 +1,5 @@
 import { Menubar } from './GUI/Menubar.js';
+import { UITabbedPanel } from './GUI/Sidebar.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -278,6 +279,7 @@ function init() {
 
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
+	buffer.lines.renderOrder = 100;
 	scene.add( pickable, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	const geometry = new THREE.SphereGeometry( 1 );
@@ -288,6 +290,8 @@ function init() {
 
 	const menubar = new Menubar( scene, preBuffer(), pickable, selected );
 	document.body.appendChild( menubar.dom );
+	const sidebar = new UITabbedPanel();
+	document.body.appendChild( sidebar.dom );
 
 }
 

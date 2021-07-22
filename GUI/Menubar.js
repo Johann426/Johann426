@@ -82,14 +82,6 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
-			const geo = this.buffer.lines.geometry.clone();
-			const mat = this.buffer.lines.material.clone();
-			const lines = new THREE.Line( geo, mat );
-			const curve = new NurbsCurve( 3 );
-			Object.defineProperty( lines, 'curve', { value: curve } );
-			this.pickable.add( lines );
-			this.selected.buffer = lines;
-
 		} );
 
 		items.dom.children[ 1 ].addEventListener( 'click', () => {
@@ -100,6 +92,14 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 3 ].addEventListener( 'click', () => {
 
+			const geo = this.buffer.lines.geometry.clone();
+			const mat = this.buffer.lines.material.clone();
+			const lines = new THREE.Line( geo, mat );
+			const curve = new NurbsCurve( 3 );
+			Object.defineProperty( lines, 'curve', { value: curve } );
+			mat.color.set( 0x808080 );
+			this.pickable.add( lines );
+			this.selected.buffer = lines;
 			this.state = 'Add';
 
 		} );

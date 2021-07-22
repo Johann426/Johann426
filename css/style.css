@@ -66,6 +66,15 @@ canvas {
 	}
 	
 	
+#sidebar {
+	position: absolute;
+	right: 0;
+	top: 32px;
+	bottom: 0;
+	width: 300px;
+	background: rgba(158, 158, 158, 0.493);
+	overflow: auto;
+}
 
 		
 
