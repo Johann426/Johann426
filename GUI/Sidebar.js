@@ -6,104 +6,42 @@ class UITabbedPanel extends UIElement {
 
 		super();
 		this.setId( 'sidebar' );
-
-		this.tabs = [];
-		this.panels = [];
-
-		this.tabsDiv = new UIElement( 'div' );
-		this.tabsDiv.setClass( 'Tabs' );
-
-		this.panelsDiv = new UIElement( 'div' );
-		this.panelsDiv.setClass( 'Panels' );
-
-		this.add( this.tabsDiv );
-		this.add( this.panelsDiv );
-
-		this.selected = '';
+		this.add( this.Position() );
 
 	}
 
-	select( id ) {
+	Position() {
 
-		let tab;
-		let panel;
-		const scope = this;
+		const row = new Row();
+		const x = newUIElement().setStyle( 'width', [ '50px' ] );
+		const y = newUIElement().setStyle( 'width', [ '50px' ] );
+		const z = newUIElement().setStyle( 'width', [ '50px' ] );
+		row.add( newUIElement( 'span' ).setTextContent( 'Position : '), x, y, z );
 
-		// Deselect current selection
-		if ( this.selected && this.selected.length ) {
-
-			tab = this.tabs.find( function ( item ) {
-
-				return item.dom.id === scope.selected;
-
-			} );
-			panel = this.panels.find( function ( item ) {
-
-				return item.dom.id === scope.selected;
-
-			} );
-
-			if ( tab ) {
-
-				tab.removeClass( 'selected' );
-
-			}
-
-			if ( panel ) {
-
-				panel.setDisplay( 'none' );
-
-			}
-
-		}
-
-		tab = this.tabs.find( function ( item ) {
-
-			return item.dom.id === id;
-
-		} );
-		panel = this.panels.find( function ( item ) {
-
-			return item.dom.id === id;
-
-		} );
-
-		if ( tab ) {
-
-			tab.addClass( 'selected' );
-
-		}
-
-		if ( panel ) {
-
-			panel.setDisplay( '' );
-
-		}
-
-		this.selected = id;
-
-		return this;
+		return row;
 
 	}
+}
 
-	addTab( id, label, items ) {
-
-		const tab = new UITab( label, this );
-		tab.setId( id );
-		this.tabs.push( tab );
-		this.tabsDiv.add( tab );
-
-		const panel = new UIElement( 'div' );
-		panel.setId( id );
-		panel.add( items );
-		panel.setDisplay( 'none' );
-		this.panels.push( panel );
-		this.panelsDiv.add( panel );
-
-		this.select( id );
-
+class Row extends UIElement {
+	
+	construct() {
+		
+		super( 'div' );
+		this.setClass( 'Row' );
+		
 	}
+	
+}
 
+class UINumber extends UIElement {
+	
+	construct( number ) {
+		
+		super( 'input' );
+		this.setClass( 'Number' );
+		this.dom.value = '0.00';
+	}
 }
 
 class UITab extends UIElement {
