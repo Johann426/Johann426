@@ -13,10 +13,10 @@ class UITabbedPanel extends UIElement {
 	Position() {
 
 		const row = new Row();
-		const x = newUIElement().setStyle( 'width', [ '50px' ] );
-		const y = newUIElement().setStyle( 'width', [ '50px' ] );
-		const z = newUIElement().setStyle( 'width', [ '50px' ] );
-		row.add( newUIElement( 'span' ).setTextContent( 'Position : '), x, y, z );
+		const x = new UINumber().setStyle( 'width', [ '50px' ] );
+		const y = new UINumber().setStyle( 'width', [ '50px' ] );
+		const z = new UINumber().setStyle( 'width', [ '50px' ] );
+		row.add( new UIElement( 'span' ).setTextContent( 'Position : '), x, y, z );
 
 		return row;
 
@@ -25,7 +25,7 @@ class UITabbedPanel extends UIElement {
 
 class Row extends UIElement {
 	
-	construct() {
+	constructor() {
 		
 		super( 'div' );
 		this.setClass( 'Row' );
@@ -36,7 +36,7 @@ class Row extends UIElement {
 
 class UINumber extends UIElement {
 	
-	construct( number ) {
+	constructor( number ) {
 		
 		super( 'input' );
 		this.setClass( 'Number' );
