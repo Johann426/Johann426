@@ -12,36 +12,28 @@ class UITabbedPanel extends UIElement {
 
 	Position() {
 
-		const row = new Row();
+		const row = new UIElement( 'div' );
 		const x = new UINumber().setStyle( 'width', [ '50px' ] );
 		const y = new UINumber().setStyle( 'width', [ '50px' ] );
 		const z = new UINumber().setStyle( 'width', [ '50px' ] );
-		row.add( new UIElement( 'span' ).setTextContent( 'Position : '), x, y, z );
+		row.add( new UIElement( 'span' ).setTextContent( 'Position : ' ), x, y, z );
 
 		return row;
 
 	}
-}
 
-class Row extends UIElement {
-	
-	constructor() {
-		
-		super( 'div' );
-		this.setClass( 'Row' );
-		
-	}
-	
 }
 
 class UINumber extends UIElement {
-	
-	constructor( number ) {
-		
+
+	constructor() {
+
 		super( 'input' );
 		this.setClass( 'Number' );
 		this.dom.value = '0.00';
+
 	}
+
 }
 
 class UITab extends UIElement {

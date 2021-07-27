@@ -92,7 +92,6 @@ function init() {
 
 	} );
 
-	var isDrag = false;
 	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'mousemove', e => {
@@ -170,10 +169,6 @@ function init() {
 				// 	sphereInter.visible = false;
 
 				// }
-
-		}
-
-		if ( isDrag ) {
 
 		}
 
@@ -257,8 +252,6 @@ function init() {
 
 		}
 
-		isDrag = true;
-
 	} );
 
 	document.addEventListener( 'mouseup', e => {
@@ -266,7 +259,6 @@ function init() {
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-		isDrag = false;
 
 	} );
 
