@@ -274,9 +274,9 @@ function init() {
 		buffer: buffer
 
 	};
-	
-	Object.defineProperty(selected.buffer.lines, 'curve', { value: new NurbsCurve( 3 ) } );
-	
+
+	Object.defineProperty( selected.buffer.lines, 'curve', { value: new NurbsCurve( 3 ) } );
+
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
