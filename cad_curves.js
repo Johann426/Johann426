@@ -1,5 +1,6 @@
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
+import { NurbsCurve } from './Modeling/NurbsCurve.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -262,18 +263,20 @@ function init() {
 
 	} );
 
+	const pickable = new THREE.Object3D();
+	const buffer = preBuffer();
+	buffer.lines.renderOrder = 100;
+	scene.add( pickable, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+
 	// Create model and menubar
 	const selected = {
 
 		buffer: 0
 
 	};
-
-	const pickable = new THREE.Object3D();
-	const buffer = preBuffer();
-	buffer.lines.renderOrder = 100;
-	scene.add( pickable, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
-
+	
+	Object.defineProperty(selected.buffer.lines, 'curve', { value: new NurbsCurve( 3 ) } );
+	
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
@@ -282,7 +285,7 @@ function init() {
 
 	const menubar = new Menubar( scene, preBuffer(), pickable, selected );
 	document.body.appendChild( menubar.dom );
-	const sidebar = new UITabbedPanel();
+	const sidebar = new UITabbedPanel( selected );
 	document.body.appendChild( sidebar.dom );
 
 }
