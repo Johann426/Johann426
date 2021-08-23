@@ -271,7 +271,7 @@ function init() {
 	// Create model and menubar
 	const selected = {
 
-		buffer: 0
+		buffer: buffer
 
 	};
 	
