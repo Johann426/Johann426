@@ -157,16 +157,19 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
-				raycaster.setFromCamera( pointer, camera );
-				const intersects = raycaster.intersectObjects( [ buffer.points ], true );
-				
-				if ( intersects.length > 0 ) {
+				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
+				if ( intPoints.length > 0 ) {
+
+					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
 					sphereInter.visible = true;
-					sphereInter.position.copy( intersects[ 0 ].point );
-					console.log( intersects[ 0 ].index );
+					sphereInter.position.copy( pos );
 
 					if ( dragging ) {
+
+						updateSelectedPoint( buffer.point, pos.x, pos.y, pos.z );
+						//curve.remove( intPoints[ 0 ].index );
+						//curve.add( pos );
 
 					}
 
@@ -209,7 +212,7 @@ function init() {
 
 			case 'Remove':
 
-				for ( let i = 0; i < curve.pole.length; i ++ ) {
+				/* for ( let i = 0; i < curve.pole.length; i ++ ) {
 
 					const v = curve.pole[ i ].point;
 					const distance = raycaster.ray.distanceToPoint( v );
@@ -221,6 +224,17 @@ function init() {
 						renderer.render( scene, camera );
 
 					}
+
+				} */
+
+				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
+
+				if ( intPoints.length > 0 ) {
+
+					curve.remove( intPoints[ 0 ].index );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.buffer );
+					renderer.render( scene, camera );
 
 				}
 
@@ -277,7 +291,7 @@ function init() {
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
 	buffer.lines.renderOrder = 100;
-	scene.add( pickable, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
 	const selected = {
@@ -310,18 +324,13 @@ function preBuffer() {
 	let geo, pos, mat;
 
 	geo = new THREE.BufferGeometry();
-	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
-	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
-
 	mat = new THREE.ShaderMaterial( {
 
 		transparent: true,
 		uniforms: {
 			size: { value: 10 },
 			scale: { value: 1 },
-			color: { value: new THREE.Color( 'DimGray' ) }
+			color: { value: new THREE.Color( 'Yellow' ) }
 		},
 		vertexShader: THREE.ShaderLib.points.vertexShader,
 		fragmentShader: `
@@ -335,6 +344,15 @@ function preBuffer() {
 
 	} );
 
+	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) );
+	const point = new THREE.Points( geo.clone(), mat.clone() );
+
+	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
+	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+
+	mat.uniforms.color = { value: new THREE.Color( 'DimGray' ) };
 	const ctrlPoints = new THREE.Points( geo.clone(), mat.clone() );
 
 	mat.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
@@ -357,6 +375,7 @@ function preBuffer() {
 
 	return {
 
+		point: point,
 		points: points,
 		ctrlPoints: ctrlPoints,
 		lines: lines,
@@ -501,5 +520,16 @@ function updateDistance( curve, distance, v ) {
 		arr[ index ++ ] = pts[ i ].z;
 
 	}
+
+}
+
+function updateSelectedPoint( point, x, y, z ) {
+
+	const pos = point.geometry.attributes.position;
+	pos.needsUpdate = true;
+	const arr = pos.array;
+	arr[ 0 ] = x;
+	arr[ 1 ] = y;
+	arr[ 2 ] = z;
 
 }
