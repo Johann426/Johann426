@@ -167,9 +167,12 @@ function init() {
 
 					if ( dragging ) {
 
+						curve.remove( intPoints[ 0 ].index );
+						curve.incert( intPoints[ 0 ].index, pos );
 						updateSelectedPoint( buffer.point, pos.x, pos.y, pos.z );
-						//curve.remove( intPoints[ 0 ].index );
-						//curve.add( pos );
+						updateCurveBuffer( curve, buffer );
+						updateLines( curve, selected.buffer );
+						renderer.render( scene, camera );
 
 					}
 
