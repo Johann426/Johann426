@@ -50,7 +50,7 @@ function init() {
 	} );
 
 	const raycaster = new THREE.Raycaster();
-	raycaster.params.Points.threshold = 0.05;
+	raycaster.params.Points.threshold = 1;
 	raycaster.params.Line.threshold = 1;
 
 	document.addEventListener( 'keydown', e => {
@@ -157,19 +157,20 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
-				// raycaster.setFromCamera( pointer, camera );
-				// const intersects = raycaster.intersectObjects( pickable.children, true );
-				// if ( intersects.length > 0 ) {
+				raycaster.setFromCamera( pointer, camera );
+				const intersects = raycaster.intersectObjects( [ buffer.points ], true );
+				
+				if ( intersects.length > 0 ) {
 
-				// 	sphereInter.visible = true;
-				// 	sphereInter.position.copy( intersects[ 0 ].point );
-				// 	console.log( intersects[ 0 ] );
+					sphereInter.visible = true;
+					sphereInter.position.copy( intersects[ 0 ].point );
+					console.log( intersects[ 0 ] );
 
-				// } else {
+				} else {
 
-				// 	sphereInter.visible = false;
+					sphereInter.visible = false;
 
-				// }
+				}
 
 		}
 
@@ -300,6 +301,8 @@ function preBuffer() {
 
 	geo = new THREE.BufferGeometry();
 	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
+	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 
 	mat = new THREE.ShaderMaterial( {
@@ -331,12 +334,6 @@ function preBuffer() {
 	const polygon = new THREE.Line( geo.clone(), mat.clone() );
 
 	mat.color.set( 0xffff00 );
-	pos[ 0 ] = - 10000;
-	pos[ 1 ] = - 10000;
-	pos[ 2 ] = - 10000;
-	pos[ 3 ] = 10000;
-	pos[ 4 ] = 10000;
-	pos[ 5 ] = 10000;
 	const lines = new THREE.Line( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
