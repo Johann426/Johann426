@@ -93,9 +93,10 @@ function init() {
 
 	} );
 
+	let dragging = false;
 	var previousIntersect = new THREE.Vector3();
 
-	document.addEventListener( 'mousemove', e => {
+	document.addEventListener( 'pointermove', e => {
 
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
@@ -122,7 +123,6 @@ function init() {
 				}
 
 				curve.add( intersect );
-				previousIntersect = intersect;
 
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.buffer );
@@ -164,7 +164,11 @@ function init() {
 
 					sphereInter.visible = true;
 					sphereInter.position.copy( intersects[ 0 ].point );
-					console.log( intersects[ 0 ] );
+					console.log( intersects[ 0 ].index );
+
+					if ( dragging ) {
+
+					}
 
 				} else {
 
@@ -174,6 +178,8 @@ function init() {
 
 		}
 
+		previousIntersect = intersect;
+
 	} );
 
 	document.addEventListener( 'pointerdown', e => {
@@ -181,6 +187,8 @@ function init() {
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		dragging = true;
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.buffer.curve;
@@ -256,11 +264,13 @@ function init() {
 
 	} );
 
-	document.addEventListener( 'mouseup', e => {
+	document.addEventListener( 'pointerup', e => {
 
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+
+		dragging = false;
 
 	} );
 
