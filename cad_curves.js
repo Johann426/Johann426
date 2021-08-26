@@ -161,6 +161,8 @@ function init() {
 
 				if ( intPoints.length > 0 ) {
 
+					menubar.state = 'editting';
+
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
 					sphereInter.visible = true;
 					sphereInter.position.copy( pos );
@@ -279,6 +281,8 @@ function init() {
 
 		}
 
+		buffer.point.visible = true;
+
 	} );
 
 	document.addEventListener( 'pointerup', e => {
@@ -288,6 +292,8 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		dragging = false;
+
+		buffer.point.visible = false;
 
 	} );
 
