@@ -302,7 +302,7 @@ function init() {
 		
 		if( menubar.state == 'editting' ) {
 
-			menubar.state = 'editting';
+			menubar.state = 'view';
 
 		}
 
