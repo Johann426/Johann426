@@ -170,8 +170,8 @@ function init() {
 					if ( dragging ) {
 
 						curve.remove( intPoints[ 0 ].index );
-						curve.incert( intPoints[ 0 ].index, pos );
-						updateSelectedPoint( buffer.point, pos.x, pos.y, pos.z );
+						curve.incert( intPoints[ 0 ].index, intersect );
+						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.buffer );
 						renderer.render( scene, camera );
@@ -532,13 +532,13 @@ function updateDistance( curve, distance, v ) {
 
 }
 
-function updateSelectedPoint( point, x, y, z ) {
+function updateSelectedPoint( point, v ) {
 
 	const pos = point.geometry.attributes.position;
 	pos.needsUpdate = true;
 	const arr = pos.array;
-	arr[ 0 ] = x;
-	arr[ 1 ] = y;
-	arr[ 2 ] = z;
+	arr[ 0 ] = v.x;
+	arr[ 1 ] = v.y;
+	arr[ 2 ] = v.z;
 
 }
