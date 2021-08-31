@@ -4,20 +4,23 @@ class UITabbedPanel extends UIElement {
 
 	constructor( selected ) {
 
-		super();
+		super( 'div' );
 		this.setId( 'sidebar' );
 		this.selected = selected;
-		this.add( this.Position() );
+		this.add( this.Coords( 'Position' ) );
+		this.add( this.Coords( 'Rotation' ) );
+		this.add( this.Coords( 'Scale' ) );
 
 	}
 
-	Position() {
+	Coords( name ) {
 
 		const row = new UIElement( 'div' );
-		const x = new UINumber().setStyle( 'width', [ '50px' ] );
-		const y = new UINumber().setStyle( 'width', [ '50px' ] );
-		const z = new UINumber().setStyle( 'width', [ '50px' ] );
-		row.add( new UIElement( 'span' ).setTextContent( 'Position : ' ), x, y, z );
+		const t = new UIText().setValue( name + ' : ' ).setStyle( 'width', [ '75px' ] );
+		const x = new UINumber().setStyle( 'width', [ '67px' ] );
+		const y = new UINumber().setStyle( 'width', [ '67px' ] );
+		const z = new UINumber().setStyle( 'width', [ '67px' ] );
+		row.add( t, x, y, z );
 
 		//console.log( this.selected.buffer.lines.curve );
 		//const pts = this.selected.buffer.lines.curve.pole.map( e => e.point );
