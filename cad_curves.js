@@ -103,7 +103,7 @@ function init() {
 		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = selected.buffer.curve;
+		const curve = selected.lines.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -125,7 +125,7 @@ function init() {
 				curve.add( intersect );
 
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.buffer );
+				updateLines( curve, selected.lines );
 				renderer.render( scene, camera );
 
 				break;
@@ -143,7 +143,7 @@ function init() {
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.buffer );
+						updateLines( curve, selected.lines );
 						renderer.render( scene, camera );
 
 					}
@@ -165,7 +165,7 @@ function init() {
 					curve.incert( intPoints[ 0 ].index, intersect );
 					updateSelectedPoint( buffer.point, intersect );
 					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.buffer );
+					updateLines( curve, selected.lines );
 					renderer.render( scene, camera );
 
 				}
@@ -198,7 +198,7 @@ function init() {
 		dragging = true;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = selected.buffer.curve;
+		const curve = selected.lines.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -211,7 +211,7 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				curve.add( intersect );
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.buffer );
+				updateLines( curve, selected.lines );
 				renderer.render( scene, camera );
 
 				break;
@@ -226,7 +226,7 @@ function init() {
 
 						curve.remove( i );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.buffer );
+						updateLines( curve, selected.lines );
 						renderer.render( scene, camera );
 
 					}
@@ -237,7 +237,7 @@ function init() {
 
 					curve.remove( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.buffer );
+					updateLines( curve, selected.lines );
 					renderer.render( scene, camera );
 
 				}
@@ -258,7 +258,7 @@ function init() {
 
 						curve.removeTangent( i );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.buffer );
+						updateLines( curve, selected.lines );
 						renderer.render( scene, camera );
 
 					}
@@ -273,8 +273,8 @@ function init() {
 				const intersects = raycaster.intersectObjects( pickable.children, true );
 				if ( intersects.length > 0 ) {
 
-					selected.buffer = intersects[ 0 ].object;
-					updateCurveBuffer( selected.buffer.curve, buffer );
+					selected.lines = intersects[ 0 ].object;
+					updateCurveBuffer( selected.lines.curve, buffer );
 
 				}
 				
@@ -316,11 +316,11 @@ function init() {
 	// Create model and menubar
 	const selected = {
 
-		buffer: buffer
+		lines: buffer.lines
 
 	};
 
-	Object.defineProperty( selected.buffer.lines, 'curve', { value: new NurbsCurve( 3 ) } );
+	Object.defineProperty( selected.lines, 'curve', { value: new NurbsCurve( 3 ) } );
 
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
