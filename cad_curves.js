@@ -333,6 +333,13 @@ function init() {
 	const sidebar = new UITabbedPanel( selected );
 	document.body.appendChild( sidebar.dom );
 
+	const geo_plane = new THREE.PlaneGeometry( 1, 1);
+	const mat_plane = new THREE.MeshBasicMaterial( { color: 0xc0c0c0, side: THREE.DoubleSide } );
+	mat_plane.transparent = true;
+	mat_plane.opacity = 0.5;
+	const plane = new THREE.Mesh( geo_plane, mat_plane );
+	scene.add( plane );
+
 }
 
 
