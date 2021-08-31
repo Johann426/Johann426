@@ -282,6 +282,9 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index
+					sidebar.position.dom.children[ 1 ].value = intPoints[ 0 ].point.x;
+					sidebar.position.dom.children[ 2 ].value = intPoints[ 0 ].point.y;
+					sidebar.position.dom.children[ 3 ].value = intPoints[ 0 ].point.z;
 
 				}
 
