@@ -93,6 +93,7 @@ function init() {
 
 	} );
 
+	let index = 0;
 	let dragging = false;
 	var previousIntersect = new THREE.Vector3();
 
@@ -159,23 +160,22 @@ function init() {
 
 				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
-				if ( menubar.state == 'editting' ) {
-
-					curve.remove( intPoints[ 0 ].index );
-					curve.incert( intPoints[ 0 ].index, intersect );
-					updateSelectedPoint( buffer.point, intersect );
-					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
-					renderer.render( scene, camera );
-
-				}
-
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
 					sphereInter.visible = true;
 					sphereInter.position.copy( pos );
 
+					if ( menubar.state == 'editting' ) {
+
+						curve.remove( intPoints[ 0 ].index );
+						curve.incert( intPoints[ 0 ].index, intersect );
+						updateSelectedPoint( buffer.point, intersect );
+						updateCurveBuffer( curve, buffer );
+						updateLines( curve, selected.lines );
+						renderer.render( scene, camera );
+
+					}
 
 				} else {
 
@@ -281,6 +281,7 @@ function init() {
 				if( intPoints.length > 0 ) {
 
 					menubar.state = 'editting';
+					index = intPoints[ 0 ].index
 
 				}
 
