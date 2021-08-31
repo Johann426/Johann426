@@ -168,8 +168,7 @@ function init() {
 
 					if ( menubar.state == 'editting' ) {
 
-						curve.remove( index );
-						curve.incert( index, intersect );
+						curve.mod( index, intersect );
 						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
@@ -250,18 +249,12 @@ function init() {
 
 			case 'Remove tangent':
 
-				for ( let i = 0; i < curve.pole.length; i ++ ) {
+				if ( intPoints.length > 0 ) {
 
-					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.1 ) {
-
-						curve.removeTangent( i );
-						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
-
-					}
+					curve.removeTangent( intPoints[ 0 ].index );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.lines );
+					renderer.render( scene, camera );
 
 				}
 
@@ -277,11 +270,11 @@ function init() {
 					updateCurveBuffer( selected.lines.curve, buffer );
 
 				}
-				
-				if( intPoints.length > 0 ) {
+
+				if ( intPoints.length > 0 ) {
 
 					menubar.state = 'editting';
-					index = intPoints[ 0 ].index
+					index = intPoints[ 0 ].index;
 					sidebar.position.dom.children[ 1 ].value = intPoints[ 0 ].point.x;
 					sidebar.position.dom.children[ 2 ].value = intPoints[ 0 ].point.y;
 					sidebar.position.dom.children[ 3 ].value = intPoints[ 0 ].point.z;
@@ -303,8 +296,8 @@ function init() {
 		dragging = false;
 
 		buffer.point.visible = false;
-		
-		if( menubar.state == 'editting' ) {
+
+		if ( menubar.state == 'editting' ) {
 
 			menubar.state = 'view';
 
@@ -337,7 +330,7 @@ function init() {
 	const sidebar = new UITabbedPanel( selected );
 	document.body.appendChild( sidebar.dom );
 
-	const geo_plane = new THREE.PlaneGeometry( 1, 1);
+	const geo_plane = new THREE.PlaneGeometry( 1, 1 );
 	const mat_plane = new THREE.MeshBasicMaterial( { color: 0xc0c0c0, side: THREE.DoubleSide } );
 	mat_plane.transparent = true;
 	mat_plane.opacity = 0.5;
