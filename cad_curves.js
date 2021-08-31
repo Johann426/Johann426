@@ -168,8 +168,8 @@ function init() {
 
 					if ( menubar.state == 'editting' ) {
 
-						curve.remove( intPoints[ 0 ].index );
-						curve.incert( intPoints[ 0 ].index, intersect );
+						curve.remove( index );
+						curve.incert( index, intersect );
 						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
