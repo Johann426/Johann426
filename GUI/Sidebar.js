@@ -7,7 +7,8 @@ class UITabbedPanel extends UIElement {
 		super( 'div' );
 		this.setId( 'sidebar' );
 		this.selected = selected;
-		this.add( this.Coords( 'Position' ) );
+		this.position = this.Coords( 'Position' );
+		this.add( this.position );
 		this.add( this.Coords( 'Rotation' ) );
 		this.add( this.Coords( 'Scale' ) );
 
