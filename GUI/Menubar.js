@@ -99,7 +99,7 @@ class Menubar extends UIElement {
 			Object.defineProperty( lines, 'curve', { value: curve } );
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );
-			this.selected.buffer = lines;
+			this.selected.lines = lines;
 			this.state = 'Add';
 
 		} );
