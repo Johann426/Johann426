@@ -115,15 +115,16 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
 
-					if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
+// 					if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
 
-						curve.remove( curve.pole.length - 1 );
+// 						curve.remove( curve.pole.length - 1 );
 
-					}
+// 					}
 
+					curve.mod( curve.pole.length - 1, intersect );
 				}
 
-				curve.add( intersect );
+// 				curve.add( intersect );
 
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
