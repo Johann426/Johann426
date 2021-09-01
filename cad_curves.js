@@ -221,7 +221,7 @@ function init() {
 
 				break;
 
-			case 'curve'
+			case 'curve':
 
 				if ( intPoints.length > 0 ) {
 
