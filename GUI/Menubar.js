@@ -102,6 +102,8 @@ class Menubar extends UIElement {
 			this.pickable.add( lines );
 			this.selected.lines = lines;
 			this.state = 'Add';
+			const buffer = this.buffer;
+			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
 		} );
 
