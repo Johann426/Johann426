@@ -71,6 +71,7 @@ function init() {
 
 			case 'Escape':
 				menubar.state = 'view';
+				[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
 				break;
 
 			default :
@@ -206,6 +207,34 @@ function init() {
 
 		switch ( menubar.state ) {
 
+			case 'view':
+
+				const intersects = raycaster.intersectObjects( pickable.children, true );
+				if ( intersects.length > 0 ) {
+
+					selected.lines = intersects[ 0 ].object;
+					updateCurveBuffer( selected.lines.curve, buffer );
+					menubar.state = 'curve';
+					[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
+
+				}
+
+				break;
+
+			case 'curve'
+
+				if ( intPoints.length > 0 ) {
+
+					menubar.state = 'editting';
+					index = intPoints[ 0 ].index;
+					sidebar.position.dom.children[ 1 ].value = intPoints[ 0 ].point.x;
+					sidebar.position.dom.children[ 2 ].value = intPoints[ 0 ].point.y;
+					sidebar.position.dom.children[ 3 ].value = intPoints[ 0 ].point.z;
+
+				}
+
+				break;
+
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
@@ -263,25 +292,6 @@ function init() {
 
 			default:
 
-				raycaster.setFromCamera( pointer, camera );
-				const intersects = raycaster.intersectObjects( pickable.children, true );
-				if ( intersects.length > 0 ) {
-
-					selected.lines = intersects[ 0 ].object;
-					updateCurveBuffer( selected.lines.curve, buffer );
-
-				}
-
-				if ( intPoints.length > 0 ) {
-
-					menubar.state = 'editting';
-					index = intPoints[ 0 ].index;
-					sidebar.position.dom.children[ 1 ].value = intPoints[ 0 ].point.x;
-					sidebar.position.dom.children[ 2 ].value = intPoints[ 0 ].point.y;
-					sidebar.position.dom.children[ 3 ].value = intPoints[ 0 ].point.z;
-
-				}
-
 		}
 
 		buffer.point.visible = true;
@@ -300,7 +310,7 @@ function init() {
 
 		if ( menubar.state == 'editting' ) {
 
-			menubar.state = 'view';
+			menubar.state = 'curve';
 
 		}
 
