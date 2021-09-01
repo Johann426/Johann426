@@ -43,6 +43,7 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
+			this.selected.lines.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
 		} );
