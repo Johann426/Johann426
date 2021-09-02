@@ -58,6 +58,7 @@ function init() {
 		switch ( e.code ) {
 
 			case 'ShiftLeft':
+
 				menubar.state = 'Add';
 				break;
 
@@ -69,9 +70,18 @@ function init() {
 
 				break;
 
+			case 'Enter':
+			case 'Space':
+
+				menubar.state = 'curve';
+
+				break;
+
 			case 'Escape':
+
 				menubar.state = 'view';
 				[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
+
 				break;
 
 			default :
@@ -116,16 +126,17 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
 
-// 					if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
+					// if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
 
-// 						curve.remove( curve.pole.length - 1 );
+					// 	curve.remove( curve.pole.length - 1 );
 
-// 					}
+					// }
 
 					curve.mod( curve.pole.length - 1, intersect );
+
 				}
 
-// 				curve.add( intersect );
+				// curve.add( intersect );
 
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
