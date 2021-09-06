@@ -186,6 +186,9 @@ function init() {
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
 						renderer.render( scene, camera );
+						sidebar.position.dom.children[ 1 ].value = intersect.x;
+						sidebar.position.dom.children[ 2 ].value = intersect.y;
+						sidebar.position.dom.children[ 3 ].value = intersect.z;
 
 					}
 
@@ -238,9 +241,6 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;
-					sidebar.position.dom.children[ 1 ].value = intPoints[ 0 ].point.x;
-					sidebar.position.dom.children[ 2 ].value = intPoints[ 0 ].point.y;
-					sidebar.position.dom.children[ 3 ].value = intPoints[ 0 ].point.z;
 
 				}
 
