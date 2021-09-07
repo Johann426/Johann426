@@ -1,6 +1,7 @@
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
+import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -359,6 +360,18 @@ function init() {
 	const plane = new THREE.Mesh( geo_plane, mat_plane );
 	scene.add( plane );
 
+	const loader = new Rhino3dmLoader();
+	loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+	loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
+
+		scene.add( object );
+		initGUI( object.userData.layers );
+
+		// hide spinner
+		document.getElementById( 'loader' ).style.display = 'none';
+
+	} );
+	
 }
 
 
