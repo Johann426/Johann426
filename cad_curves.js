@@ -146,9 +146,9 @@ function init() {
 
 				// curve.add( intersect );
 
-				updateCurveBuffer( curve, buffer );
+				updateCurveBuffer( curve, buffer );  // fps drop !!! why ???
 				updateLines( curve, selected.lines );
-				// renderer.render( scene, camera );
+				renderer.render( scene, camera );
 
 				break;
 
