@@ -1,7 +1,9 @@
+import * as THREE from './Rendering/three.module.js';
+import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
-import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
+import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -33,7 +35,7 @@ function init() {
 				controls.enabled = false;
 
 		}
-		
+
 		stats.begin();
 		stats.end();
 
@@ -42,9 +44,9 @@ function init() {
 	renderer.domElement.id = 'canvas';
 	document.body.appendChild( renderer.domElement );
 
-	const controls = new THREE.OrbitControls( camera, renderer.domElement );
+	const controls = new OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
-	
+
 	const stats = new Stats();
 	stats.showPanel( 0 );
 	document.body.appendChild( stats.dom );
@@ -146,7 +148,7 @@ function init() {
 
 				// curve.add( intersect );
 
-				updateCurveBuffer( curve, buffer );  // fps drop !!! why ???
+				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
 				updateLines( curve, selected.lines );
 				renderer.render( scene, camera );
 
@@ -368,8 +370,8 @@ function init() {
 	scene.add( plane );
 
 	const loader = new Rhino3dmLoader();
-	loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
-	loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
+	loader.setLibraryPath( './libs/' );
+	loader.load( './3dm/Rhino_Logo.3dm', function ( object ) {
 
 		scene.add( object );
 		initGUI( object.userData.layers );
@@ -378,7 +380,7 @@ function init() {
 		document.getElementById( 'loader' ).style.display = 'none';
 
 	} );
-	
+
 }
 
 

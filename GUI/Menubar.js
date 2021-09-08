@@ -1,3 +1,4 @@
+import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { NurbsCurve } from '../Modeling/NurbsCurve.js';
 
