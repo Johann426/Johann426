@@ -33,6 +33,9 @@ function init() {
 				controls.enabled = false;
 
 		}
+		
+		stats.begin();
+		stats.end();
 
 	} );
 
@@ -41,6 +44,10 @@ function init() {
 
 	const controls = new THREE.OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
+	
+	const stats = new Stats();
+	stats.showPanel( 0 );
+	document.body.appendChild( stats.dom );
 
 	window.addEventListener( 'resize', () => {
 
@@ -141,7 +148,7 @@ function init() {
 
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
+				// renderer.render( scene, camera );
 
 				break;
 
