@@ -4,6 +4,7 @@ import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
 import { NurbsCurve } from './Modeling/NurbsCurve.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
+import { GUI } from './libs/dat.gui.module.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
