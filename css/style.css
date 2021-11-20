@@ -74,6 +74,7 @@ canvas {
 	width: 300px;
 	background: rgba(158, 158, 158, 0.493);
 	overflow: auto;
+	resize: vertical;
 }
 
 		
