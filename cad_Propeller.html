@@ -13,16 +13,17 @@
                 display: none;
             }
         </style>
-        <script src="./Rendering/three.min.js"></script>
-		<script src="./Rendering/OrbitControls.js"></script>
-		<script src="./Propeller.js"></script>
+	<script src="./Propeller.js"></script>
     </head>
     <body>
     </body>
 </html>
 
-<script>
-
+<script type="module">
+	
+	import * as THREE from './Rendering/three.module.js'
+	import { OrbitControls } from './Rendering/OrbitControls.js'
+	
 	init();
 
 	function init() {
@@ -44,7 +45,7 @@
 
 		document.body.appendChild( renderer.domElement );
 
-		const controls = new THREE.OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera, renderer.domElement );
 		controls.enableDamping = true;
 
 		window.addEventListener( 'resize', () => {
@@ -122,9 +123,9 @@
 		
 		geometry.computeVertexNormals()
 		
-		material = new THREE.MeshNormalMaterial();
+		const material = new THREE.MeshNormalMaterial();
 		material.side = THREE.DoubleSide;
-		mesh = new THREE.Mesh( geometry, material );
+		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
 	}
