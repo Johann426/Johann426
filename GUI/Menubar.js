@@ -25,7 +25,23 @@ class Menubar extends UIElement {
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
 		const items = new MenuItems();
+		items.add( new MenuItem( 'Import' ) );
+
+		const fileInput = document.createElement( 'input' );
+		fileInput.multiple = true;
+		fileInput.type = 'file';
+		fileInput.addEventListener( 'change', function () {
+
+			// do something
+
+		} );
 		menu.add( items );
+
+		items.dom.children[ 0 ].addEventListener( 'click', () => {
+
+			fileInput.click();
+
+		} );
 
 		return menu;
 
@@ -182,5 +198,7 @@ class MenuDivider extends UIElement {
 	}
 
 }
+
+
 
 export { Menubar };
