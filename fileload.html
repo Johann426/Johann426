@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>File resd</title>
+</head>
+  
+<body>
+	<input id="inputFile" type="file" onchange="previewFile()">
+	<p class="content"></p>
+	<div id="dropbox" style="text-aligh:center; border:1px solid grey; width:330px; height:300px;">
+		Drag & drop here
+	</div>
+
+	<script>
+		function previewFile() {
+  			const content = document.querySelector('.content');
+	  		const [file] = document.querySelector('input[type=file]').files;
+	  		const reader = new FileReader();
+
+  			reader.addEventListener("load", () => {
+    		// this will then display a text file
+    		content.innerText = reader.result;
+  			}, false);
+
+	  		if (file) {
+    			reader.readAsText(file);
+  			}
+		}
+		
+		let dropbox;
+
+		dropbox = document.getElementById("dropbox");
+		dropbox.addEventListener("dragenter", dragenter, false);
+		dropbox.addEventListener("dragleave", dragleave, false);
+		dropbox.addEventListener("dragover", dragover, false);
+		dropbox.addEventListener("drop", drop, false);
+		
+		function dragenter(e) {
+  			e.stopPropagation();
+  			e.preventDefault();
+			dropbox.style.border = "3px solid red"
+		}
+		
+		function dragleave(e) {
+  			e.stopPropagation();
+  			e.preventDefault();
+			dropbox.style.border = "1px solid grey"
+		}
+		
+		function dragover(e) {
+  			e.stopPropagation();
+  			e.preventDefault();
+		}
+		
+		function drop(e) {
+  			e.stopPropagation();
+  			e.preventDefault();
+			dropbox.style.border = "1px solid grey"
+  			const dt = e.dataTransfer;
+  			const files = dt.files;
+
+ 		 	handleFiles(files);
+		}
+			
+}
