@@ -25,21 +25,35 @@ class Menubar extends UIElement {
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
 		const items = new MenuItems();
-		items.add( new MenuItem( 'Import' ) );
-
-		const fileInput = document.createElement( 'input' );
-		fileInput.multiple = true;
-		fileInput.type = 'file';
-		fileInput.addEventListener( 'change', function () {
-
-			// do something
-
-		} );
+		items.add( new MenuItem( 'Import hull' ) );
+		items.add( new MenuItem( 'Import Propeller' ) );
 		menu.add( items );
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
-			fileInput.click();
+			hullOpen.click();
+
+		} );
+
+		items.dom.children[ 1 ].addEventListener( 'click', () => {
+
+			propOpen.click();
+
+		} );
+
+		const hullOpen = document.createElement( 'input' );
+		hullOpen.type = 'file';
+		hullOpen.addEventListener( 'change', function () {
+
+			// do something
+
+		} );
+
+		const propOpen = document.createElement( 'input' );
+		propOpen.type = 'file';
+		propOpen.addEventListener( 'change', function () {
+
+			// do something
 
 		} );
 
