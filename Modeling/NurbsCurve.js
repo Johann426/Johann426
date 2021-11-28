@@ -25,7 +25,7 @@ class NurbsCurve {
 
 	}
 
-	add( point ) {
+	addPoint( point ) {
 
 		this.pole.push( { point: point } );
 
