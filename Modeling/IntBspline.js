@@ -1,13 +1,13 @@
 /*
  * If the given data consists of only points (and constraints), on the basis of The NURBS Book,
- * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
+ * this class provides a global algorithm to solve the linear equations to evaluate an unknown B-Spline,
  * i.e., parameterized value, knot vector, and control points.
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, globalCurveInterp, deWeight } from './NurbsUtil.js';
+import { curvePoint, curveDers, globalCurveInterp } from './NurbsUtil.js';
 
-class NurbsCurve {
+class IntBspline {
 
 	constructor( deg, type = 'chordal' ) {
 
@@ -25,7 +25,7 @@ class NurbsCurve {
 
 	}
 
-	addPoint( point ) {
+	add( point ) {
 
 		this.pole.push( { point: point } );
 
@@ -84,7 +84,7 @@ class NurbsCurve {
 	getCtrlPoints() {
 
 		this._calcCtrlPoints();
-		return deWeight( this.ctrlp );
+		return this.ctrlp;
 
 	}
 
@@ -323,4 +323,4 @@ function deBoorKnots( deg, prm ) {
 
 }
 
-export { NurbsCurve };
+export { IntBspline };

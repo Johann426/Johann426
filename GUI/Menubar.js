@@ -1,6 +1,6 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
-import { NurbsCurve } from '../Modeling/NurbsCurve.js';
+import { IntBspline } from '../Modeling/IntBspline.js';
 
 class Menubar extends UIElement {
 
@@ -127,7 +127,7 @@ class Menubar extends UIElement {
 			const geo = this.buffer.lines.geometry.clone();
 			const mat = this.buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
-			const curve = new NurbsCurve( 3 );
+			const curve = new IntBspline( 3 );
 			Object.defineProperty( lines, 'curve', { value: curve } );
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );

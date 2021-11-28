@@ -2,7 +2,7 @@ import * as THREE from './Rendering/three.module.js';
 import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
-import { NurbsCurve } from './Modeling/NurbsCurve.js';
+import { IntBspline } from './Modeling/IntBspline';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 
@@ -356,7 +356,7 @@ function init() {
 
 	};
 
-	Object.defineProperty( selected.lines, 'curve', { value: new NurbsCurve( 3 ) } );
+	Object.defineProperty( selected.lines, 'curve', { value: new IntBspline( 3 ) } );
 
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );

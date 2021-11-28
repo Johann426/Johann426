@@ -174,11 +174,11 @@ function dersBasisFunc( deg, knot, span, n, t ) {
 /*
 * Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
 */
-function _curvePoint( deg, knot, ctrl, t ) {
+function curvePoint( deg, knot, ctrl, t ) {
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
 	const nj = basisFuncs( deg, knot, span, t );
-	var v = new Vector3( 0, 0, 0 );
+	const v = new Vector3( 0, 0, 0 );
 
 	for ( let j = 0; j <= deg; j ++ ) {
 
@@ -195,30 +195,29 @@ function _curvePoint( deg, knot, ctrl, t ) {
 /*
 * Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
 */
-function _SurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, u, v ) {
+function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
-	//const ni = knotU.length - degU - 2;
-	//const nj = knotV.length - degV - 2;
-
-	const spanU = findIndexSpan( degU, knotU, n, u );
-	const spanV = findIndexSpan( degV, knotV, m, v );
-	const ni = basisFuncs( degU, knotU, spanU, u );
-	const nj = basisFuncs( degV, knotV, spanV, v );
-	var v = new Vector3( 0, 0, 0 );
+	const spanU = findIndexSpan( degU, knotU, n, t1 );
+	const spanV = findIndexSpan( degV, knotV, m, t2 );
+	const ni = basisFuncs( degU, knotU, spanU, t1 );
+	const nj = basisFuncs( degV, knotV, spanV, t2 );
+	const v = new Vector3( 0, 0, 0 );
 
 	for ( let j = 0; j <= degV; j ++ ) {
 
+		const index = spanV - degV + j;
+		const tmp = new Vector3( 0, 0, 0 );
 		for ( let i = 0; i <= degU; i ++ ) {
 
-			v.x += ni[ i ] * ctrl[ spanU - degU + i ].x;
-			v.y += ni[ i ] * ctrl[ spanU - degU + i ].y;
-			v.z += ni[ i ] * ctrl[ spanU - degU + i ].z;
+			tmp.x += ni[ i ] * ctrl[ spanU - degU + i ][ index ].x;
+			tmp.y += ni[ i ] * ctrl[ spanU - degU + i ][ index ].y;
+			tmp.z += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
 
 		}
 
-		v.x += nj[ j ] * v.x;
-		v.y += nj[ j ] * v.y;
-		v.z += nj[ j ] * v.z;
+		v.x += nj[ index ] * tmp.x;
+		v.y += nj[ index ] * tmp.y;
+		v.z += nj[ index ] * tmp.z;
 
 	}
 
@@ -229,7 +228,7 @@ function _SurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, u, v ) {
 /*
 * Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
 */
-function curvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
+function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
 	const nj = basisFuncs( deg, knot, span, t );
@@ -250,9 +249,43 @@ function curvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, w
 }
 
 /*
+* Compute Nurbs surface point. See The NURBS Book, page 134, algorithm A4.3.
+*/
+function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
+
+	const spanU = findIndexSpan( degU, knotU, n, t1 );
+	const spanV = findIndexSpan( degV, knotV, m, t2 );
+	const ni = basisFuncs( degU, knotU, spanU, t1 );
+	const nj = basisFuncs( degV, knotV, spanV, t2 );
+	const v = new Vector4( 0, 0, 0, 0 );
+
+	for ( let j = 0; j <= degV; j ++ ) {
+
+		const index = spanV - degV + j;
+		const tmp = new Vector4( 0, 0, 0 );
+		for ( let i = 0; i <= degU; i ++ ) {
+
+			tmp.x += ni[ i ] * ctrl[ spanU - degU + i ][ index ].x;
+			tmp.y += ni[ i ] * ctrl[ spanU - degU + i ][ index ].y;
+			tmp.z += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
+			tmp.w += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
+
+		}
+
+		v.x += nj[ index ] * tmp.x;
+		v.y += nj[ index ] * tmp.y;
+		v.z += nj[ index ] * tmp.z;
+
+	}
+
+	return v;
+
+}
+
+/*
 * Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
 */
-function _curveDers( deg, knot, ctrl, t, n = 2 ) {
+function curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 	const v = [];
 	// We allow n > degree, although the ders are 0 in this case (for nonrational curves),
@@ -282,7 +315,7 @@ function _curveDers( deg, knot, ctrl, t, n = 2 ) {
 /*
 * Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
 */
-function curveDers( deg, knot, ctrl, t, n = 2 ) {
+function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 
 	const v = [];
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
@@ -642,7 +675,7 @@ function lubksb( n, a, indx, b ) {
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		b[ i ] = new Vector4( x[ i ], y[ i ], z[ i ], 1.0 );
+		b[ i ] = new Vector3( x[ i ], y[ i ], z[ i ] );
 
 	}
 
