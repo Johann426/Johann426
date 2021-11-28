@@ -48,9 +48,15 @@ function init() {
 	const controls = new OrbitControls( camera, renderer.domElement );
 	controls.enableDamping = true;
 
+	// stats
 	const stats = new Stats();
 	stats.showPanel( 0 );
 	document.body.appendChild( stats.dom );
+
+	// grid
+	const gridHelper = new THREE.GridHelper( 30, 30, 0x303030, 0x303030 );
+	gridHelper.geometry.rotateX( 0.5 * Math.PI );
+	scene.add( gridHelper );
 
 	window.addEventListener( 'resize', () => {
 
@@ -370,17 +376,17 @@ function init() {
 	const plane = new THREE.Mesh( geo_plane, mat_plane );
 	scene.add( plane );
 
-	const loader = new Rhino3dmLoader();
-	loader.setLibraryPath( './libs/' );
-	loader.load( './3dm/Rhino_Logo.3dm', function ( object ) {
+	// const loader = new Rhino3dmLoader();
+	// loader.setLibraryPath( './libs/' );
+	// loader.load( './3dm/Rhino_Logo.3dm', function ( object ) {
 
-		scene.add( object );
-		initGUI( object.userData.layers, scene );
+	// 	scene.add( object );
+	// 	initGUI( object.userData.layers, scene );
 
-		// hide spinner
-		document.getElementById( 'loader' ).style.display = 'none';
+	// 	// hide spinner
+	// 	document.getElementById( 'loader' ).style.display = 'none';
 
-	} );
+	// } );
 
 }
 
