@@ -2,7 +2,7 @@ import * as THREE from './Rendering/three.module.js';
 import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
-import { IntBspline } from './Modeling/IntBspline';
+import { IntBspline } from './Modeling/IntBspline.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 
