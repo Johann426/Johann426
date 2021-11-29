@@ -74,7 +74,6 @@ class NurbsCurve {
 
 	closestPoint( v ) {
 
-		this._calcCtrlPoints();
 		var t = 0;
 		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
 
