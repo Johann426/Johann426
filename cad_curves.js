@@ -552,7 +552,7 @@ function updateCurvature( curve, curvature ) {
 	//update curvature
 	if ( curvature !== undefined ) {
 
-		const geo = lines.geometry;
+		const geo = curvature.geometry;
 		geo.setDrawRange( 0, MAX_SEG * 2 );
 		
 		const pts = curve.interrogating( MAX_SEG );
