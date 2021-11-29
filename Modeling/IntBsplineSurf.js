@@ -1,8 +1,8 @@
-import { NurbsUtil, Vector3 } from './NurbsUtil.js';
+import { surfacePoint, deBoorKnots, globalCurveInterp } from './NurbsUtil.js';
 
 class IntBsplineSurf {
 
-	constructor( ni, nj, points, deg, type = 'chordal' ) {
+	constructor( ni, nj, points, degU, degV, type = 'chordal' ) {
 
 		this.ni = ni;
 		this.nj = nj;
@@ -23,28 +23,70 @@ class IntBsplineSurf {
 
 		this.type = type;
 
-		this.deg = () => {
+		this.degU = () => {
 
-			const nm1 = this.pole.length - 1;
+			return ( ni -1 > degU ? degU : ni - 1 );
 
-			return ( nm1 > deg ? deg : nm1 );
+		};
+		
+		
+		this.degV = () => {
+
+			return ( nj -1 > degV ? degV : nj - 1 );
 
 		};
 
 	}
 
+	getPointAt( t1, t2 ) {
+		
+		this._calcCtrlPoints();
+		return surfacePoint(
+			this.ni, this.nj,
+			this.degU(), this.degV(),
+			this.knots.row, this.knots.col,
+			this.ctrlp, t1, t2);
+
+	}
+	
+	getPoints( n, m ) {
+		
+		this._calcCtrlPoints();
+		const p =[];
+		
+		for ( let j = 0; j < m; j ++ ) {
+			
+			p[j] = [];
+			const t2 = j / ( m - 1 ) ;
+			
+			for( let i = 0; i < n; i ++ ) {
+				
+				const t1 = i / ( n - 1 );
+				
+				p[ j ][ i ] = surfacePoint(
+						this.ni, this.nj,
+						this.degU(), this.degV(),
+						this.knots.row, this.knots.col,
+						this.ctrlp, t1, t2);
+			}
+		}
+		
+		return p;
+		
+	}
+	
 	_calcCtrlPoints() {
 
 		const ni = this.ni;
 		const nj = this.nj;
 		const points = this.points; //this.pole.map( e => e.point )
 		this.para = this._parameterize( ni, nj, points, this.type );
-		this.knots = this._calcKnots( ni, nj, this.deg(), this.para, this.pole );
+		this.knots = this._calcKnots( ni, nj, this.degU(), this.degV(), this.para, this.pole );
 		this.ctrlPoints = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlPoints[ j ] = NurbsUtil.globalCurveInterp( this.deg(), this.para.row, this.knots.row, this.pole[ j ] );
+			this.ctrlPoints[ j ] = globalCurveInterp( this.degU(), this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -58,7 +100,7 @@ class IntBsplineSurf {
 
 			}
 
-			const ctrl = NurbsUtil.globalCurveInterp( this.deg(), this.para.col, this.knots.col, r );
+			const ctrl = globalCurveInterp( this.degV(), this.para.col, this.knots.col, r );
 
 			for ( let j = 0; j < nj; j ++ ) {
 
@@ -70,47 +112,7 @@ class IntBsplineSurf {
 
 	}
 
-	_calcKnots( ni, nj, deg, prm, pole ) {
-
-		// const a = prm.row.slice();
-		// var m = 0;
-
-		// for ( let i = 0; i < n; i ++ ) {
-
-		// 	const hasValue = pole[ i ].slope ? true : false;
-
-		// 	if ( hasValue ) {
-
-		// 		let one3rd, two3rd;
-
-		// 		switch ( i ) {
-
-		// 			case 0 :
-
-		// 				one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
-		// 				a.splice( 1, 0, one3rd );
-		// 				break;
-
-		// 			case nm1 :
-
-		// 				one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
-		// 				a.splice( nm1 + m, 0, one3rd );
-		// 				break;
-
-		// 			default :
-
-		// 				one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
-		// 				two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
-		// 				a.splice( i + m, 0, one3rd );
-		// 				a.splice( i + m + 1, 1, two3rd );
-
-		// 		}
-
-		// 		m ++;
-
-		// 	}
-
-		// }
+	_calcKnots( ni, nj, degU, degV, prm, pole ) {
 
 		const knot = {
 
@@ -119,8 +121,8 @@ class IntBsplineSurf {
 
 		};
 
-		knot.row = NurbsUtil.deBoorKnots( deg, prm.row ); //.sort( ( a, b ) => { return a - b } );
-		knot.col = NurbsUtil.deBoorKnots( deg, prm.col );
+		knot.row = deBoorKnots( degU, prm.row ); //.sort( ( a, b ) => { return a - b } );
+		knot.col = deBoorKnots( degV, prm.col );
 
 		return knot;
 
@@ -130,60 +132,64 @@ class IntBsplineSurf {
 
 		const prm = {
 
-			'row': [],
-			'col': []
+			'row': new Array(ni).fill(0),
+			'col': new Array(nj).fill(0)
 
 		};
 
 		for ( let j = 0; j < nj; j ++ ) {
 
 			let sum = 0.0;
+			const tmp = [];
 
 			for ( let i = 1; i < ni; i ++ ) {
 
 				const del = points[ j ][ i ].clone().sub( points[ j ][ i - 1 ] );
 				const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
 				sum += len;
-				prm.row[ i ] = sum;
+				tmp[ i ] = sum;
 
 			}
-
-			prm.row[ 0 ] = 0.0;
 
 			for ( let i = 1; i < ni; i ++ ) {
 
-				prm.row[ i ] += prm.row[ i ] / sum / nj;
+				tmp[ i ] /= sum;
+				prm.row[ i ] += tmp[ i ] / nj
 
 			}
 
-			prm.row[ ni - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-
 		}
+		
+		prm.row[ 0 ] = 0.0;
+		
+		prm.row[ ni - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
 
 		for ( let i = 0; i < ni; i ++ ) {
 
 			let sum = 0.0;
+			const tmp = [];
 
 			for ( let j = 1; j < nj; j ++ ) {
 
 				const del = points[ j ][ i ].clone().sub( points[ j - 1 ][ i ] );
 				const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
 				sum += len;
-				prm.col[ j ] = sum;
+				tmp[ j ] = sum;
 
 			}
-
-			prm.col[ 0 ] = 0.0;
 
 			for ( let j = 1; j < nj; j ++ ) {
 
-				prm.col[ j ] += prm.col[ j ] / sum / ni;
+				tmp[ j ] /= sum;
+				prm.col[ j ] += tmp[ j ] / ni;
 
 			}
 
-			prm.col[ nj - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-
 		}
+		
+		prm.col[ 0 ] = 0.0;
+		
+		prm.col[ nj - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
 
 		return prm;
 
