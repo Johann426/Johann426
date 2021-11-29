@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, globalCurveInterp } from './NurbsUtil.js';
+import { curvePoint, curveDers, deBoorKnots, globalCurveInterp } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -288,39 +288,6 @@ function calcKnots( deg, prm, pole ) {
 
 }
 
-function deBoorKnots( deg, prm ) {
 
-	const n = prm.length;
-	const knot = [];
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i ] = 0.0;
-
-	}
-
-	for ( let i = 1; i < n - deg; i ++ ) {
-
-		let sum = 0.0;
-
-		for ( let j = i; j < i + deg; j ++ ) {
-
-			sum += prm[ j ];
-
-		}
-
-		knot[ i + deg ] = sum / deg;
-
-	}
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i + n ] = 1.0;
-
-	}
-
-	return knot;
-
-}
 
 export { IntBspline };
