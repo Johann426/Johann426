@@ -1,11 +1,11 @@
-import { curvePoint, curveDers, globalCurveInterp } from './NurbsUtil.js';
+import { curvePoint, curveDers, globalCurveInterp, Vector4 } from './NurbsUtil.js';
 
 class NurbsCurve {
 
 	constructor( deg, knots, ctrlp, weight ) {
 
 		this.knots = knots;
-
+		
 		this.ctrlp = ctrlp;
 
 		this.deg = () => {
@@ -15,6 +15,12 @@ class NurbsCurve {
 			return ( nm1 > deg ? deg : nm1 );
 
 		};
+		
+		for ( let i = 0; i < ctrlp.length; i ++ ) {
+			
+			this.ctrlpw[ i ] = new Vector4( ctrlp[ i ].x, ctrlp[ i ].y, ctrlp[ i ].z, weight[ i ] )
+			
+		}
 
 	}
 	
