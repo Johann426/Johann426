@@ -82,11 +82,11 @@ class IntBsplineSurf {
 		const points = this.points; //this.pole.map( e => e.point )
 		this.para = this._parameterize( ni, nj, points, this.type );
 		this.knots = this._calcKnots( ni, nj, this.degU(), this.degV(), this.para, this.pole );
-		this.ctrlPoints = [];
+		this.ctrlp = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlPoints[ j ] = globalCurveInterp( this.degU(), this.para.row, this.knots.row, this.pole[ j ] );
+			this.ctrlp[ j ] = globalCurveInterp( this.degU(), this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -96,7 +96,7 @@ class IntBsplineSurf {
 
 			for ( let j = 0; j < nj; j ++ ) {
 
-				r[ j ] = { 'point': this.ctrlPoints[ j ][ i ] };
+				r[ j ] = { 'point': this.ctrlp[ j ][ i ] };
 
 			}
 
@@ -104,7 +104,7 @@ class IntBsplineSurf {
 
 			for ( let j = 0; j < nj; j ++ ) {
 
-				this.ctrlPoints[ j ][ i ] = ctrl[ j ];
+				this.ctrlp[ j ][ i ] = ctrl[ j ];
 
 			}
 
