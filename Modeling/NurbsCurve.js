@@ -2,7 +2,7 @@ import { curvePoint, curveDers, globalCurveInterp } from './NurbsUtil.js';
 
 class NurbsCurve {
 
-	constructor( deg, knots, ctrlp ) {
+	constructor( deg, knots, ctrlp, weight ) {
 
 		this.knots = knots;
 
