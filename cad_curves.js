@@ -426,6 +426,7 @@ function preBuffer() {
 	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
 	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	geo.setDrawRange( 0, 0 );
 
 	mat.uniforms.color = { value: new THREE.Color( 'DimGray' ) };
 	const ctrlPoints = new THREE.Points( geo.clone(), mat.clone() );
@@ -527,14 +528,14 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 
 function updateLines( curve, lines ) {
 
-	let index;
-
 	//update curve
+	const geo = lines.geometry;
+	geo.setDrawRange( 0, MAX_POINTS );
 	const pts = curve.getPoints( MAX_POINTS );
 	const pos = lines.geometry.attributes.position;
 	pos.needsUpdate = true;
 	const arr = pos.array;
-	index = 0;
+	let index = 0;
 
 	for ( let i = 0; i < MAX_POINTS; i ++ ) {
 
@@ -548,16 +549,17 @@ function updateLines( curve, lines ) {
 
 function updateCurvature( curve, curvature ) {
 
-	let index;
-
 	//update curvature
 	if ( curvature !== undefined ) {
 
+		const geo = lines.geometry;
+		geo.setDrawRange( 0, MAX_SEG * 2 );
+		
 		const pts = curve.interrogating( MAX_SEG );
 		const pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;
 		const arr = pos.array;
-		index = 0;
+		let index = 0;
 
 		for ( let i = 0; i < MAX_SEG; i ++ ) {
 
