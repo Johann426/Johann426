@@ -209,15 +209,15 @@ function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 		const tmp = new Vector3( 0, 0, 0 );
 		for ( let i = 0; i <= degU; i ++ ) {
 
-			tmp.x += ni[ i ] * ctrl[ spanU - degU + i ][ index ].x;
-			tmp.y += ni[ i ] * ctrl[ spanU - degU + i ][ index ].y;
-			tmp.z += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
+			tmp.x += ni[ i ] * ctrl[ index ][ spanU - degU + i ].x;
+			tmp.y += ni[ i ] * ctrl[ index ][ spanU - degU + i ].y;
+			tmp.z += ni[ i ] * ctrl[ index ][ spanU - degU + i ].z;
 
 		}
 
-		v.x += nj[ index ] * tmp.x;
-		v.y += nj[ index ] * tmp.y;
-		v.z += nj[ index ] * tmp.z;
+		v.x += nj[ j ] * tmp.x;
+		v.y += nj[ j ] * tmp.y;
+		v.z += nj[ j ] * tmp.z;
 
 	}
 
@@ -358,7 +358,40 @@ function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 
 }
 
+function deBoorKnots( deg, prm ) {
 
+	const n = prm.length;
+	const knot = [];
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i ] = 0.0;
+
+	}
+
+	for ( let i = 1; i < n - deg; i ++ ) {
+
+		let sum = 0.0;
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			sum += prm[ j ];
+
+		}
+
+		knot[ i + deg ] = sum / deg;
+
+	}
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i + n ] = 1.0;
+
+	}
+
+	return knot;
+
+}
 
 /*
  * Compute binomial coefficient, k! / ( i! * ( k - i )! )
@@ -883,4 +916,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, globalCurveInterp, deWeight };
+export { curvePoint, surfacePoint, curveDers, deBoorKnots, globalCurveInterp, deWeight };
