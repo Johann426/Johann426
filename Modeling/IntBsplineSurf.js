@@ -25,56 +25,58 @@ class IntBsplineSurf {
 
 		this.degU = () => {
 
-			return ( ni -1 > degU ? degU : ni - 1 );
+			return ( ni - 1 > degU ? degU : ni - 1 );
 
 		};
-		
-		
+
+
 		this.degV = () => {
 
-			return ( nj -1 > degV ? degV : nj - 1 );
+			return ( nj - 1 > degV ? degV : nj - 1 );
 
 		};
 
 	}
 
 	getPointAt( t1, t2 ) {
-		
+
 		this._calcCtrlPoints();
 		return surfacePoint(
 			this.ni, this.nj,
 			this.degU(), this.degV(),
 			this.knots.row, this.knots.col,
-			this.ctrlp, t1, t2);
+			this.ctrlp, t1, t2 );
 
 	}
-	
+
 	getPoints( n, m ) {
-		
+
 		this._calcCtrlPoints();
-		const p =[];
-		
+		const p = [];
+
 		for ( let j = 0; j < m; j ++ ) {
-			
-			p[j] = [];
-			const t2 = j / ( m - 1 ) ;
-			
-			for( let i = 0; i < n; i ++ ) {
-				
+
+			p[ j ] = [];
+			const t2 = j / ( m - 1 );
+
+			for ( let i = 0; i < n; i ++ ) {
+
 				const t1 = i / ( n - 1 );
-				
+
 				p[ j ][ i ] = surfacePoint(
-						this.ni, this.nj,
-						this.degU(), this.degV(),
-						this.knots.row, this.knots.col,
-						this.ctrlp, t1, t2);
+					this.ni, this.nj,
+					this.degU(), this.degV(),
+					this.knots.row, this.knots.col,
+					this.ctrlp, t1, t2 );
+
 			}
+
 		}
-		
+
 		return p;
-		
+
 	}
-	
+
 	_calcCtrlPoints() {
 
 		const ni = this.ni;
@@ -132,8 +134,8 @@ class IntBsplineSurf {
 
 		const prm = {
 
-			'row': new Array(ni).fill(0),
-			'col': new Array(nj).fill(0)
+			'row': new Array( ni ).fill( 0 ),
+			'col': new Array( nj ).fill( 0 )
 
 		};
 
@@ -154,14 +156,14 @@ class IntBsplineSurf {
 			for ( let i = 1; i < ni; i ++ ) {
 
 				tmp[ i ] /= sum;
-				prm.row[ i ] += tmp[ i ] / nj
+				prm.row[ i ] += tmp[ i ] / nj;
 
 			}
 
 		}
-		
+
 		prm.row[ 0 ] = 0.0;
-		
+
 		prm.row[ ni - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
 
 		for ( let i = 0; i < ni; i ++ ) {
@@ -186,9 +188,9 @@ class IntBsplineSurf {
 			}
 
 		}
-		
+
 		prm.col[ 0 ] = 0.0;
-		
+
 		prm.col[ nj - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
 
 		return prm;

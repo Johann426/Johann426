@@ -5,7 +5,7 @@ class NurbsCurve {
 	constructor( deg, knots, ctrlp, weight ) {
 
 		this.knots = knots;
-		
+
 		this.ctrlp = ctrlp;
 
 		this.deg = () => {
@@ -15,15 +15,15 @@ class NurbsCurve {
 			return ( nm1 > deg ? deg : nm1 );
 
 		};
-		
+
 		for ( let i = 0; i < ctrlp.length; i ++ ) {
-			
-			this.ctrlpw[ i ] = new Vector4( ctrlp[ i ].x, ctrlp[ i ].y, ctrlp[ i ].z, weight[ i ] )
-			
+
+			this.ctrlpw[ i ] = new Vector4( ctrlp[ i ].x, ctrlp[ i ].y, ctrlp[ i ].z, weight[ i ] );
+
 		}
 
 	}
-	
+
 	getPointAt( t ) {
 
 		return curvePoint( this.deg(), this.knots, this.ctrlp, t );

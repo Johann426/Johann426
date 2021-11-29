@@ -554,7 +554,7 @@ function updateCurvature( curve, curvature ) {
 
 		const geo = curvature.geometry;
 		geo.setDrawRange( 0, MAX_SEG * 2 );
-		
+
 		const pts = curve.interrogating( MAX_SEG );
 		const pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;

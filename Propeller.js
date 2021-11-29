@@ -43,8 +43,6 @@ class Propeller {
 
 		const PI = Math.PI;
 		const r = rbyR.map( x => x * 0.5 );
-		const s = skew.map( x => x * PI / 180 );
-		const nk = NoBlade;
 		const nj = rbyR.length;
 		const ni = section.xc.length;
 		const xc = meanline.xc;
