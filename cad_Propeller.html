@@ -23,6 +23,7 @@
 	
 	import * as THREE from './Rendering/three.module.js'
 	import { OrbitControls } from './Rendering/OrbitControls.js'
+	import { IntBsplineSurf } from '../Modeling/IntBsplineSurf.js'
 	
 	init();
 
@@ -127,6 +128,29 @@
 		material.side = THREE.DoubleSide;
 		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
+		
+		
+		
+		
+		
+		
+		// test
+		const points = [];
+		
+		for (let j = 0; j < nj; j++) {
+			for (let i = 0; i < ni; i++) {
+				const x = blade[0].back.x[i][j];
+				const y = blade[0].back.y[i][j];
+				const z = blade[0].back.z[i][j];
+				points[ j ][ i ] = new THREE.Vector3( x, y, z );
+			}
+		}
+		
+		const surfaces = [];
+		surfaces.push( new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+		surfaces[0].getPointAt( 0.5, 0.5 );
+		console.log( surfaces[0].getPoints( 50, 50 ) );
+		
 
 	}
 
