@@ -48,7 +48,7 @@ class Propeller {
 		const xc = meanline.xc;
 		const yc = meanline.yc;
 		const dydx = meanline.dydx;
-		if ( xc != section.xc ) console.log( 'the data of meanline and that of section are not matched' );
+		if ( xc.toString() != section.xc.toString() ) console.log( 'the data of meanline and that of section are not matched' );
 		const ytm = section.ytm;
 
 		chord[ nj - 1 ] = Math.max( chord[ nj - 1 ], thick[ nj - 1 ] / 0.2 );
