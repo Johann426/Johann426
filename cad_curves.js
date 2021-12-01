@@ -127,9 +127,10 @@ function init() {
 
 	document.addEventListener( 'pointermove', e => {
 
+		const rect = renderer.domElement.getBoundingClientRect();
 		const pointer = new THREE.Vector2();
 		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		pointer.y = - ( e.clientY - rect.y ) / window.innerHeight * 2 + 1;
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.lines.curve;
