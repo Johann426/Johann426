@@ -127,10 +127,7 @@ function init() {
 
 	document.addEventListener( 'pointermove', e => {
 
-		const rect = renderer.domElement.getBoundingClientRect();
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY - rect.y ) / window.innerHeight * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.lines.curve;
@@ -224,9 +221,7 @@ function init() {
 
 	document.addEventListener( 'pointerdown', e => {
 
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		dragging = true;
 
@@ -329,9 +324,7 @@ function init() {
 
 	document.addEventListener( 'pointerup', e => {
 
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		dragging = false;
 
@@ -393,7 +386,16 @@ function init() {
 
 
 
+function getLocalCoordinates( dom, x, y ) {
 
+	const rect = dom.getBoundingClientRect();
+	const pointer = new THREE.Vector2();
+	pointer.x = ( x - rect.x ) / window.innerWidth * 2 - 1;
+	pointer.y = - ( y - rect.y ) / window.innerHeight * 2 + 1;
+
+	return pointer;
+
+}
 
 function preBuffer() {
 
