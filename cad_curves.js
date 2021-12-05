@@ -122,8 +122,6 @@ function init() {
 	} );
 
 	let index = 0;
-	let dragging = false;
-	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
 
@@ -141,17 +139,9 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
 
-					// if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
-
-					// 	curve.remove( curve.pole.length - 1 );
-
-					// }
-
 					curve.mod( curve.pole.length - 1, intersect );
 
 				}
-
-				// curve.add( intersect );
 
 				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
 				updateLines( curve, selected.lines );
@@ -270,21 +260,6 @@ function init() {
 				break;
 
 			case 'Remove':
-
-				/* for ( let i = 0; i < curve.pole.length; i ++ ) {
-
-					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.1 ) {
-
-						curve.remove( i );
-						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
-
-					}
-
-				} */
 
 				if ( intPoints.length > 0 ) {
 
