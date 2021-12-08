@@ -51,7 +51,7 @@ function init() {
 	// stats
 	const stats = new Stats();
 	stats.showPanel( 0 );
-	document.body.appendChild( stats.dom );
+	//document.body.appendChild( stats.dom );
 
 	// grid
 	const gridHelper = new THREE.GridHelper( 30, 30, 0x303030, 0x303030 );
