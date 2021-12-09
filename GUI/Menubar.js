@@ -51,11 +51,18 @@ class Menubar extends UIElement {
 
 		const propOpen = document.createElement( 'input' );
 		propOpen.type = 'file';
-		propOpen.addEventListener( 'change', function () {
+		propOpen.onchange = function () {
 
-			// do something
+			const file = this.files[0];
+			const reader = new FileReader();
+			
+			reader.onload = function( e ) {
 
-		} );
+				console.log( e.target.result );
+
+			}
+
+		};
 
 		return menu;
 
