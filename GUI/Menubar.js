@@ -61,6 +61,8 @@ class Menubar extends UIElement {
 				console.log( e.target.result );
 
 			}
+			
+			reader.readAsText(file);
 
 		};
 
