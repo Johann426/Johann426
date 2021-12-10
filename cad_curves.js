@@ -214,7 +214,7 @@ function init() {
 
 		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
-		dragging = true;
+		//dragging = true;
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.lines.curve;
@@ -302,7 +302,7 @@ function init() {
 
 		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
-		dragging = false;
+		//dragging = false;
 
 		buffer.point.visible = false;
 
@@ -360,8 +360,25 @@ function init() {
 	
 	
 	const hull = new wigleyHull();
-	console.log( hull.getSectionLines() );
+	const pts = hull.getSectionLines();
 	
+	for ( let j = 0; j < 10; j ++) {
+		
+		menubar.dom.children[2].children[1].children[3].click();
+		const curve = selected.lines.curve;
+		
+		for ( let i = 0; i < 10; i ++) {
+			
+			const p = pts[ i + 10 * j ];
+			curve.add( new THREE.Vector( p[0], p[1], p[2] ) );
+			
+		}
+				  
+	}		  
+	
+	menubar.state = 'view';
+	updateLines( curve, selected.lines );
+	renderer.render( scene, camera );
 
 }
 
