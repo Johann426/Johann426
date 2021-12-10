@@ -123,6 +123,7 @@ function init() {
 	} );
 
 	let index = 0;
+	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
 
