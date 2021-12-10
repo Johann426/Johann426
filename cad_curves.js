@@ -5,6 +5,7 @@ import { UITabbedPanel } from './GUI/Sidebar.js';
 import { IntBspline } from './Modeling/IntBspline.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
+import { wigleyHull } from './wigleyHull.js'
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -356,6 +357,11 @@ function init() {
 	// 	document.getElementById( 'loader' ).style.display = 'none';
 
 	// } );
+	
+	
+	const hull = wigleyHull();
+	console.log( hull.getLines() );
+	
 
 }
 
@@ -501,6 +507,8 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 		arr[ index ++ ] = i < l ? pts[ i ].z : null;
 
 	}
+	
+	wigleyHull 
 
 }
 
