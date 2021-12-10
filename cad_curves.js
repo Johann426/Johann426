@@ -527,8 +527,6 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 
 	}
 	
-	wigleyHull 
-
 }
 
 function updateLines( curve, lines ) {
