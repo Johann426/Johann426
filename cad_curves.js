@@ -359,8 +359,8 @@ function init() {
 	// } );
 	
 	
-	const hull = wigleyHull();
-	console.log( hull.getLines() );
+	const hull = new wigleyHull();
+	console.log( hull.getSectionLines() );
 	
 
 }
