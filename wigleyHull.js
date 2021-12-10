@@ -1,6 +1,6 @@
 class wigleyHull {
 	
-	constructor( L, B, T ) {
+	constructor( L = 10, B = 2, T = 1) {
 	
 		this.L = L;
 		this.B = B;
