@@ -370,16 +370,17 @@ function init() {
 		for ( let i = 0; i < 10; i ++) {
 			
 			const p = pts[ i + 10 * j ];
-			curve.add( new THREE.Vector( p[0], p[1], p[2] ) );
+			curve.add( new THREE.Vector3( p[0], p[1], p[2] ) );
 			
 		}
-				  
-	}		  
-	
-	menubar.state = 'view';
-	updateLines( curve, selected.lines );
-	renderer.render( scene, camera );
 
+		menubar.state = 'view';
+		updateLines( curve, selected.lines );
+		renderer.render( scene, camera );
+
+	}
+	
+	
 }
 
 
