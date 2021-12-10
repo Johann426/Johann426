@@ -16,14 +16,14 @@ class wigleyHull {
 		
 		for ( let j = 0; j < nj; j ++ ) {
 			
-			const x = - 2 + 4 * j  / ( nj - 1);
+			const x = - 0.5 * this.L + this.L * j  / ( nj - 1);
 			
 			for ( let i = 0; i < ni; i ++ ) {
 		
-				const z = - 0.5 + 0.5 * i / (ni - 1);
+				const z = - this.T + this.T * i / (ni - 1);
 				const x2 = 2 * x / this.L;
-				const z2 = 2 * z / this.T;
-				const y = - this.B * ( 1 - x2 * x2 ) * ( 1 - z2 * z2 );
+				const z2 = z / this.T;
+				const y = - 0.5 * this.B * ( 1 - x2 * x2 ) * ( 1 - z2 * z2 );
 				pts.push( [x, y, z] );
 					
 			}
