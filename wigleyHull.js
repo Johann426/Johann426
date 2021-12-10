@@ -35,3 +35,5 @@ class wigleyHull {
 	}
 	
 }
+
+export { wigleyHull };
