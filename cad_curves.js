@@ -5,7 +5,7 @@ import { UITabbedPanel } from './GUI/Sidebar.js';
 import { IntBspline } from './Modeling/IntBspline.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
-import { wigleyHull } from './wigleyHull.js'
+import { wigleyHull } from './wigleyHull.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -358,21 +358,21 @@ function init() {
 	// 	document.getElementById( 'loader' ).style.display = 'none';
 
 	// } );
-	
-	
+
+
 	const hull = new wigleyHull();
 	const pts = hull.getSectionLines();
-	
-	for ( let j = 0; j < 10; j ++) {
-		
-		menubar.dom.children[2].children[1].children[3].click();
+
+	for ( let j = 0; j < 10; j ++ ) {
+
+		menubar.dom.children[ 2 ].children[ 1 ].children[ 3 ].click();
 		const curve = selected.lines.curve;
-		
-		for ( let i = 0; i < 10; i ++) {
-			
+
+		for ( let i = 0; i < 10; i ++ ) {
+
 			const p = pts[ i + 10 * j ];
-			curve.add( new THREE.Vector3( p[0], p[1], p[2] ) );
-			
+			curve.add( new THREE.Vector3( p[ 0 ], p[ 1 ], p[ 2 ] ) );
+
 		}
 
 		menubar.state = 'view';
@@ -380,8 +380,8 @@ function init() {
 		renderer.render( scene, camera );
 
 	}
-	
-	
+
+
 }
 
 
@@ -526,7 +526,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 		arr[ index ++ ] = i < l ? pts[ i ].z : null;
 
 	}
-	
+
 }
 
 function updateLines( curve, lines ) {
