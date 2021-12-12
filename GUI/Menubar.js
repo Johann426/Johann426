@@ -53,16 +53,16 @@ class Menubar extends UIElement {
 		propOpen.type = 'file';
 		propOpen.onchange = function () {
 
-			const file = this.files[0];
+			const file = this.files[ 0 ];
 			const reader = new FileReader();
-			
-			reader.onload = function( e ) {
+
+			reader.onload = function ( e ) {
 
 				console.log( e.target.result );
 
-			}
-			
-			reader.readAsText(file);
+			};
+
+			reader.readAsText( file );
 
 		};
 
