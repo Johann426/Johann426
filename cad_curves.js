@@ -98,7 +98,7 @@ function init() {
 			case 'Escape':
 
 				menubar.state = 'view';
-				[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
+				[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
 
 				break;
 
@@ -177,7 +177,6 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-
 				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
 				if ( intPoints.length > 0 ) {
@@ -234,7 +233,7 @@ function init() {
 					selected.lines = intersects[ 0 ].object;
 					updateCurveBuffer( selected.lines.curve, buffer );
 					menubar.state = 'curve';
-					[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
+					[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
 				}
 
@@ -448,7 +447,9 @@ function preBuffer() {
 	mat.color.set( 0x800000 );
 	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
 
-	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 2 * 3 ), 3 ) );
+	pos = new Float32Array( 2 * 3 );
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	geo.setDrawRange( 0, 2 );
 	mat.color.set( 0x00ff00 );
 	const distance = new THREE.Line( geo, mat );
 
@@ -534,8 +535,8 @@ function updateLines( curve, lines ) {
 	//update curve
 	const geo = lines.geometry;
 	geo.setDrawRange( 0, MAX_POINTS );
+	const pos = geo.attributes.position;
 	const pts = curve.getPoints( MAX_POINTS );
-	const pos = lines.geometry.attributes.position;
 	pos.needsUpdate = true;
 	const arr = pos.array;
 	let index = 0;
@@ -557,9 +558,8 @@ function updateCurvature( curve, curvature ) {
 
 		const geo = curvature.geometry;
 		geo.setDrawRange( 0, MAX_SEG * 2 );
-
+		const pos = geo.attributes.position;
 		const pts = curve.interrogating( MAX_SEG );
-		const pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;
 		const arr = pos.array;
 		let index = 0;
