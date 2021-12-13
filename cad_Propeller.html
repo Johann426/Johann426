@@ -24,6 +24,7 @@
 	import * as THREE from './Rendering/three.module.js'
 	import { OrbitControls } from './Rendering/OrbitControls.js'
 	import { IntBsplineSurf } from '../Modeling/IntBsplineSurf.js'
+	import { Propeller } from './Propeller.js'
 	
 	init();
 
@@ -135,6 +136,16 @@
 		
 		
 		// B-spline surface interpolation
+		drawProp( prop, scene );
+
+	}
+
+	function drawprop( prop, scene ) {
+		
+		const nk = prop.NoBlade;
+		const nj = prop.rbyR.length;
+		const ni = prop.meanline.xc.length;
+		const blade = prop.getXYZ();
 		const points = [];
 		
 		for (let j = 0; j < nj; j++) {
@@ -149,7 +160,7 @@
 			}
 		}
 		
-		InterpolatedSurface( ni, nj, points, prop, scene )
+		InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
 
 		for (let j = 0; j < nj; j++) {
 
@@ -163,24 +174,26 @@
 			}
 		}
 		
-		InterpolatedSurface( ni, nj, points, prop, scene )
-
-	}
-
-	function InterpolatedSurface( ni, nj, points, prop, scene ) {
+		InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
 		
-		const MAX_POINTS = 200;
+		
+	}
+	
+	function InterpolatedSurface( ni, nj, points, NoBlade, scene ) {
+		
+		const MAX_RADIAL_POINTS = 200;
+		const MAX_CHORDAL_POINTS = 200;
 		const mat = new THREE.MeshNormalMaterial();
 		mat.side = THREE.DoubleSide;
 
 		const surfaces = [];
 		surfaces.push( new IntBsplineSurf( ni, nj, points, 3, 3 ) );
-		const surf = surfaces[0].getPoints( MAX_POINTS, MAX_POINTS );
+		const surf = surfaces[0].getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
 
 		const pos = [];
 		let index = 0;
-		for (let j = 0; j < MAX_POINTS - 1; j++) {
-			for (let i = 0; i < MAX_POINTS - 1; i++) {
+		for (let j = 0; j < MAX_RADIAL_POINTS - 1; j++) {
+			for (let i = 0; i < MAX_CHORDAL_POINTS - 1; i++) {
 				pos[index++] = surf[j][i].x;
 				pos[index++] = surf[j][i].y;
 				pos[index++] = surf[j][i].z;
@@ -208,8 +221,8 @@
 		geo.computeVertexNormals()
 
 		// loop over no. of blade
-		for ( let k = 1; k <= prop.NoBlade; k ++ ) {
-			const phi = 2 * Math.PI * ( k - 1 ) / prop.NoBlade;
+		for ( let k = 1; k <= NoBlade; k ++ ) {
+			const phi = 2 * Math.PI * ( k - 1 ) / NoBlade;
 			scene.add( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
 		}
 
