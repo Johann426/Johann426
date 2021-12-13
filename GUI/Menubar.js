@@ -5,11 +5,11 @@ import { Propeller } from '../propeller.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, buffer, pickable, selected ) {
+	constructor( scene, buffer, pickable, selected, prop ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.add( this.file() );
+		this.add( this.file( prop ) );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
@@ -21,7 +21,7 @@ class Menubar extends UIElement {
 
 	}
 
-	file() {
+	file( prop ) {
 
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
@@ -61,7 +61,6 @@ class Menubar extends UIElement {
 
 				//console.log( e.target.result );
 				const txt = e.target.result
-				const prop = new Propeller();
 				prop.readTxt( txt );
 				console.log(prop);
 
