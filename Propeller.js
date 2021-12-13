@@ -33,9 +33,9 @@ class Propeller {
 
 	}
 
-	raedTxt( txt ) {
+	readTxt( txt ) {
 
-		arr = txt.split('\r\n');
+		const arr = txt.split('\r\n');
 		this.dia = arr[4].split(/\s+/)[1];
 		this.NoBlade = arr[4].split(/\s+/)[2];
 		this.HubD_face = arr[5].split(/\s+/)[1];
@@ -206,3 +206,5 @@ class Propeller {
 	}
 
 }
+
+export { Propeller }
