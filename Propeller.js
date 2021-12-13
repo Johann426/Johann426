@@ -207,4 +207,4 @@ class Propeller {
 
 }
 
-export { Propeller }
+export { Propeller };
