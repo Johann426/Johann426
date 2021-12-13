@@ -393,7 +393,7 @@ function init() {
 
 
 
-function drawprop( prop, scene ) {
+function drawProp( prop, scene ) {
 
 	const nk = prop.NoBlade;
 	const nj = prop.rbyR.length;
