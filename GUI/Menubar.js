@@ -1,6 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
+import { IntBspline } from '../propeller.js';
 
 class Menubar extends UIElement {
 
@@ -58,12 +59,16 @@ class Menubar extends UIElement {
 
 			reader.onload = function ( e ) {
 
-				console.log( e.target.result );
+				//console.log( e.target.result );
+				const txt = e.target.result
+				const prop = new Propeller();
+				prop.readGeo( txt );
+				console.log(prop);
 
 			};
 
 			reader.readAsText( file );
-
+			
 		};
 
 		return menu;
