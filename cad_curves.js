@@ -336,7 +336,8 @@ function init() {
 	sphereInter.visible = false;
 	scene.add( sphereInter );
 
-	const menubar = new Menubar( scene, preBuffer(), pickable, selected );
+	const prop = new Propeller();
+	const menubar = new Menubar( scene, preBuffer(), pickable, selected, prop );
 	document.body.appendChild( menubar.dom );
 	const sidebar = new UITabbedPanel( selected );
 	document.body.appendChild( sidebar.dom );
@@ -382,7 +383,6 @@ function init() {
 
 	}
 
-	const prop = new Propeller();
 	drawProp( prop, scene );
 
 }
@@ -473,10 +473,13 @@ function InterpolatedSurface( ni, nj, points, NoBlade, scene ) {
 	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(pos), 3));
 	geo.computeVertexNormals()
 
+	const propMeshs = [];
+	
 	// loop over no. of blade
 	for ( let k = 1; k <= NoBlade; k ++ ) {
 		const phi = 2 * Math.PI * ( k - 1 ) / NoBlade;
-		scene.add( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+		scene.add( propMeshs[ k - 1 ] );
 	}
 
 }
@@ -528,8 +531,6 @@ function preBuffer() {
 	const point = new THREE.Points( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
-	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	geo.setDrawRange( 0, 0 );
 
@@ -586,6 +587,8 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	pts = curve.pole.map( e => e.point );
 	geo = points.geometry;
 	geo.setDrawRange( 0, pts.length );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
 	pos = geo.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
@@ -638,6 +641,8 @@ function updateLines( curve, lines ) {
 	//update curve
 	const geo = lines.geometry;
 	geo.setDrawRange( 0, MAX_POINTS );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
 	const pos = geo.attributes.position;
 	const pts = curve.getPoints( MAX_POINTS );
 	pos.needsUpdate = true;
