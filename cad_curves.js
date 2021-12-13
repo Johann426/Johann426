@@ -3,9 +3,11 @@ import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
 import { IntBspline } from './Modeling/IntBspline.js';
+import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
+import { Propeller } from './Propeller.js'
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -380,8 +382,109 @@ function init() {
 
 	}
 
+	const prop = new Propeller();
+	drawProp( prop, scene );
 
 }
+
+
+
+
+
+
+
+function drawprop( prop, scene ) {
+
+	const nk = prop.NoBlade;
+	const nj = prop.rbyR.length;
+	const ni = prop.meanline.xc.length;
+	const blade = prop.getXYZ();
+	const points = [];
+
+	for (let j = 0; j < nj; j++) {
+
+		points[ j ] = [];
+
+		for (let i = 0; i < ni; i++) {
+			const x = blade[0].back.x[i][j];
+			const y = blade[0].back.y[i][j];
+			const z = blade[0].back.z[i][j];
+			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+		}
+	}
+
+	InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+
+	for (let j = 0; j < nj; j++) {
+
+		points[ j ] = [];
+
+		for (let i = 0; i < ni; i++) {
+			const x = blade[0].face.x[i][j];
+			const y = blade[0].face.y[i][j];
+			const z = blade[0].face.z[i][j];
+			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+		}
+	}
+
+	InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+
+
+}
+
+function InterpolatedSurface( ni, nj, points, NoBlade, scene ) {
+
+	const MAX_RADIAL_POINTS = 200;
+	const MAX_CHORDAL_POINTS = 200;
+	const mat = new THREE.MeshNormalMaterial();
+	mat.side = THREE.DoubleSide;
+
+	const surfaces = [];
+	surfaces.push( new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+	const surf = surfaces[0].getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
+
+	const pos = [];
+	let index = 0;
+	for (let j = 0; j < MAX_RADIAL_POINTS - 1; j++) {
+		for (let i = 0; i < MAX_CHORDAL_POINTS - 1; i++) {
+			pos[index++] = surf[j][i].x;
+			pos[index++] = surf[j][i].y;
+			pos[index++] = surf[j][i].z;
+			pos[index++] = surf[j][i + 1].x;
+			pos[index++] = surf[j][i + 1].y;
+			pos[index++] = surf[j][i + 1].z;
+			pos[index++] = surf[j + 1][i].x;
+			pos[index++] = surf[j + 1][i].y;
+			pos[index++] = surf[j + 1][i].z;
+
+			pos[index++] = surf[j + 1][i + 1].x;
+			pos[index++] = surf[j + 1][i + 1].y;
+			pos[index++] = surf[j + 1][i + 1].z;
+			pos[index++] = surf[j + 1][i].x;
+			pos[index++] = surf[j + 1][i].y;
+			pos[index++] = surf[j + 1][i].z;
+			pos[index++] = surf[j][i + 1].x;
+			pos[index++] = surf[j][i + 1].y;
+			pos[index++] = surf[j][i + 1].z;
+		}
+	}
+
+	const geo = new THREE.BufferGeometry();
+	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(pos), 3));
+	geo.computeVertexNormals()
+
+	// loop over no. of blade
+	for ( let k = 1; k <= NoBlade; k ++ ) {
+		const phi = 2 * Math.PI * ( k - 1 ) / NoBlade;
+		scene.add( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+	}
+
+}
+
+
+
+
+
 
 
 
