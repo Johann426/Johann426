@@ -42,19 +42,19 @@ class Propeller {
 		this.HubD_back = arr[5].split(/\s+/)[2];
 		this.HubL_face = arr[5].split(/\s+/)[3];
 		this.HubL_back = arr[5].split(/\s+/)[4];
-		this.rbyR = arr[6].split(/\s+/);
+		this.rbyR = arr[6].split(/\s+/).map( e => Number(e ) );
 		this.rbyR.splice(0, 1);
-		this.pitch = arr[7].split(/\s+/);
+		this.pitch = arr[7].split(/\s+/).map( e => Number(e ) );
 		this.pitch.splice(0, 1);
-		this.rake = arr[8].split(/\s+/);
+		this.rake = arr[8].split(/\s+/).map( e => Number(e ) );
 		this.rake.splice(0, 1);
-		this.skew = arr[9].split(/\s+/);
+		this.skew = arr[9].split(/\s+/).map( e => Number(e ) );
 		this.skew.splice(0, 1);
-		this.chord = arr[10].split(/\s+/);
+		this.chord = arr[10].split(/\s+/).map( e => Number(e ) );
 		this.chord.splice(0, 1);
-		this.camber = arr[11].split(/\s+/);
+		this.camber = arr[11].split(/\s+/).map( e => Number(e ) );
 		this.camber.splice(0, 1);
-		this.thick = arr[12].split(/\s+/);
+		this.thick = arr[12].split(/\s+/).map( e => Number(e ) );
 		this.thick.splice(0, 1);
 
 	}
