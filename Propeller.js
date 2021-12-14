@@ -35,27 +35,27 @@ class Propeller {
 
 	readTxt( txt ) {
 
-		const arr = txt.split('\r\n');
-		this.dia = arr[4].split(/\s+/)[1];
-		this.NoBlade = arr[4].split(/\s+/)[2];
-		this.HubD_face = arr[5].split(/\s+/)[1];
-		this.HubD_back = arr[5].split(/\s+/)[2];
-		this.HubL_face = arr[5].split(/\s+/)[3];
-		this.HubL_back = arr[5].split(/\s+/)[4];
-		this.rbyR = arr[6].split(/\s+/).map( e => Number(e ) );
-		this.rbyR.splice(0, 1);
-		this.pitch = arr[7].split(/\s+/).map( e => Number(e ) );
-		this.pitch.splice(0, 1);
-		this.rake = arr[8].split(/\s+/).map( e => Number(e ) );
-		this.rake.splice(0, 1);
-		this.skew = arr[9].split(/\s+/).map( e => Number(e ) );
-		this.skew.splice(0, 1);
-		this.chord = arr[10].split(/\s+/).map( e => Number(e ) );
-		this.chord.splice(0, 1);
-		this.camber = arr[11].split(/\s+/).map( e => Number(e ) );
-		this.camber.splice(0, 1);
-		this.thick = arr[12].split(/\s+/).map( e => Number(e ) );
-		this.thick.splice(0, 1);
+		const arr = txt.split( '\r\n' );
+		this.dia = arr[ 4 ].split( /\s+/ )[ 1 ];
+		this.NoBlade = arr[ 4 ].split( /\s+/ )[ 2 ];
+		this.HubD_face = arr[ 5 ].split( /\s+/ )[ 1 ];
+		this.HubD_back = arr[ 5 ].split( /\s+/ )[ 2 ];
+		this.HubL_face = arr[ 5 ].split( /\s+/ )[ 3 ];
+		this.HubL_back = arr[ 5 ].split( /\s+/ )[ 4 ];
+		this.rbyR = arr[ 6 ].split( /\s+/ ).map( e => Number( e ) );
+		this.rbyR.splice( 0, 1 );
+		this.pitch = arr[ 7 ].split( /\s+/ ).map( e => Number( e ) );
+		this.pitch.splice( 0, 1 );
+		this.rake = arr[ 8 ].split( /\s+/ ).map( e => Number( e ) );
+		this.rake.splice( 0, 1 );
+		this.skew = arr[ 9 ].split( /\s+/ ).map( e => Number( e ) );
+		this.skew.splice( 0, 1 );
+		this.chord = arr[ 10 ].split( /\s+/ ).map( e => Number( e ) );
+		this.chord.splice( 0, 1 );
+		this.camber = arr[ 11 ].split( /\s+/ ).map( e => Number( e ) );
+		this.camber.splice( 0, 1 );
+		this.thick = arr[ 12 ].split( /\s+/ ).map( e => Number( e ) );
+		this.thick.splice( 0, 1 );
 
 	}
 

@@ -7,7 +7,7 @@ import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
-import { Propeller } from './Propeller.js'
+import { Propeller } from './Propeller.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -298,6 +298,10 @@ function init() {
 
 		buffer.point.visible = true;
 
+		const meshList = [];
+		prop_ids.map( e => meshList.push( scene.getObjectById( e ) ) );
+		updateProp( meshList, prop );
+
 	} );
 
 	document.addEventListener( 'pointerup', e => {
@@ -395,59 +399,116 @@ function drawProp( prop, ids ) {
 	const blade = prop.getXYZ();
 	const points = [];
 
-	for (let j = 0; j < nj; j++) {
+	for ( let j = 0; j < nj; j ++ ) {
 
 		points[ j ] = [];
 
-		for (let i = 0; i < ni; i++) {
-			const x = blade[0].back.x[i][j];
-			const y = blade[0].back.y[i][j];
-			const z = blade[0].back.z[i][j];
+		for ( let i = 0; i < ni; i ++ ) {
+
+			const x = blade[ 0 ].back.x[ i ][ j ];
+			const y = blade[ 0 ].back.y[ i ][ j ];
+			const z = blade[ 0 ].back.z[ i ][ j ];
 			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
 		}
+
 	}
 
-	//InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
-	
 	const geo = new THREE.BufferGeometry();
 	const pos = new Float32Array( 200 * 200 * 3 * 6 ); // 200 x 200 x 3 vertices per point x 6 points per surface
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3) );
-	const mat = new THREE.MeshBasicMaterial
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	const mat = new THREE.MeshBasicMaterial();
 	mat.side = THREE.DoubleSide;
 	const propMeshs = [];
-	
-	// loop over no. of blade
-	for ( let k = 1; k <= prop.NoBlade; k ++ ) {
-		const phi = 2 * Math.PI * ( k - 1 ) / prop.NoBlade;
-		updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
-		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
-	}
-	
 
-	for (let j = 0; j < nj; j++) {
+	updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+
+	// loop over no. of blade
+	for ( let k = 1; k <= nk; k ++ ) {
+
+		const phi = 2 * Math.PI * ( k - 1 ) / nk;
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
+
+	}
+
+
+	for ( let j = 0; j < nj; j ++ ) {
 
 		points[ j ] = [];
 
-		for (let i = 0; i < ni; i++) {
-			const x = blade[0].face.x[i][j];
-			const y = blade[0].face.y[i][j];
-			const z = blade[0].face.z[i][j];
+		for ( let i = 0; i < ni; i ++ ) {
+
+			const x = blade[ 0 ].face.x[ i ][ j ];
+			const y = blade[ 0 ].face.y[ i ][ j ];
+			const z = blade[ 0 ].face.z[ i ][ j ];
 			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
 		}
+
 	}
 
-	//InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+	updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
 
 	// loop over no. of blade
-	for ( let k = 1; k <= prop.NoBlade; k ++ ) {
-		const phi = 2 * Math.PI * ( k - 1 ) / prop.NoBlade;
-		updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
-		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+	for ( let k = 1; k <= nk; k ++ ) {
+
+		const phi = 2 * Math.PI * ( k - 1 ) / nk;
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
+
 	}
-	
+
+	ids.length = 0;
 	propMeshs.map( e => ids.push( e.id ) );
-	
+
 	return propMeshs;
+
+}
+
+function updateProp( meshList, prop ) {
+
+	const nk = prop.NoBlade;
+	const nj = prop.rbyR.length;
+	const ni = prop.meanline.xc.length;
+	const blade = prop.getXYZ();
+	const points = [];
+
+	for ( let k = 0; k < nk; k ++ ) {
+
+		for ( let j = 0; j < nj; j ++ ) {
+
+			points[ j ] = [];
+
+			for ( let i = 0; i < ni; i ++ ) {
+
+				const x = blade[ k ].back.x[ i ][ j ];
+				const y = blade[ k ].back.y[ i ][ j ];
+				const z = blade[ k ].back.z[ i ][ j ];
+				points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+			}
+
+		}
+
+		updateGeo( meshList[ k ].geometry, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+
+		for ( let j = 0; j < nj; j ++ ) {
+
+			points[ j ] = [];
+
+			for ( let i = 0; i < ni; i ++ ) {
+
+				const x = blade[ k ].face.x[ i ][ j ];
+				const y = blade[ k ].face.y[ i ][ j ];
+				const z = blade[ k ].face.z[ i ][ j ];
+				points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+			}
+
+		}
+
+		updateGeo( meshList[ nk + k ].geometry, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+
+	}
 
 }
 
@@ -458,36 +519,40 @@ function updateGeo( geo, surface ) {
 	geo.computeBoundingSphere();
 	const pos = geo.attributes.position;
 	pos.needsUpdate = true;
-	
+
 	const MAX_RADIAL_POINTS = 200;
 	const MAX_CHORDAL_POINTS = 200;
-	
+
 	const surf = surface.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
 
 	const arr = pos.array;
 	let index = 0;
-	for (let j = 0; j < MAX_RADIAL_POINTS - 1; j++) {
-		for (let i = 0; i < MAX_CHORDAL_POINTS - 1; i++) {
-			arr[index++] = surf[j][i].x;
-			arr[index++] = surf[j][i].y;
-			arr[index++] = surf[j][i].z;
-			arr[index++] = surf[j][i + 1].x;
-			arr[index++] = surf[j][i + 1].y;
-			arr[index++] = surf[j][i + 1].z;
-			arr[index++] = surf[j + 1][i].x;
-			arr[index++] = surf[j + 1][i].y;
-			arr[index++] = surf[j + 1][i].z;
+	for ( let j = 0; j < MAX_RADIAL_POINTS - 1; j ++ ) {
 
-			arr[index++] = surf[j + 1][i + 1].x;
-			arr[index++] = surf[j + 1][i + 1].y;
-			arr[index++] = surf[j + 1][i + 1].z;
-			arr[index++] = surf[j + 1][i].x;
-			arr[index++] = surf[j + 1][i].y;
-			arr[index++] = surf[j + 1][i].z;
-			arr[index++] = surf[j][i + 1].x;
-			arr[index++] = surf[j][i + 1].y;
-			arr[index++] = surf[j][i + 1].z;
+		for ( let i = 0; i < MAX_CHORDAL_POINTS - 1; i ++ ) {
+
+			arr[ index ++ ] = surf[ j ][ i ].x;
+			arr[ index ++ ] = surf[ j ][ i ].y;
+			arr[ index ++ ] = surf[ j ][ i ].z;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
+
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].z;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
+
 		}
+
 	}
 
 }
