@@ -5,7 +5,7 @@ import { Propeller } from '../propeller.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, buffer, pickable, selected, prop ) {
+	constructor( scene, buffer, pickable, prop, picked ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
@@ -17,7 +17,7 @@ class Menubar extends UIElement {
 		this.scene = scene;
 		this.buffer = buffer;
 		this.pickable = pickable;
-		this.selected = selected;
+		this.picked = picked;
 
 	}
 
@@ -87,7 +87,7 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
 
-			this.selected.lines.curve.add( new THREE.Vector3() );
+			this.pickable.getObjectById(this.picked.id).curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
 		} );
@@ -144,7 +144,7 @@ class Menubar extends UIElement {
 			Object.defineProperty( lines, 'curve', { value: curve } );
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );
-			this.selected.lines = lines;
+			this.picked.id = lines.id;
 			this.state = 'Add';
 			const buffer = this.buffer;
 			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
