@@ -316,20 +316,13 @@ function init() {
 
 	} );
 
+	const selected = new Object();
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
 	buffer.lines.renderOrder = 100;
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
-	const selected = {
-
-		lines: buffer.lines
-
-	};
-
-	Object.defineProperty( selected.lines, 'curve', { value: new IntBspline( 3 ) } );
-
 	const geometry = new THREE.SphereGeometry( 1 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
