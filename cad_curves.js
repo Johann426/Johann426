@@ -2,7 +2,6 @@ import * as THREE from './Rendering/three.module.js';
 import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
-import { IntBspline } from './Modeling/IntBspline.js';
 import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
@@ -125,6 +124,7 @@ function init() {
 	} );
 
 	let index = 0;
+	let isAdd = false;
 	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
@@ -143,13 +143,22 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
 
-					curve.mod( curve.pole.length - 1, intersect );
+					if ( isAdd ) {
+
+						curve.add( intersect );
+						isAdd = false;
+
+					} else {
+
+						curve.mod( curve.pole.length - 1, intersect );
+
+					}
+
 
 				}
 
 				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
 				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
 
 				break;
 
@@ -167,7 +176,6 @@ function init() {
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
 
 					}
 
@@ -181,6 +189,7 @@ function init() {
 				updateDistance( curve, buffer.distance, intersect );
 				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
+				// Modify curve point
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
@@ -193,7 +202,6 @@ function init() {
 						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
 						sidebar.position.dom.children[ 1 ].value = intersect.x;
 						sidebar.position.dom.children[ 2 ].value = intersect.y;
 						sidebar.position.dom.children[ 3 ].value = intersect.z;
@@ -247,6 +255,7 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;
+					updateSelectedPoint( buffer.point, curve.pole[ index ].point );
 
 				}
 
@@ -254,11 +263,11 @@ function init() {
 
 			case 'Add':
 
-				raycaster.ray.intersectPlane( plane, intersect );
-				curve.add( intersect );
-				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
+				// raycaster.ray.intersectPlane( plane, intersect );
+				// curve.add( intersect );
+				// updateCurveBuffer( curve, buffer );
+				// updateLines( curve, selected.lines );
+				isAdd = true;
 
 				break;
 
@@ -300,7 +309,7 @@ function init() {
 
 		const meshList = [];
 		prop_ids.map( e => meshList.push( scene.getObjectById( e ) ) );
-		updateProp( meshList, prop );
+		//updateProp( meshList, prop );
 
 	} );
 
@@ -323,7 +332,6 @@ function init() {
 	const selected = new Object();
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
-	buffer.lines.renderOrder = 100;
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
@@ -629,6 +637,9 @@ function preBuffer() {
 	geo.setDrawRange( 0, 2 );
 	mat.color.set( 0x00ff00 );
 	const distance = new THREE.Line( geo, mat );
+
+	point.renderOrder = 100;
+	lines.renderOrder = 100;
 
 	return {
 
