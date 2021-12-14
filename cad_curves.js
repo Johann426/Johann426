@@ -323,7 +323,7 @@ function init() {
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
-	const geometry = new THREE.SphereGeometry( 1 );
+	const geometry = new THREE.SphereGeometry( 0.01 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
@@ -376,7 +376,7 @@ function init() {
 
 	}
 
-	drawProp( prop, scene );
+	drawProp( prop ).map( e => scene.add( e ) );
 
 }
 
@@ -406,7 +406,22 @@ function drawProp( prop, scene ) {
 		}
 	}
 
-	InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+	//InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+	
+	const geo = new THREE.BufferGeometry();
+	const pos = new Float32Array( 200 * 200 * 3 * 6 ); // 200 x 200 x 3 vertices per point x 6 points per surface
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3) );
+	const mat = new THREE.MeshBasicMaterial
+	mat.side = THREE.DobleSide;
+	const propMeshs = [];
+	
+	// loop over no. of blade
+	for ( let k = 1; k <= prop.NoBlade; k ++ ) {
+		const phi = 2 * Math.PI * ( k - 1 ) / prop.NoBlade;
+		updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+	}
+	
 
 	for (let j = 0; j < nj; j++) {
 
@@ -420,59 +435,56 @@ function drawProp( prop, scene ) {
 		}
 	}
 
-	InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
+	//InterpolatedSurface( ni, nj, points, prop.NoBlade, scene )
 
+	// loop over no. of blade
+	for ( let k = 1; k <= prop.NoBlade; k ++ ) {
+		const phi = 2 * Math.PI * ( k - 1 ) / prop.NoBlade;
+		updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
+	}
+	
+	return propMeshs;
 
 }
 
-function InterpolatedSurface( ni, nj, points, NoBlade, scene ) {
+function updateGeo( geo, surface ) {
 
+	//const geo = mesh.geometry;
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
+	const pos = geo.attributes.position;
+	pos.needsUpdate = true;
+	
 	const MAX_RADIAL_POINTS = 200;
 	const MAX_CHORDAL_POINTS = 200;
-	const mat = new THREE.MeshNormalMaterial();
-	mat.side = THREE.DoubleSide;
+	
+	const surf = surfaces.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
 
-	const surfaces = [];
-	surfaces.push( new IntBsplineSurf( ni, nj, points, 3, 3 ) );
-	const surf = surfaces[0].getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
-
-	const pos = [];
+	const arr = pos.array;
 	let index = 0;
 	for (let j = 0; j < MAX_RADIAL_POINTS - 1; j++) {
 		for (let i = 0; i < MAX_CHORDAL_POINTS - 1; i++) {
-			pos[index++] = surf[j][i].x;
-			pos[index++] = surf[j][i].y;
-			pos[index++] = surf[j][i].z;
-			pos[index++] = surf[j][i + 1].x;
-			pos[index++] = surf[j][i + 1].y;
-			pos[index++] = surf[j][i + 1].z;
-			pos[index++] = surf[j + 1][i].x;
-			pos[index++] = surf[j + 1][i].y;
-			pos[index++] = surf[j + 1][i].z;
+			arr[index++] = surf[j][i].x;
+			arr[index++] = surf[j][i].y;
+			arr[index++] = surf[j][i].z;
+			arr[index++] = surf[j][i + 1].x;
+			arr[index++] = surf[j][i + 1].y;
+			arr[index++] = surf[j][i + 1].z;
+			arr[index++] = surf[j + 1][i].x;
+			arr[index++] = surf[j + 1][i].y;
+			arr[index++] = surf[j + 1][i].z;
 
-			pos[index++] = surf[j + 1][i + 1].x;
-			pos[index++] = surf[j + 1][i + 1].y;
-			pos[index++] = surf[j + 1][i + 1].z;
-			pos[index++] = surf[j + 1][i].x;
-			pos[index++] = surf[j + 1][i].y;
-			pos[index++] = surf[j + 1][i].z;
-			pos[index++] = surf[j][i + 1].x;
-			pos[index++] = surf[j][i + 1].y;
-			pos[index++] = surf[j][i + 1].z;
+			arr[index++] = surf[j + 1][i + 1].x;
+			arr[index++] = surf[j + 1][i + 1].y;
+			arr[index++] = surf[j + 1][i + 1].z;
+			arr[index++] = surf[j + 1][i].x;
+			arr[index++] = surf[j + 1][i].y;
+			arr[index++] = surf[j + 1][i].z;
+			arr[index++] = surf[j][i + 1].x;
+			arr[index++] = surf[j][i + 1].y;
+			arr[index++] = surf[j][i + 1].z;
 		}
-	}
-
-	const geo = new THREE.BufferGeometry();
-	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(pos), 3));
-	geo.computeVertexNormals()
-
-	const propMeshs = [];
-	
-	// loop over no. of blade
-	for ( let k = 1; k <= NoBlade; k ++ ) {
-		const phi = 2 * Math.PI * ( k - 1 ) / NoBlade;
-		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
-		scene.add( propMeshs[ k - 1 ] );
 	}
 
 }
@@ -715,43 +727,3 @@ function updateSelectedPoint( point, v ) {
 
 }
 
-function initGUI( layers, scene ) {
-
-	const gui = new GUI( { width: 300 } );
-
-	const layersControl = gui.addFolder( 'layers' );
-	layersControl.open();
-
-	for ( let i = 0; i < layers.length; i ++ ) {
-
-		const layer = layers[ i ];
-		layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
-
-			const name = this.object.name;
-
-			scene.traverse( function ( child ) {
-
-				if ( child.userData.hasOwnProperty( 'attributes' ) ) {
-
-					if ( 'layerIndex' in child.userData.attributes ) {
-
-						const layerName = layers[ child.userData.attributes.layerIndex ].name;
-
-						if ( layerName === name ) {
-
-							child.visible = val;
-							layer.visible = val;
-
-						}
-
-					}
-
-				}
-
-			} );
-
-		} );
-
-	}
-
-}
