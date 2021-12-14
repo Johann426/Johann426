@@ -2,11 +2,10 @@ import { UIElement } from './UIElement.js';
 
 class UITabbedPanel extends UIElement {
 
-	constructor( selected ) {
+	constructor() {
 
 		super( 'div' );
 		this.setId( 'sidebar' );
-		this.selected = selected;
 		this.position = this.Coords( 'Position' );
 		this.add( this.position );
 		this.add( this.Coords( 'Rotation' ) );
@@ -23,9 +22,6 @@ class UITabbedPanel extends UIElement {
 		const z = new UINumber().setStyle( 'width', [ '67px' ] );
 		row.add( t, x, y, z );
 
-		//console.log( this.selected.buffer.lines.curve );
-		//const pts = this.selected.buffer.lines.curve.pole.map( e => e.point );
-		
 		return row;
 
 	}
