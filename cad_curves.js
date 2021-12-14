@@ -339,7 +339,7 @@ function init() {
 	const prop = new Propeller();
 	const menubar = new Menubar( scene, preBuffer(), pickable, selected, prop );
 	document.body.appendChild( menubar.dom );
-	const sidebar = new UITabbedPanel( selected );
+	const sidebar = new UITabbedPanel();
 	document.body.appendChild( sidebar.dom );
 
 	const geo_plane = new THREE.PlaneGeometry( 1, 1 );
