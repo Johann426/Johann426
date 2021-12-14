@@ -376,7 +376,8 @@ function init() {
 
 	}
 
-	drawProp( prop ).map( e => scene.add( e ) );
+	const prop_ids = [];
+	drawProp( prop, prop_ids ).map( e => scene.add( e ) );
 
 }
 
@@ -386,7 +387,7 @@ function init() {
 
 
 
-function drawProp( prop, scene ) {
+function drawProp( prop, ids ) {
 
 	const nk = prop.NoBlade;
 	const nj = prop.rbyR.length;
@@ -412,7 +413,7 @@ function drawProp( prop, scene ) {
 	const pos = new Float32Array( 200 * 200 * 3 * 6 ); // 200 x 200 x 3 vertices per point x 6 points per surface
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3) );
 	const mat = new THREE.MeshBasicMaterial
-	mat.side = THREE.DobleSide;
+	mat.side = THREE.DoubleSide;
 	const propMeshs = [];
 	
 	// loop over no. of blade
@@ -444,6 +445,8 @@ function drawProp( prop, scene ) {
 		propMeshs.push( new THREE.Mesh( geo.clone().rotateX(phi), mat ) );
 	}
 	
+	propMeshs.map( e => ids.push( e.id ) );
+	
 	return propMeshs;
 
 }
@@ -459,7 +462,7 @@ function updateGeo( geo, surface ) {
 	const MAX_RADIAL_POINTS = 200;
 	const MAX_CHORDAL_POINTS = 200;
 	
-	const surf = surfaces.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
+	const surf = surface.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
 
 	const arr = pos.array;
 	let index = 0;
