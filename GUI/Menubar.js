@@ -1,7 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
-import { updateProp, DrawProp } from '../cad_curve.js';
+import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
 
