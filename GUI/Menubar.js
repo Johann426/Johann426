@@ -1,6 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
+import { updateProp, DrawProp } from '../cad_curve.js';
 
 class Menubar extends UIElement {
 
@@ -8,7 +9,7 @@ class Menubar extends UIElement {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.add( this.file( prop ) );
+		this.add( this.file( scene, prop ) );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
@@ -20,7 +21,7 @@ class Menubar extends UIElement {
 
 	}
 
-	file( prop ) {
+	file( scene, prop ) {
 
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
@@ -58,10 +59,23 @@ class Menubar extends UIElement {
 
 			reader.onload = function ( e ) {
 
-				//console.log( e.target.result );
+				const NoBlade = prop.NoBlade;
 				const txt = e.target.result;
 				prop.readTxt( txt );
-				console.log( prop );
+				
+				const meshList = [];
+				prop.ids.map( e => meshList.push( scene.getObjectById( e ) ) );
+				
+				if ( NoBlade == prop.NoBlade ) {
+					
+					updateProp( meshList, prop);
+					
+				} else {
+					
+					meshList.map( e => scene.remove( e ) );
+					drawProp( prop ).map( e => scene.add( e ) );
+					
+				}
 
 			};
 
