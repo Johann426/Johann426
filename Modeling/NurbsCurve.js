@@ -1,4 +1,4 @@
-import { curvePoint, curveDers, globalCurveInterp, Vector4 } from './NurbsUtil.js';
+import { nurbsCurvePoint, nurbsCurveDers, Vector4 } from './NurbsUtil.js';
 
 class NurbsCurve {
 
@@ -8,13 +8,7 @@ class NurbsCurve {
 
 		this.ctrlp = ctrlp;
 
-		this.deg = () => {
-
-			const nm1 = this.ctrlp.length - 1;
-
-			return ( nm1 > deg ? deg : nm1 );
-
-		};
+		this.dmax = deg;
 
 		for ( let i = 0; i < ctrlp.length; i ++ ) {
 
@@ -24,9 +18,16 @@ class NurbsCurve {
 
 	}
 
+	get deg() {
+
+		const nm1 = this.pole.length - 1;
+		return ( nm1 > this.dmax ? this.dmax : nm1 );
+
+	}
+
 	getPointAt( t ) {
 
-		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
+		return nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, t );
 
 	}
 
@@ -37,7 +38,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = curvePoint( this.deg(), this.knots, this.ctrlp, t );
+			p[ i ] = nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, t );
 
 		}
 
@@ -47,7 +48,7 @@ class NurbsCurve {
 
 	getDerivatives( t, k ) {
 
-		return curveDers( this.deg(), this.knots, this.ctrlp, t, k );
+		return nurbsCurveDers( this.deg(), this.knots, this.ctrlpw, t, k );
 
 	}
 
@@ -58,7 +59,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+			const ders = nurbsCurveDers( this.deg(), this.knots, this.ctrlpw, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -81,11 +82,11 @@ class NurbsCurve {
 	closestPoint( v ) {
 
 		var t = 0;
-		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
+		var l = nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, 0 ).sub( v ).length();
 
 		for ( let i = 1; i <= 20; i ++ ) {
 
-			const len = curvePoint( this.deg(), this.knots, this.ctrlp, i / 20 ).sub( v ).length();
+			const len = nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, i / 20 ).sub( v ).length();
 
 			if ( len < l ) {
 
@@ -102,7 +103,7 @@ class NurbsCurve {
 
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
-			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+			const ders = nurbsCurveDers( this.deg(), this.knots, this.ctrlpw, t, 2 );
 			const sub = ders[ 0 ].clone().sub( v );
 			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
@@ -127,7 +128,7 @@ class NurbsCurve {
 
 		}
 
-		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
+		return nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, t );
 
 	}
 

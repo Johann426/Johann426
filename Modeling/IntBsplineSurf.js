@@ -7,6 +7,9 @@ class IntBsplineSurf {
 		this.ni = ni;
 		this.nj = nj;
 		this.points = points;
+		this.maxU = degU;
+		this.maxV = degV;
+		this.type = type;
 		this.pole = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
@@ -21,20 +24,17 @@ class IntBsplineSurf {
 
 		}
 
-		this.type = type;
+	}
 
-		this.degU = () => {
+	get degU() {
 
-			return ( ni - 1 > degU ? degU : ni - 1 );
+		return ( this.ni - 1 > this.maxU ? this.maxU : this.ni - 1 );
 
-		};
+	}
 
+	get degV() {
 
-		this.degV = () => {
-
-			return ( nj - 1 > degV ? degV : nj - 1 );
-
-		};
+		return ( this.nj - 1 > this.maxV ? this.maxV : this.nj - 1 );
 
 	}
 
@@ -43,7 +43,7 @@ class IntBsplineSurf {
 		this._calcCtrlPoints();
 		return surfacePoint(
 			this.ni, this.nj,
-			this.degU(), this.degV(),
+			this.degU, this.degV,
 			this.knots.row, this.knots.col,
 			this.ctrlp, t1, t2 );
 
@@ -65,7 +65,7 @@ class IntBsplineSurf {
 
 				p[ j ][ i ] = surfacePoint(
 					this.ni, this.nj,
-					this.degU(), this.degV(),
+					this.degU, this.degV,
 					this.knots.row, this.knots.col,
 					this.ctrlp, t1, t2 );
 
@@ -83,12 +83,12 @@ class IntBsplineSurf {
 		const nj = this.nj;
 		const points = this.points; //this.pole.map( e => e.point )
 		this.para = this._parameterize( ni, nj, points, this.type );
-		this.knots = this._calcKnots( ni, nj, this.degU(), this.degV(), this.para, this.pole );
+		this.knots = this._calcKnots( ni, nj, this.degU, this.degV, this.para, this.pole );
 		this.ctrlp = [];
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlp[ j ] = globalCurveInterp( this.degU(), this.para.row, this.knots.row, this.pole[ j ] );
+			this.ctrlp[ j ] = globalCurveInterp( this.degU, this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -102,7 +102,7 @@ class IntBsplineSurf {
 
 			}
 
-			const ctrl = globalCurveInterp( this.degV(), this.para.col, this.knots.col, r );
+			const ctrl = globalCurveInterp( this.degV, this.para.col, this.knots.col, r );
 
 			for ( let j = 0; j < nj; j ++ ) {
 

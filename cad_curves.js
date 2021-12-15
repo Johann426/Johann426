@@ -141,7 +141,12 @@ function init() {
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
-				if ( curve.pole !== undefined ) {
+
+				if ( curve.pole.length == 0 ) {
+
+					curve.add( new THREE.Vector3() );
+
+				} else {
 
 					if ( isAdd ) {
 
@@ -153,7 +158,6 @@ function init() {
 						curve.mod( curve.pole.length - 1, intersect );
 
 					}
-
 
 				}
 
@@ -298,6 +302,15 @@ function init() {
 					renderer.render( scene, camera );
 
 				}
+
+				break;
+
+			case 'knot insert':
+
+				curve.insertKnotAt( 0.5 );
+				updateCurveBuffer( curve, buffer );
+				updateLines( curve, selected.lines );
+				renderer.render( scene, camera );
 
 				break;
 

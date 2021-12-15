@@ -1,12 +1,10 @@
-
-
 /*
-* Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
-* deg: degree
-* knot: knot vector (knot[i]: knots)
-* n: number of control points
-* t: parameter
-*/
+ * Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
+ * deg: degree
+ * knot: knot vector (knot[i]: knots)
+ * n: number of control points
+ * t: parameter
+ */
 function findIndexSpan( deg, knot, n, t ) {
 
 	const nm1 = n - 1;
@@ -33,8 +31,8 @@ function findIndexSpan( deg, knot, n, t ) {
 }
 
 /*
-* Compute nonvanishing basis functions. See The NURBS Book, page 70, algorithm A2.2
-*/
+ * Compute nonvanishing basis functions. See The NURBS Book, page 70, algorithm A2.2
+ */
 function basisFuncs( deg, knot, span, t ) {
 
 	const left = [];
@@ -65,9 +63,9 @@ function basisFuncs( deg, knot, span, t ) {
 }
 
 /*
-* Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
-* ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
-*/
+ * Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
+ * ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
+ */
 function dersBasisFunc( deg, knot, span, n, t ) {
 
 	const order = deg + 1;
@@ -172,8 +170,8 @@ function dersBasisFunc( deg, knot, span, n, t ) {
 }
 
 /*
-* Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
-*/
+ * Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
+ */
 function curvePoint( deg, knot, ctrl, t ) {
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
@@ -193,8 +191,37 @@ function curvePoint( deg, knot, ctrl, t ) {
 }
 
 /*
-* Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
-*/
+ * Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+ */
+function curveDers( deg, knot, ctrl, t, n = 2 ) {
+
+	const v = [];
+	// We allow n > degree, although the ders are 0 in this case (for nonrational curves),
+	// but these ders are needed for rational curves
+	const span = findIndexSpan( deg, knot, ctrl.length, t );
+	const nders = dersBasisFunc( deg, knot, span, n, t );
+
+	for ( let k = 0; k <= n; k ++ ) {
+
+		v[ k ] = new Vector3( 0, 0, 0 );
+
+		for ( let j = 0; j <= deg; j ++ ) {
+
+			v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
+			v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
+			v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
+
+		}
+
+	}
+
+	return v;
+
+}
+
+/*
+ * Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
+ */
 function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
 	const spanU = findIndexSpan( degU, knotU, n, t1 );
@@ -226,8 +253,8 @@ function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 }
 
 /*
-* Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
-*/
+ * Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
+ */
 function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
@@ -249,72 +276,8 @@ function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, 
 }
 
 /*
-* Compute Nurbs surface point. See The NURBS Book, page 134, algorithm A4.3.
-*/
-function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
-
-	const spanU = findIndexSpan( degU, knotU, n, t1 );
-	const spanV = findIndexSpan( degV, knotV, m, t2 );
-	const ni = basisFuncs( degU, knotU, spanU, t1 );
-	const nj = basisFuncs( degV, knotV, spanV, t2 );
-	const v = new Vector4( 0, 0, 0, 0 );
-
-	for ( let j = 0; j <= degV; j ++ ) {
-
-		const index = spanV - degV + j;
-		const tmp = new Vector4( 0, 0, 0 );
-		for ( let i = 0; i <= degU; i ++ ) {
-
-			tmp.x += ni[ i ] * ctrl[ spanU - degU + i ][ index ].x;
-			tmp.y += ni[ i ] * ctrl[ spanU - degU + i ][ index ].y;
-			tmp.z += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
-			tmp.w += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
-
-		}
-
-		v.x += nj[ index ] * tmp.x;
-		v.y += nj[ index ] * tmp.y;
-		v.z += nj[ index ] * tmp.z;
-
-	}
-
-	return v;
-
-}
-
-/*
-* Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
-*/
-function curveDers( deg, knot, ctrl, t, n = 2 ) {
-
-	const v = [];
-	// We allow n > degree, although the ders are 0 in this case (for nonrational curves),
-	// but these ders are needed for rational curves
-	const span = findIndexSpan( deg, knot, ctrl.length, t );
-	const nders = dersBasisFunc( deg, knot, span, n, t );
-
-	for ( let k = 0; k <= n; k ++ ) {
-
-		v[ k ] = new Vector3( 0, 0, 0 );
-
-		for ( let j = 0; j <= deg; j ++ ) {
-
-			v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
-			v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
-			v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
-
-		}
-
-	}
-
-	return v;
-
-}
-
-
-/*
-* Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
-*/
+ * Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
+ */
 function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 
 	const v = [];
@@ -355,6 +318,76 @@ function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 	const ders = v.map( e => new Vector3( e.x, e.y, e.z ) );
 
 	return ders;
+
+}
+
+/*
+ * Compute Nurbs surface point. See The NURBS Book, page 134, algorithm A4.3.
+ */
+function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
+
+	const spanU = findIndexSpan( degU, knotU, n, t1 );
+	const spanV = findIndexSpan( degV, knotV, m, t2 );
+	const ni = basisFuncs( degU, knotU, spanU, t1 );
+	const nj = basisFuncs( degV, knotV, spanV, t2 );
+	const v = new Vector4( 0, 0, 0, 0 );
+
+	for ( let j = 0; j <= degV; j ++ ) {
+
+		const index = spanV - degV + j;
+		const tmp = new Vector4( 0, 0, 0 );
+		for ( let i = 0; i <= degU; i ++ ) {
+
+			tmp.x += ni[ i ] * ctrl[ spanU - degU + i ][ index ].x;
+			tmp.y += ni[ i ] * ctrl[ spanU - degU + i ][ index ].y;
+			tmp.z += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
+			tmp.w += ni[ i ] * ctrl[ spanU - degU + i ][ index ].z;
+
+		}
+
+		v.x += nj[ index ] * tmp.x;
+		v.y += nj[ index ] * tmp.y;
+		v.z += nj[ index ] * tmp.z;
+
+	}
+
+	return v;
+
+}
+
+/*
+ * Modify control points by knots insertion. See The NURBS Book, page 134, algorithm A5.1.
+ */
+
+function knotsInsert( deg, knot, ctrl, t ) {
+
+	var q = []; //Array(order) { Vector3() }
+	const span = findIndexSpan( deg, knot, ctrl.length, t );
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		const tmp = ctrl[ span - deg + i ];
+		q[ i ] = tmp;
+
+	}
+
+	const low = span - deg + 1;
+
+	for ( let i = 0; i < deg; i ++ ) {
+
+		const alpha = ( t - knot[ low + i ] ) / ( knot[ span + 1 + i ] - knot[ low + i ] );
+		q[ i ] = q[ i + 1 ].clone().mul( alpha ).add( q[ i ].clone().mul( 1.0 - alpha ) );
+
+	}
+
+	for ( let i = 0; i < deg; i ++ ) {
+
+		i == deg - 1 ? ctrl.splice( low + i, 0, q[ i ] ) : ctrl[ low + i ] = q[ i ];
+
+	}
+
+	//evalPrm( ctrlPts );
+	knot.splice( span + 1, 0, t );
 
 }
 
@@ -425,12 +458,12 @@ function binomial( k, i ) {
 }
 
 /*
-* Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
-* deg: degree
-* prm: parameterized value at each point
-* knot: knot vector (knot[i]: knots)
-* pole: to store points having slope constraints(option)
-*/
+ * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+ * deg: degree
+ * prm: parameterized value at each point
+ * knot: knot vector (knot[i]: knots)
+ * pole: to store points having slope constraints(option)
+ */
 function globalCurveInterp( deg, prm, knot, pole ) {
 
 	const n = pole.length;
@@ -916,4 +949,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, surfacePoint, curveDers, deBoorKnots, globalCurveInterp, deWeight };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert };
