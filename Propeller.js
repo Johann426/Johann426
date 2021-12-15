@@ -2,9 +2,11 @@ class Propeller {
 
 	constructor() {
 
+		this.ids = [];
+
 		this.isNondimensional = true; //Non-dimensional properties
 
-		this.NoBlade = 3;
+		this.NoBlade = 4;
 
 		this.rbyR = [ 0.2000, 0.3000, 0.4000, 0.5000, 0.6000, 0.7000, 0.8000, 0.9000, 1.000 ];
 		this.pitch = [ 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000, 1.0000 ];
@@ -33,6 +35,32 @@ class Propeller {
 
 	}
 
+	readTxt( txt ) {
+
+		const arr = txt.split( '\r\n' );
+		this.dia = Number( arr[ 4 ].split( /\s+/ )[ 1 ] );
+		this.NoBlade = Number( arr[ 4 ].split( /\s+/ )[ 2 ] );
+		this.HubD_face = Number( arr[ 5 ].split( /\s+/ )[ 1 ] );
+		this.HubD_back = Number( arr[ 5 ].split( /\s+/ )[ 2 ] );
+		this.HubL_face = Number( arr[ 5 ].split( /\s+/ )[ 3 ] );
+		this.HubL_back = Number( arr[ 5 ].split( /\s+/ )[ 4 ] );
+		this.rbyR = arr[ 6 ].split( /\s+/ ).map( e => Number( e ) );
+		this.rbyR.splice( 0, 1 );
+		this.pitch = arr[ 7 ].split( /\s+/ ).map( e => Number( e ) );
+		this.pitch.splice( 0, 1 );
+		this.rake = arr[ 8 ].split( /\s+/ ).map( e => Number( e ) );
+		this.rake.splice( 0, 1 );
+		this.skew = arr[ 9 ].split( /\s+/ ).map( e => Number( e ) );
+		this.skew.splice( 0, 1 );
+		this.chord = arr[ 10 ].split( /\s+/ ).map( e => Number( e ) );
+		this.chord.splice( 0, 1 );
+		this.camber = arr[ 11 ].split( /\s+/ ).map( e => Number( e ) );
+		this.camber.splice( 0, 1 );
+		this.thick = arr[ 12 ].split( /\s+/ ).map( e => Number( e ) );
+		this.thick.splice( 0, 1 );
+
+	}
+
 	getXYZ() {
 
 		return this.calcPropGeom( this.NoBlade, this.rbyR, this.pitch, this.chord, this.skew, this.rake, this.camber, this.thick, this.meanline, this.section );
@@ -43,14 +71,12 @@ class Propeller {
 
 		const PI = Math.PI;
 		const r = rbyR.map( x => x * 0.5 );
-		const s = skew.map( x => x * PI / 180 );
-		const nk = NoBlade;
 		const nj = rbyR.length;
 		const ni = section.xc.length;
 		const xc = meanline.xc;
 		const yc = meanline.yc;
 		const dydx = meanline.dydx;
-		if ( xc != section.xc ) console.log( 'the data of meanline and that of section are not matched' );
+		if ( xc.toString() != section.xc.toString() ) console.log( 'the data of meanline and that of section are not matched' );
 		const ytm = section.ytm;
 
 		chord[ nj - 1 ] = Math.max( chord[ nj - 1 ], thick[ nj - 1 ] / 0.2 );
@@ -182,3 +208,5 @@ class Propeller {
 	}
 
 }
+
+export { Propeller };

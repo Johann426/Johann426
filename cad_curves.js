@@ -2,9 +2,11 @@ import * as THREE from './Rendering/three.module.js';
 import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
-import { NurbsCurve } from './Modeling/NurbsCurve.js';
+import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
+import { wigleyHull } from './wigleyHull.js';
+import { Propeller } from './Propeller.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -51,7 +53,7 @@ function init() {
 	// stats
 	const stats = new Stats();
 	stats.showPanel( 0 );
-	document.body.appendChild( stats.dom );
+	//document.body.appendChild( stats.dom );
 
 	// grid
 	const gridHelper = new THREE.GridHelper( 30, 30, 0x303030, 0x303030 );
@@ -97,7 +99,7 @@ function init() {
 			case 'Escape':
 
 				menubar.state = 'view';
-				[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
+				[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
 
 				break;
 
@@ -122,14 +124,12 @@ function init() {
 	} );
 
 	let index = 0;
-	let dragging = false;
+	let isAdd = false;
 	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
 
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.lines.curve;
@@ -143,21 +143,22 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				if ( curve.pole !== undefined ) {
 
-					// if ( curve.pole.map( e => e.point ).includes( previousIntersect ) ) {
+					if ( isAdd ) {
 
-					// 	curve.remove( curve.pole.length - 1 );
+						curve.add( intersect );
+						isAdd = false;
 
-					// }
+					} else {
 
-					curve.mod( curve.pole.length - 1, intersect );
+						curve.mod( curve.pole.length - 1, intersect );
+
+					}
+
 
 				}
 
-				// curve.add( intersect );
-
 				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
 				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
 
 				break;
 
@@ -175,7 +176,6 @@ function init() {
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
 
 					}
 
@@ -187,9 +187,9 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-
 				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
+				// Modify curve point
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
@@ -202,7 +202,6 @@ function init() {
 						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
 						sidebar.position.dom.children[ 1 ].value = intersect.x;
 						sidebar.position.dom.children[ 2 ].value = intersect.y;
 						sidebar.position.dom.children[ 3 ].value = intersect.z;
@@ -223,11 +222,9 @@ function init() {
 
 	document.addEventListener( 'pointerdown', e => {
 
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
-		dragging = true;
+		//dragging = true;
 
 		raycaster.setFromCamera( pointer, camera );
 		const curve = selected.lines.curve;
@@ -246,7 +243,7 @@ function init() {
 					selected.lines = intersects[ 0 ].object;
 					updateCurveBuffer( selected.lines.curve, buffer );
 					menubar.state = 'curve';
-					[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
+					[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
 				}
 
@@ -258,6 +255,7 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;
+					updateSelectedPoint( buffer.point, curve.pole[ index ].point );
 
 				}
 
@@ -265,30 +263,15 @@ function init() {
 
 			case 'Add':
 
-				raycaster.ray.intersectPlane( plane, intersect );
-				curve.add( intersect );
-				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
+				// raycaster.ray.intersectPlane( plane, intersect );
+				// curve.add( intersect );
+				// updateCurveBuffer( curve, buffer );
+				// updateLines( curve, selected.lines );
+				isAdd = true;
 
 				break;
 
 			case 'Remove':
-
-				/* for ( let i = 0; i < curve.pole.length; i ++ ) {
-
-					const v = curve.pole[ i ].point;
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.1 ) {
-
-						curve.remove( i );
-						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
-						renderer.render( scene, camera );
-
-					}
-
-				} */
 
 				if ( intPoints.length > 0 ) {
 
@@ -328,11 +311,9 @@ function init() {
 
 	document.addEventListener( 'pointerup', e => {
 
-		const pointer = new THREE.Vector2();
-		pointer.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-		pointer.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
-		dragging = false;
+		//dragging = false;
 
 		buffer.point.visible = false;
 
@@ -344,29 +325,22 @@ function init() {
 
 	} );
 
+	const selected = new Object();
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
-	buffer.lines.renderOrder = 100;
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
-	const selected = {
-
-		lines: buffer.lines
-
-	};
-
-	Object.defineProperty( selected.lines, 'curve', { value: new NurbsCurve( 3 ) } );
-
-	const geometry = new THREE.SphereGeometry( 1 );
+	const geometry = new THREE.SphereGeometry( 0.01 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
 	scene.add( sphereInter );
 
-	const menubar = new Menubar( scene, preBuffer(), pickable, selected );
+	const prop = new Propeller();
+	const menubar = new Menubar( scene, preBuffer(), pickable, selected, prop );
 	document.body.appendChild( menubar.dom );
-	const sidebar = new UITabbedPanel( selected );
+	const sidebar = new UITabbedPanel();
 	document.body.appendChild( sidebar.dom );
 
 	const geo_plane = new THREE.PlaneGeometry( 1, 1 );
@@ -388,11 +362,221 @@ function init() {
 
 	// } );
 
+
+	const hull = new wigleyHull();
+	const pts = hull.getSectionLines();
+
+	for ( let j = 0; j < 10; j ++ ) {
+
+		menubar.dom.children[ 2 ].children[ 1 ].children[ 3 ].click();
+		const curve = selected.lines.curve;
+
+		for ( let i = 0; i < 10; i ++ ) {
+
+			const p = pts[ i + 10 * j ];
+			curve.add( new THREE.Vector3( p[ 0 ], p[ 1 ], p[ 2 ] ) );
+
+		}
+
+		menubar.state = 'view';
+		updateLines( curve, selected.lines );
+		renderer.render( scene, camera );
+
+	}
+
+	drawProp( prop ).map( e => scene.add( e ) );
+
 }
 
 
 
 
+
+
+
+function drawProp( prop ) {
+
+	const nk = prop.NoBlade;
+	const nj = prop.rbyR.length;
+	const ni = prop.meanline.xc.length;
+	const blade = prop.getXYZ();
+	const points = [];
+
+	for ( let j = 0; j < nj; j ++ ) {
+
+		points[ j ] = [];
+
+		for ( let i = 0; i < ni; i ++ ) {
+
+			const x = blade[ 0 ].back.x[ i ][ j ];
+			const y = blade[ 0 ].back.y[ i ][ j ];
+			const z = blade[ 0 ].back.z[ i ][ j ];
+			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+		}
+
+	}
+
+	const geo = new THREE.BufferGeometry();
+	const pos = new Float32Array( 200 * 200 * 3 * 6 ); // 200 x 200 x 3 vertices per point x 6 points per surface
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	const mat = new THREE.MeshBasicMaterial();
+	mat.side = THREE.DoubleSide;
+	const propMeshs = [];
+
+	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
+
+	// loop over no. of blade
+	for ( let k = 1; k <= nk; k ++ ) {
+
+		const phi = 2 * Math.PI * ( k - 1 ) / nk;
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
+
+	}
+
+
+	for ( let j = 0; j < nj; j ++ ) {
+
+		points[ j ] = [];
+
+		for ( let i = 0; i < ni; i ++ ) {
+
+			const x = blade[ 0 ].face.x[ i ][ j ];
+			const y = blade[ 0 ].face.y[ i ][ j ];
+			const z = blade[ 0 ].face.z[ i ][ j ];
+			points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+		}
+
+	}
+
+	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
+
+	// loop over no. of blade
+	for ( let k = 1; k <= nk; k ++ ) {
+
+		const phi = 2 * Math.PI * ( k - 1 ) / nk;
+		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
+
+	}
+
+	prop.ids.length = 0;
+	propMeshs.map( e => prop.ids.push( e.id ) );
+
+	return propMeshs;
+
+}
+
+function updateProp( meshList, prop ) {
+
+	const nk = prop.NoBlade;
+	const nj = prop.rbyR.length;
+	const ni = prop.meanline.xc.length;
+	const blade = prop.getXYZ();
+	const points = [];
+
+	for ( let k = 0; k < nk; k ++ ) {
+
+		for ( let j = 0; j < nj; j ++ ) {
+
+			points[ j ] = [];
+
+			for ( let i = 0; i < ni; i ++ ) {
+
+				const x = blade[ k ].back.x[ i ][ j ];
+				const y = blade[ k ].back.y[ i ][ j ];
+				const z = blade[ k ].back.z[ i ][ j ];
+				points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+			}
+
+		}
+
+		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ k ].geometry );
+
+		for ( let j = 0; j < nj; j ++ ) {
+
+			points[ j ] = [];
+
+			for ( let i = 0; i < ni; i ++ ) {
+
+				const x = blade[ k ].face.x[ i ][ j ];
+				const y = blade[ k ].face.y[ i ][ j ];
+				const z = blade[ k ].face.z[ i ][ j ];
+				points[ j ][ i ] = new THREE.Vector3( x, y, z );
+
+			}
+
+		}
+
+		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ nk + k ].geometry );
+
+	}
+
+}
+
+function updateGeo( surface, geo ) {
+
+	//const geo = mesh.geometry;
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
+	const pos = geo.attributes.position;
+	pos.needsUpdate = true;
+
+	const MAX_RADIAL_POINTS = 200;
+	const MAX_CHORDAL_POINTS = 200;
+
+	const surf = surface.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
+
+	const arr = pos.array;
+	let index = 0;
+	for ( let j = 0; j < MAX_RADIAL_POINTS - 1; j ++ ) {
+
+		for ( let i = 0; i < MAX_CHORDAL_POINTS - 1; i ++ ) {
+
+			arr[ index ++ ] = surf[ j ][ i ].x;
+			arr[ index ++ ] = surf[ j ][ i ].y;
+			arr[ index ++ ] = surf[ j ][ i ].z;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
+
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].z;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
+			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
+			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
+
+		}
+
+	}
+
+}
+
+
+
+
+
+
+
+
+function getLocalCoordinates( dom, x, y ) {
+
+	const rect = dom.getBoundingClientRect();
+	const pointer = new THREE.Vector2();
+	pointer.x = ( x - rect.x ) / window.innerWidth * 2 - 1;
+	pointer.y = - ( y - rect.y ) / window.innerHeight * 2 + 1;
+
+	return pointer;
+
+}
 
 function preBuffer() {
 
@@ -423,9 +607,8 @@ function preBuffer() {
 	const point = new THREE.Points( geo.clone(), mat.clone() );
 
 	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-	pos[ 0 ] = pos[ 1 ] = pos[ 2 ] = - 10000;
-	pos[ 3 ] = pos[ 4 ] = pos[ 5 ] = 10000;
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	geo.setDrawRange( 0, 0 );
 
 	mat.uniforms.color = { value: new THREE.Color( 'DimGray' ) };
 	const ctrlPoints = new THREE.Points( geo.clone(), mat.clone() );
@@ -444,9 +627,14 @@ function preBuffer() {
 	mat.color.set( 0x800000 );
 	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
 
-	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 2 * 3 ), 3 ) );
+	pos = new Float32Array( 2 * 3 );
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	geo.setDrawRange( 0, 2 );
 	mat.color.set( 0x00ff00 );
 	const distance = new THREE.Line( geo, mat );
+
+	point.renderOrder = 100;
+	lines.renderOrder = 100;
 
 	return {
 
@@ -478,6 +666,8 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	pts = curve.pole.map( e => e.point );
 	geo = points.geometry;
 	geo.setDrawRange( 0, pts.length );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
 	pos = geo.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
@@ -527,14 +717,16 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 
 function updateLines( curve, lines ) {
 
-	let index;
-
 	//update curve
+	const geo = lines.geometry;
+	geo.setDrawRange( 0, MAX_POINTS );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
+	const pos = geo.attributes.position;
 	const pts = curve.getPoints( MAX_POINTS );
-	const pos = lines.geometry.attributes.position;
 	pos.needsUpdate = true;
 	const arr = pos.array;
-	index = 0;
+	let index = 0;
 
 	for ( let i = 0; i < MAX_POINTS; i ++ ) {
 
@@ -548,16 +740,16 @@ function updateLines( curve, lines ) {
 
 function updateCurvature( curve, curvature ) {
 
-	let index;
-
 	//update curvature
 	if ( curvature !== undefined ) {
 
+		const geo = curvature.geometry;
+		geo.setDrawRange( 0, MAX_SEG * 2 );
+		const pos = geo.attributes.position;
 		const pts = curve.interrogating( MAX_SEG );
-		const pos = curvature.geometry.attributes.position;
 		pos.needsUpdate = true;
 		const arr = pos.array;
-		index = 0;
+		let index = 0;
 
 		for ( let i = 0; i < MAX_SEG; i ++ ) {
 
@@ -609,43 +801,4 @@ function updateSelectedPoint( point, v ) {
 
 }
 
-function initGUI( layers, scene ) {
-
-	const gui = new GUI( { width: 300 } );
-
-	const layersControl = gui.addFolder( 'layers' );
-	layersControl.open();
-
-	for ( let i = 0; i < layers.length; i ++ ) {
-
-		const layer = layers[ i ];
-		layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
-
-			const name = this.object.name;
-
-			scene.traverse( function ( child ) {
-
-				if ( child.userData.hasOwnProperty( 'attributes' ) ) {
-
-					if ( 'layerIndex' in child.userData.attributes ) {
-
-						const layerName = layers[ child.userData.attributes.layerIndex ].name;
-
-						if ( layerName === name ) {
-
-							child.visible = val;
-							layer.visible = val;
-
-						}
-
-					}
-
-				}
-
-			} );
-
-		} );
-
-	}
-
-}
+export { updateProp, drawProp };

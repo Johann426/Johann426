@@ -1,14 +1,15 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
-import { NurbsCurve } from '../Modeling/NurbsCurve.js';
+import { IntBspline } from '../Modeling/IntBspline.js';
+import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, buffer, pickable, selected ) {
+	constructor( scene, buffer, pickable, selected, prop ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.add( this.file() );
+		this.add( this.file( scene, prop ) );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
@@ -20,7 +21,7 @@ class Menubar extends UIElement {
 
 	}
 
-	file() {
+	file( scene, prop ) {
 
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
@@ -51,11 +52,36 @@ class Menubar extends UIElement {
 
 		const propOpen = document.createElement( 'input' );
 		propOpen.type = 'file';
-		propOpen.addEventListener( 'change', function () {
+		propOpen.onchange = function () {
 
-			// do something
+			const file = this.files[ 0 ];
+			const reader = new FileReader();
 
-		} );
+			reader.onload = function ( e ) {
+
+				const NoBlade = prop.NoBlade;
+				const txt = e.target.result;
+				prop.readTxt( txt );
+
+				const meshList = [];
+				prop.ids.map( e => meshList.push( scene.getObjectById( e ) ) );
+
+				if ( NoBlade == prop.NoBlade ) {
+
+					updateProp( meshList, prop );
+
+				} else {
+
+					meshList.map( e => scene.remove( e ) );
+					drawProp( prop ).map( e => scene.add( e ) );
+
+				}
+
+			};
+
+			reader.readAsText( file );
+
+		};
 
 		return menu;
 
@@ -127,7 +153,7 @@ class Menubar extends UIElement {
 			const geo = this.buffer.lines.geometry.clone();
 			const mat = this.buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
-			const curve = new NurbsCurve( 3 );
+			const curve = new IntBspline( 3 );
 			Object.defineProperty( lines, 'curve', { value: curve } );
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );

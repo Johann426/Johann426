@@ -1,103 +1,37 @@
-/*
- * If the given data consists of only points (and constraints), on the basis of The NURBS Book,
- * this class provides a global algorithm to solve the linear equations to evaluate an unknown NURBS,
- * i.e., parameterized value, knot vector, and control points.
- * js code by Johann426.github
- */
-
-import { curvePoint, curveDers, globalCurveInterp, deWeight } from './NurbsUtil.js';
+import { curvePoint, curveDers, globalCurveInterp, Vector4 } from './NurbsUtil.js';
 
 class NurbsCurve {
 
-	constructor( deg, type = 'chordal' ) {
+	constructor( deg, knots, ctrlp, weight ) {
 
-		this.pole = [];
+		this.knots = knots;
 
-		this.type = type;
+		this.ctrlp = ctrlp;
 
 		this.deg = () => {
 
-			const nm1 = this.pole.length - 1;
+			const nm1 = this.ctrlp.length - 1;
 
 			return ( nm1 > deg ? deg : nm1 );
 
 		};
 
-	}
+		for ( let i = 0; i < ctrlp.length; i ++ ) {
 
-	add( point ) {
-
-		this.pole.push( { point: point } );
-
-	}
-
-	mod( i, point ) {
-
-		this.pole[ i ].point = point;
-
-	}
-
-	incert( i, point ) {
-
-		this.pole.splice( i, 0, { point: point } );
-
-	}
-
-	remove( i ) {
-
-		this.pole.splice( i, 1 );
-
-	}
-
-	addTangent( i, v ) {
-
-		const points = this.pole.map( e => e.point );
-		const chordL = this.getChordLength( points );
-		v.normalize().multiplyScalar( chordL );
-		this.pole[ i ].slope = v;
-
-	}
-
-	removeTangent( i ) {
-
-		this.pole[ i ].slope = undefined;
-
-	}
-
-	getChordLength( points ) {
-
-		const n = points.length;
-		var sum = 0.0;
-
-		for ( let i = 1; i < n; i ++ ) {
-
-			const del = points[ i ].clone().sub( points[ i - 1 ] );
-			const len = del.length();
-			sum += len;
+			this.ctrlpw[ i ] = new Vector4( ctrlp[ i ].x, ctrlp[ i ].y, ctrlp[ i ].z, weight[ i ] );
 
 		}
-
-		return sum;
-
-	}
-
-	getCtrlPoints() {
-
-		this._calcCtrlPoints();
-		return deWeight( this.ctrlp );
 
 	}
 
 	getPointAt( t ) {
 
-		this._calcCtrlPoints();
 		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 	}
 
 	getPoints( n ) {
 
-		this._calcCtrlPoints();
 		const p = [];
 
 		for ( let i = 0; i < n; i ++ ) {
@@ -113,14 +47,11 @@ class NurbsCurve {
 
 	getDerivatives( t, k ) {
 
-		this._calcCtrlPoints();
 		return curveDers( this.deg(), this.knots, this.ctrlp, t, k );
 
 	}
 
 	interrogating( n ) {
-
-		this._calcCtrlPoints();
 
 		const p = [];
 
@@ -149,7 +80,6 @@ class NurbsCurve {
 
 	closestPoint( v ) {
 
-		this._calcCtrlPoints();
 		var t = 0;
 		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
 
@@ -200,126 +130,6 @@ class NurbsCurve {
 		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
 
 	}
-
-	_calcCtrlPoints() {
-
-		const points = this.pole.map( e => e.point );
-		this.param = parameterize( points, this.type );
-		this.knots = calcKnots( this.deg(), this.param, this.pole );
-		this.ctrlp = globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
-
-	}
-
-}
-
-function parameterize( points, curveType ) {
-
-	const n = points.length;
-	const prm = [];
-	var sum = 0.0;
-
-	for ( let i = 1; i < n; i ++ ) {
-
-		const del = points[ i ].clone().sub( points[ i - 1 ] );
-		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
-		sum += len;
-		prm[ i ] = sum;
-
-	}
-
-	prm[ 0 ] = 0.0;
-
-	for ( let i = 1; i < n; i ++ ) {
-
-		prm[ i ] /= sum;
-
-	}
-
-	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-	return prm;
-
-}
-
-function calcKnots( deg, prm, pole ) {
-
-	const n = pole.length;
-	const nm1 = n - 1;
-	const a = prm.slice();
-	var m = 0;
-
-	for ( let i = 0; i < n; i ++ ) {
-
-		const hasValue = pole[ i ].slope ? true : false;
-
-		if ( hasValue ) {
-
-			let one3rd, two3rd;
-
-			switch ( i ) {
-
-				case 0 :
-
-					one3rd = 0.6667 * prm[ 0 ] + 0.3333 * prm[ i + 1 ];
-					a.splice( 1, 0, one3rd );
-					break;
-
-				case nm1 :
-
-					one3rd = 0.6667 * prm[ nm1 ] + 0.3333 * prm[ nm1 - 1 ];
-					a.splice( nm1 + m, 0, one3rd );
-					break;
-
-				default :
-
-					one3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i - 1 ];
-					two3rd = 0.6667 * prm[ i ] + 0.3333 * prm[ i + 1 ];
-					a.splice( i + m, 0, one3rd );
-					a.splice( i + m + 1, 1, two3rd );
-
-			}
-
-			m ++;
-
-		}
-
-	}
-
-	return deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
-
-}
-
-function deBoorKnots( deg, prm ) {
-
-	const n = prm.length;
-	const knot = [];
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i ] = 0.0;
-
-	}
-
-	for ( let i = 1; i < n - deg; i ++ ) {
-
-		let sum = 0.0;
-
-		for ( let j = i; j < i + deg; j ++ ) {
-
-			sum += prm[ j ];
-
-		}
-
-		knot[ i + deg ] = sum / deg;
-
-	}
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i + n ] = 1.0;
-
-	}
-
-	return knot;
 
 }
 
