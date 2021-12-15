@@ -5,23 +5,24 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, deBoorKnots, globalCurveInterp } from './NurbsUtil.js';
+import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert } from './NurbsUtil.js';
 
 class IntBspline {
 
 	constructor( deg, type = 'chordal' ) {
 
-		this.pole = [];
+		this.dmax = deg;
 
 		this.type = type;
 
-		this.deg = () => {
+		this.pole = [];
 
-			const nm1 = this.pole.length - 1;
+	}
 
-			return ( nm1 > deg ? deg : nm1 );
+	get deg() {
 
-		};
+		const nm1 = this.pole.length - 1;
+		return ( nm1 > this.dmax ? this.dmax : nm1 );
 
 	}
 
@@ -64,6 +65,14 @@ class IntBspline {
 
 	}
 
+	insertKnotAt( t = 0.5 ) {
+
+		knotsInsert( this.deg, this.knots, this.ctrlp, t );
+		console.log( 'after' );
+		console.log( this.ctrlp );
+
+	}
+
 	getChordLength( points ) {
 
 		const n = points.length;
@@ -91,7 +100,7 @@ class IntBspline {
 	getPointAt( t ) {
 
 		this._calcCtrlPoints();
-		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
+		return curvePoint( this.deg, this.knots, this.ctrlp, t );
 
 	}
 
@@ -103,7 +112,7 @@ class IntBspline {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = curvePoint( this.deg(), this.knots, this.ctrlp, t );
+			p[ i ] = curvePoint( this.deg, this.knots, this.ctrlp, t );
 
 		}
 
@@ -114,7 +123,7 @@ class IntBspline {
 	getDerivatives( t, k ) {
 
 		this._calcCtrlPoints();
-		return curveDers( this.deg(), this.knots, this.ctrlp, t, k );
+		return curveDers( this.deg, this.knots, this.ctrlp, t, k );
 
 	}
 
@@ -127,7 +136,7 @@ class IntBspline {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+			const ders = curveDers( this.deg, this.knots, this.ctrlp, t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -151,11 +160,11 @@ class IntBspline {
 
 		this._calcCtrlPoints();
 		var t = 0;
-		var l = curvePoint( this.deg(), this.knots, this.ctrlp, 0 ).sub( v ).length();
+		var l = curvePoint( this.deg, this.knots, this.ctrlp, 0 ).sub( v ).length();
 
 		for ( let i = 1; i <= 20; i ++ ) {
 
-			const len = curvePoint( this.deg(), this.knots, this.ctrlp, i / 20 ).sub( v ).length();
+			const len = curvePoint( this.deg, this.knots, this.ctrlp, i / 20 ).sub( v ).length();
 
 			if ( len < l ) {
 
@@ -172,7 +181,7 @@ class IntBspline {
 
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
-			const ders = curveDers( this.deg(), this.knots, this.ctrlp, t, 2 );
+			const ders = curveDers( this.deg, this.knots, this.ctrlp, t, 2 );
 			const sub = ders[ 0 ].clone().sub( v );
 			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
@@ -197,7 +206,7 @@ class IntBspline {
 
 		}
 
-		return curvePoint( this.deg(), this.knots, this.ctrlp, t );
+		return curvePoint( this.deg, this.knots, this.ctrlp, t );
 
 	}
 
@@ -205,8 +214,8 @@ class IntBspline {
 
 		const points = this.pole.map( e => e.point );
 		this.param = parameterize( points, this.type );
-		this.knots = calcKnots( this.deg(), this.param, this.pole );
-		this.ctrlp = globalCurveInterp( this.deg(), this.param, this.knots, this.pole );
+		this.knots = calcKnots( this.deg, this.param, this.pole );
+		this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, this.pole );
 
 	}
 
