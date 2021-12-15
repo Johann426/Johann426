@@ -307,10 +307,6 @@ function init() {
 
 		buffer.point.visible = true;
 
-		const meshList = [];
-		prop_ids.map( e => meshList.push( scene.getObjectById( e ) ) );
-		//updateProp( meshList, prop );
-
 	} );
 
 	document.addEventListener( 'pointerup', e => {
@@ -388,8 +384,7 @@ function init() {
 
 	}
 
-	const prop_ids = [];
-	drawProp( prop, prop_ids ).map( e => scene.add( e ) );
+	drawProp( prop ).map( e => scene.add( e ) );
 
 }
 
@@ -399,7 +394,7 @@ function init() {
 
 
 
-function drawProp( prop, ids ) {
+function drawProp( prop ) {
 
 	const nk = prop.NoBlade;
 	const nj = prop.rbyR.length;
@@ -429,7 +424,7 @@ function drawProp( prop, ids ) {
 	mat.side = THREE.DoubleSide;
 	const propMeshs = [];
 
-	updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
 
 	// loop over no. of blade
 	for ( let k = 1; k <= nk; k ++ ) {
@@ -455,7 +450,7 @@ function drawProp( prop, ids ) {
 
 	}
 
-	updateGeo( geo, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
 
 	// loop over no. of blade
 	for ( let k = 1; k <= nk; k ++ ) {
@@ -465,8 +460,8 @@ function drawProp( prop, ids ) {
 
 	}
 
-	ids.length = 0;
-	propMeshs.map( e => ids.push( e.id ) );
+	prop.ids.length = 0;
+	propMeshs.map( e => prop.ids.push( e.id ) );
 
 	return propMeshs;
 
@@ -497,7 +492,7 @@ function updateProp( meshList, prop ) {
 
 		}
 
-		updateGeo( meshList[ k ].geometry, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ k ].geometry );
 
 		for ( let j = 0; j < nj; j ++ ) {
 
@@ -514,13 +509,13 @@ function updateProp( meshList, prop ) {
 
 		}
 
-		updateGeo( meshList[ nk + k ].geometry, new IntBsplineSurf( ni, nj, points, 3, 3 ) );
+		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ nk + k ].geometry );
 
 	}
 
 }
 
-function updateGeo( geo, surface ) {
+function updateGeo( surface, geo ) {
 
 	//const geo = mesh.geometry;
 	geo.computeBoundingBox();
@@ -806,3 +801,4 @@ function updateSelectedPoint( point, v ) {
 
 }
 
+export { updateProp, drawProp };
