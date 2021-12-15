@@ -17,6 +17,8 @@ class IntBspline {
 
 		this.pole = [];
 
+		this.needsUpdate = false;
+
 	}
 
 	get deg() {
@@ -29,24 +31,28 @@ class IntBspline {
 	add( point ) {
 
 		this.pole.push( { point: point } );
+		this.needsUpdate = true;
 
 	}
 
 	mod( i, point ) {
 
 		this.pole[ i ].point = point;
+		this.needsUpdate = true;
 
 	}
 
 	incert( i, point ) {
 
 		this.pole.splice( i, 0, { point: point } );
+		this.needsUpdate = true;
 
 	}
 
 	remove( i ) {
 
 		this.pole.splice( i, 1 );
+		this.needsUpdate = true;
 
 	}
 
@@ -56,12 +62,14 @@ class IntBspline {
 		const chordL = this.getChordLength( points );
 		v.normalize().multiplyScalar( chordL );
 		this.pole[ i ].slope = v;
+		this.needsUpdate = true;
 
 	}
 
 	removeTangent( i ) {
 
 		this.pole[ i ].slope = undefined;
+		this.needsUpdate = true;
 
 	}
 
@@ -92,27 +100,26 @@ class IntBspline {
 
 	getCtrlPoints() {
 
-		this._calcCtrlPoints();
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 		return this.ctrlp;
 
 	}
 
 	getPointAt( t ) {
 
-		this._calcCtrlPoints();
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 		return curvePoint( this.deg, this.knots, this.ctrlp, t );
 
 	}
 
 	getPoints( n ) {
 
-		this._calcCtrlPoints();
 		const p = [];
 
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = curvePoint( this.deg, this.knots, this.ctrlp, t );
+			p[ i ] = this.getPointAt( t );
 
 		}
 
@@ -122,14 +129,14 @@ class IntBspline {
 
 	getDerivatives( t, k ) {
 
-		this._calcCtrlPoints();
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 		return curveDers( this.deg, this.knots, this.ctrlp, t, k );
 
 	}
 
 	interrogating( n ) {
 
-		this._calcCtrlPoints();
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 
 		const p = [];
 
@@ -158,7 +165,7 @@ class IntBspline {
 
 	closestPoint( v ) {
 
-		this._calcCtrlPoints();
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 		var t = 0;
 		var l = curvePoint( this.deg, this.knots, this.ctrlp, 0 ).sub( v ).length();
 
@@ -216,6 +223,7 @@ class IntBspline {
 		this.param = parameterize( points, this.type );
 		this.knots = calcKnots( this.deg, this.param, this.pole );
 		this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		this.needsUpdate = false;
 
 	}
 
