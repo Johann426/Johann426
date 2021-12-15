@@ -62,19 +62,19 @@ class Menubar extends UIElement {
 				const NoBlade = prop.NoBlade;
 				const txt = e.target.result;
 				prop.readTxt( txt );
-				
+
 				const meshList = [];
 				prop.ids.map( e => meshList.push( scene.getObjectById( e ) ) );
-				
+
 				if ( NoBlade == prop.NoBlade ) {
-					
-					updateProp( meshList, prop);
-					
+
+					updateProp( meshList, prop );
+
 				} else {
-					
+
 					meshList.map( e => scene.remove( e ) );
 					drawProp( prop ).map( e => scene.add( e ) );
-					
+
 				}
 
 			};
