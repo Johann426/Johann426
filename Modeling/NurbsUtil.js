@@ -361,7 +361,7 @@ function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
 function knotsInsert( deg, knot, ctrl, t ) {
 
-	var q = []; //Array(order) { Vector3() }
+	var q = [];
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
 
 	for ( let i = 0; i <= deg; i ++ ) {
@@ -386,7 +386,6 @@ function knotsInsert( deg, knot, ctrl, t ) {
 
 	}
 
-	//evalPrm( ctrlPts );
 	knot.splice( span + 1, 0, t );
 
 }
