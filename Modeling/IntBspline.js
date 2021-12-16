@@ -163,7 +163,7 @@ class IntBspline {
 
 	}
 
-	closestPoint( v ) {
+	closestPosition( v ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
 		var t = 0;
@@ -213,6 +213,13 @@ class IntBspline {
 
 		}
 
+		return t;
+
+	}
+
+	closestPoint( v ) {
+
+		const t = this.closestPosition( v );
 		return curvePoint( this.deg, this.knots, this.ctrlp, t );
 
 	}
