@@ -356,7 +356,7 @@ function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 }
 
 /*
- * Modify control points by knots insertion. See The NURBS Book, page 134, algorithm A5.1.
+ * Modify control points by knots insertion. See The NURBS Book, page 151, algorithm A5.1.
  */
 
 function knotsInsert( deg, knot, ctrl, t ) {

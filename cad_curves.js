@@ -343,7 +343,7 @@ function init() {
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
-	const geometry = new THREE.SphereGeometry( 0.01 );
+	const geometry = new THREE.SphereGeometry( 0.02 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
