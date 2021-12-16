@@ -66,6 +66,13 @@ class IntBspline {
 
 	}
 
+	addKnuckle( i, v ) {
+
+		this.pole[ i ].slope = v;
+		this.needsUpdate = true;
+
+	}
+
 	removeTangent( i ) {
 
 		this.pole[ i ].slope = undefined;
@@ -75,7 +82,7 @@ class IntBspline {
 
 	insertKnotAt( t = 0.5 ) {
 
-		if( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
+		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
 
 	}
 

@@ -313,6 +313,18 @@ function init() {
 
 				break;
 
+			case 'knuckle':
+
+				if ( intPoints.length > 0 ) {
+
+					curve.addKnuckle( intPoints[ 0 ].index, new THREE.Vector3( 0, 0, 0 ) );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.lines );
+
+				}
+
+				break;
+
 			default:
 
 		}
