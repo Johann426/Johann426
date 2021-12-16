@@ -282,7 +282,6 @@ function init() {
 					curve.remove( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
-					renderer.render( scene, camera );
 
 				}
 
@@ -299,7 +298,6 @@ function init() {
 					curve.removeTangent( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
-					renderer.render( scene, camera );
 
 				}
 
@@ -307,10 +305,11 @@ function init() {
 
 			case 'knot insert':
 
-				curve.insertKnotAt( 0.5 );
+				raycaster.ray.intersectPlane( plane, intersect );
+				const t = curve.closestPosition( intersect );
+				curve.insertKnotAt( t );
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
-				renderer.render( scene, camera );
 
 				break;
 
