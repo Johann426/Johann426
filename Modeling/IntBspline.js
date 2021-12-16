@@ -75,9 +75,7 @@ class IntBspline {
 
 	insertKnotAt( t = 0.5 ) {
 
-		knotsInsert( this.deg, this.knots, this.ctrlp, t );
-		console.log( 'after' );
-		console.log( this.ctrlp );
+		if( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
 
 	}
 
