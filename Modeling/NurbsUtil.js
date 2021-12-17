@@ -957,4 +957,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, findIndexSpan };
