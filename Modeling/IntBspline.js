@@ -280,7 +280,7 @@ function calcKnots( deg, prm, pole ) {
 
 		const hasSlope = pole[ i ].slope ? true : false;
 
-		if ( hasSlpoe ) {
+		if ( hasSlope ) {
 
 			let one3rd, two3rd;
 
