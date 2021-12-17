@@ -135,7 +135,9 @@ function init() {
 		const curve = selected.lines.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-
+		
+		const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
+		
 		switch ( menubar.state ) {
 
 			case 'Add':
@@ -191,7 +193,7 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
+				
 
 				// Modify curve point
 				if ( intPoints.length > 0 ) {
@@ -317,6 +319,7 @@ function init() {
 
 				if ( intPoints.length > 0 ) {
 
+					curve.removeTangent( intPoints[ 0 ].index ); // tangent removed as knuckle added
 					curve.addKnuckle( intPoints[ 0 ].index, new THREE.Vector3( 0, 0, 0 ) );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
