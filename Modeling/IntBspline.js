@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert } from './NurbsUtil.js';
+import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert, findIndexSpan } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -66,9 +66,9 @@ class IntBspline {
 
 	}
 
-	addKnuckle( i, v ) {
+	addKnuckle( i ) {
 
-		this.pole[ i ].slope = v;
+		this.pole[ i ].knuckle = true;
 		this.needsUpdate = true;
 
 	}
@@ -278,9 +278,9 @@ function calcKnots( deg, prm, pole ) {
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		const hasValue = pole[ i ].slope ? true : false;
+		const hasSlope = pole[ i ].slope ? true : false;
 
-		if ( hasValue ) {
+		if ( hasSlpoe ) {
 
 			let one3rd, two3rd;
 
@@ -313,7 +313,22 @@ function calcKnots( deg, prm, pole ) {
 
 	}
 
-	return deBoorKnots( deg, a ); //.sort( ( a, b ) => { return a - b } );
+	const knots = deBoorKnots( deg, a );
+	
+	for ( let i = 0; i < n; i ++ ) {
+
+		if ( pole[ i ].knuckle ) {
+
+			// knots multiplicity preliminary algorism...
+			const span = findIndexSpan( deg, knots, n, prm[ i ] );
+			knots[ span - 1 ] = knots[ span ];
+			knots[ span + 1 ] = knots[ span ];
+
+		}
+
+	}
+	console.log( knots );
+	return knots //.sort( ( a, b ) => { return a - b } );
 
 }
 
