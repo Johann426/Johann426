@@ -478,9 +478,18 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 			const nj = basisFuncs( deg, knot, span, prm[ i ] );
 			arr[ i ] = new Array( n ).fill( 0.0 );
 
-			for ( let j = 0; j <= deg; j ++ ) {
+			if ( pole[ i ].knuckle ) {
+				
+				arr[ i ] = new Array( n ).fill( 0.0 );
+				arr[ i ][ i ] = 1.0;
+				
+			} else {
 
-				arr[ i ][ span - deg + j ] = nj[ j ];
+				for ( let j = 0; j <= deg; j ++ ) {
+
+					arr[ i ][ span - deg + j ] = nj[ j ];
+
+				}
 
 			}
 
