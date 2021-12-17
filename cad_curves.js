@@ -320,7 +320,7 @@ function init() {
 				if ( intPoints.length > 0 ) {
 
 					curve.removeTangent( intPoints[ 0 ].index ); // tangent removed as knuckle added
-					curve.addKnuckle( intPoints[ 0 ].index, new THREE.Vector3( 0, 0, 0 ) );
+					curve.addKnuckle( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
 
