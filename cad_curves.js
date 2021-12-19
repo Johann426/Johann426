@@ -303,7 +303,7 @@ function init() {
 
 				break;
 
-			case 'knot insert':
+			case 'Knot insert':
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				const t = curve.closestPosition( intersect );
@@ -313,12 +313,24 @@ function init() {
 
 				break;
 
-			case 'knuckle':
+			case 'Knuckle':
 
 				if ( intPoints.length > 0 ) {
 
 					curve.removeTangent( intPoints[ 0 ].index ); // tangent removed as knuckle added
 					curve.addKnuckle( intPoints[ 0 ].index );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.lines );
+
+				}
+
+				break;
+
+			case 'Remove knuckle':
+
+				if ( intPoints.length > 0 ) {
+
+					curve.removeKnuckle( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
 

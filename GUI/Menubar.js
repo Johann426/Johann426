@@ -98,6 +98,7 @@ class Menubar extends UIElement {
 		items.add( new MenuItem( 'Remove tangent' ) );
 		items.add( new MenuItem( 'knot insert' ) );
 		items.add( new MenuItem( 'add knuckle' ) );
+		items.add( new MenuItem( 'remove knuckle' ) );
 		menu.add( items );
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
@@ -127,13 +128,19 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 4 ].addEventListener( 'click', () => {
 
-			this.state = 'knot insert';
+			this.state = 'Knot insert';
 
 		} );
 
 		items.dom.children[ 5 ].addEventListener( 'click', () => {
 
-			this.state = 'knuckle';
+			this.state = 'Knuckle';
+
+		} );
+
+		items.dom.children[ 6 ].addEventListener( 'click', () => {
+
+			this.state = 'Remove knuckle';
 
 		} );
 

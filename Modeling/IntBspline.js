@@ -73,6 +73,13 @@ class IntBspline {
 
 	}
 
+	removeKnuckle( i ) {
+
+		this.pole[ i ].knuckle = undefined;
+		this.needsUpdate = true;
+
+	}
+
 	removeTangent( i ) {
 
 		this.pole[ i ].slope = undefined;
