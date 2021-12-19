@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert, findIndexSpan } from './NurbsUtil.js';
+import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert, findIndexSpan, uniformlySpacedknots } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -313,25 +313,28 @@ function calcKnots( deg, prm, pole ) {
 
 	}
 
-	const knots = deBoorKnots( deg, a );
-	
+	const knots = deBoorKnots( deg, a ); //uniformlySpacedknots( deg, a.length ); need parameter at basis maxima
+
+	m = 0;
+
 	for ( let i = 0; i < n; i ++ ) {
+
+		if ( pole[ i ].slope ) m ++;
 
 		if ( pole[ i ].knuckle ) {
 
 			// knots multiplicity preliminary algorism...
-			const span = findIndexSpan( deg, knots, n, prm[ i ] );
-			knots[ span - 1 ] = knots[ span ];
-			knots[ span + 1 ] = knots[ span ];
+			const index = deg + 1 + ( i + m - deg + 1 );
+			knots[ index - 1 ] = knots[ index ];
+			knots[ index + 1 ] = knots[ index ];
 
 		}
 
 	}
+
 	console.log( knots );
-	return knots //.sort( ( a, b ) => { return a - b } );
+	return knots; //.sort( ( a, b ) => { return a - b } );
 
 }
-
-
 
 export { IntBspline };

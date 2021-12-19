@@ -135,9 +135,9 @@ function init() {
 		const curve = selected.lines.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
-		
+
 		const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
-		
+
 		switch ( menubar.state ) {
 
 			case 'Add':
@@ -189,13 +189,11 @@ function init() {
 
 				break;
 
-			default:
+			default: // curve point editting
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-				
 
-				// Modify curve point
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );

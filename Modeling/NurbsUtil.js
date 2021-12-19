@@ -425,6 +425,36 @@ function deBoorKnots( deg, prm ) {
 
 }
 
+function uniformlySpacedknots( deg, n ) {
+
+	const knot = [];
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i ] = 0.0;
+
+	}
+
+	for ( let i = 1; i < n - deg; i ++ ) {
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			knot[ i + deg ] = i / ( n - deg );
+
+		}
+
+	}
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i + n ] = 1.0;
+
+	}
+
+	return knot;
+
+}
+
 /*
  * Compute binomial coefficient, k! / ( i! * ( k - i )! )
  */
@@ -470,7 +500,7 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 	const slope = pole.map( e => e.slope ).filter( Boolean );
 	var arr = [];
 
-	if ( ! slope.length ) {
+	if ( ! slope.length ) { // no directional constraint
 
 		for ( let i = 0; i < n; i ++ ) {
 
@@ -478,12 +508,12 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 			const nj = basisFuncs( deg, knot, span, prm[ i ] );
 			arr[ i ] = new Array( n ).fill( 0.0 );
 
-			if ( pole[ i ].knuckle ) {
-				
+			if ( pole[ i ].knuckle ) { // knuckle point
+
 				arr[ i ] = new Array( n ).fill( 0.0 );
-				arr[ i ][ i ] = 1.0;
-				
-			} else {
+				arr[ i ][ i ] = 1.0; // ctrlp = point
+
+			} else { // ordinary point
 
 				for ( let j = 0; j <= deg; j ++ ) {
 
@@ -501,21 +531,30 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 		lubksb( n, arr, index, ctrlp );
 		return ctrlp;
 
-	} else {
+	} else { // if directional constraint(s) exist
 
-		const nps = n + slope.length;
-		const b = new Array( nps ).fill( new Vector3() );
+		const nCtrlp = n + slope.length;
+		const b = new Array( nCtrlp ).fill( new Vector3() );
 		var m = 0;
 
 		for ( let i = 0; i < n; i ++ ) {
 
-			const span = findIndexSpan( deg, knot, nps, prm[ i ] );
+			const span = findIndexSpan( deg, knot, nCtrlp, prm[ i ] );
 			const nj = basisFuncs( deg, knot, span, prm[ i ] );
-			arr[ i + m ] = new Array( nps ).fill( 0.0 );
+			arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
 
-			for ( let j = 0; j <= deg; j ++ ) {
+			if ( pole[ i ].knuckle ) { // knuckle point
 
-				arr[ i + m ][ span - deg + j ] = nj[ j ];
+				arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
+				arr[ i + m ][ i + m ] = 1.0; // ctrlp = point
+
+			} else { // ordinary point
+
+				for ( let j = 0; j <= deg; j ++ ) {
+
+					arr[ i + m ][ span - deg + j ] = nj[ j ];
+
+				}
 
 			}
 
@@ -523,10 +562,10 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 
 			const hasValue = pole[ i ].slope ? true : false;
 
-			if ( hasValue ) {
+			if ( hasValue ) { // additional ctrlp for directional constraint
 
 				m ++;
-				arr[ i + m ] = new Array( nps ).fill( 0.0 );
+				arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
 
 				switch ( i ) {
 
@@ -539,23 +578,23 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 
 					case n - 1 :
 
-						arr[ i + m ][ nps - 2 ] = - 1.0;
-						arr[ i + m ][ nps - 1 ] = 1.0;
-						b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nps + deg ] - knot[ nps - 1 ] ) / deg );
+						arr[ i + m ][ nCtrlp - 2 ] = - 1.0;
+						arr[ i + m ][ nCtrlp - 1 ] = 1.0;
+						b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nCtrlp + deg ] - knot[ nCtrlp - 1 ] ) / deg );
 						break;
 
 					default :
 
-						const span = findIndexSpan( deg, knot, nps, prm[ i ] );
+						const span = findIndexSpan( deg, knot, nCtrlp, prm[ i ] );
 						const nder = dersBasisFunc( deg, knot, span, 1, prm[ i ] );
 
 						for ( let j = 0; j <= deg; j ++ ) {
 
-							arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ];
+							arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ]; // set the first derivative
 
 						}
 
-						b[ i + m ] = pole[ i ].slope;
+						b[ i + m ] = pole[ i ].slope; // to be equal with directional constraint
 
 				}
 
@@ -565,8 +604,8 @@ function globalCurveInterp( deg, prm, knot, pole ) {
 
 		const ctrlp = b.slice();
 		const index = [];
-		ludcmp( nps, arr, index );
-		lubksb( nps, arr, index, ctrlp );
+		ludcmp( nCtrlp, arr, index );
+		lubksb( nCtrlp, arr, index, ctrlp );
 		return ctrlp;
 
 	}
@@ -957,4 +996,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, findIndexSpan };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, findIndexSpan, uniformlySpacedknots };
