@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, deBoorKnots, globalCurveInterp, knotsInsert, findIndexSpan, uniformlySpacedknots } from './NurbsUtil.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, knotsInsert, calcNodes } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -248,33 +248,7 @@ class IntBspline {
 
 }
 
-function parameterize( points, curveType ) {
 
-	const n = points.length;
-	const prm = [];
-	var sum = 0.0;
-
-	for ( let i = 1; i < n; i ++ ) {
-
-		const del = points[ i ].clone().sub( points[ i - 1 ] );
-		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length();
-		sum += len;
-		prm[ i ] = sum;
-
-	}
-
-	prm[ 0 ] = 0.0;
-
-	for ( let i = 1; i < n; i ++ ) {
-
-		prm[ i ] /= sum;
-
-	}
-
-	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-	return prm;
-
-}
 
 function calcKnots( deg, prm, pole ) {
 
@@ -340,6 +314,7 @@ function calcKnots( deg, prm, pole ) {
 	}
 
 	console.log( knots );
+	calcNodes( deg, knots );
 	return knots; //.sort( ( a, b ) => { return a - b } );
 
 }

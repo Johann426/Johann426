@@ -390,6 +390,34 @@ function knotsInsert( deg, knot, ctrl, t ) {
 
 }
 
+function parameterize( points, curveType ) {
+
+	const n = points.length;
+	const prm = [];
+	var sum = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		const del = points[ i ].clone().sub( points[ i - 1 ] );
+		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length(); // Otherwise, use chordal
+		sum += len;
+		prm[ i ] = sum;
+
+	}
+
+	prm[ 0 ] = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		prm[ i ] /= sum;
+
+	}
+
+	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
+	return prm;
+
+}
+
 function deBoorKnots( deg, prm ) {
 
 	const n = prm.length;
@@ -454,6 +482,32 @@ function uniformlySpacedknots( deg, n ) {
 	return knot;
 
 }
+
+/*
+ * Compute Nodes (Greville points or Greville abscissae) averaged over degree number of knots
+ */
+function calcNodes( deg, knot ) {
+
+	const prm = [];
+
+	for ( let i = 1; i < knot.length - deg; i ++ ) {
+
+		let sum = 0;
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			sum += knot[ j ];
+
+		}
+
+		prm.push( sum / deg );
+
+	}
+console.log ( prm );
+	return prm;
+
+}
+
 
 /*
  * Compute binomial coefficient, k! / ( i! * ( k - i )! )
@@ -996,4 +1050,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, findIndexSpan, uniformlySpacedknots };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, calcNodes };
