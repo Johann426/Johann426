@@ -503,7 +503,7 @@ function calcNodes( deg, knot ) {
 		prm.push( sum / deg );
 
 	}
-console.log ( prm );
+
 	return prm;
 
 }

@@ -314,7 +314,7 @@ function calcKnots( deg, prm, pole ) {
 	}
 
 	console.log( knots );
-	calcNodes( deg, knots );
+	console.log( calcNodes( deg, knots ) );
 	return knots; //.sort( ( a, b ) => { return a - b } );
 
 }
