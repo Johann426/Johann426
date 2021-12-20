@@ -179,6 +179,7 @@ function init() {
 					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
+						curve.removeKnuckle( i );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
