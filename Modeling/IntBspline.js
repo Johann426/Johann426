@@ -304,7 +304,7 @@ function calcKnots( deg, prm, pole ) {
 
 		if ( pole[ i ].knuckle ) {
 
-			// knots multiplicity preliminary algorism...
+			// knots multiplicity preliminary algorism... only works for deg = 3
 			const index = deg + 1 + ( i + m - deg + 1 );
 			knots[ index - 1 ] = knots[ index ];
 			knots[ index + 1 ] = knots[ index ];
