@@ -1,9 +1,9 @@
 /*
  * Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
- * deg: degree
- * knot: knot vector (knot[i]: knots)
- * n: number of control points
- * t: parameter
+ * deg : degree
+ * knot : knot vector
+ * n : number of control points
+ * t : parameteric point
  */
 function findIndexSpan( deg, knot, n, t ) {
 
@@ -32,6 +32,10 @@ function findIndexSpan( deg, knot, n, t ) {
 
 /*
  * Compute nonvanishing basis functions. See The NURBS Book, page 70, algorithm A2.2
+ * deg : degree
+ * knot : knot vector
+ * span : index of knot vector at a parametric point
+ * t : parameteric point
  */
 function basisFuncs( deg, knot, span, t ) {
 
@@ -65,6 +69,11 @@ function basisFuncs( deg, knot, span, t ) {
 /*
  * Compute nonzero basis functions and their derivatives, up to and including nth derivatives. See The NURBS Book, page 72, algorithm A2.3.
  * ders[k][j] is the kth derivative where 0 <= k <= n and 0 <= j <= degree
+ * deg : degree
+ * knot : knot vector
+ * span : index of knot vector at a parametric point
+ * n : order of the highest derivative to compute
+ * t : parameteric point
  */
 function dersBasisFunc( deg, knot, span, n, t ) {
 
@@ -171,7 +180,11 @@ function dersBasisFunc( deg, knot, span, n, t ) {
 
 /*
  * Compute B-Spline curve point. See The NURBS Book, page 82, algorithm A3.1.
- */
+ * deg : degree
+ * knot : knot vector
+ * ctrl : control points
+ * t : parameteric point
+*/
 function curvePoint( deg, knot, ctrl, t ) {
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
@@ -192,6 +205,11 @@ function curvePoint( deg, knot, ctrl, t ) {
 
 /*
  * Compute derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+ * deg : degree
+ * knot : knot vector
+ * ctrl : control points
+ * t : parameteric point
+ * n : order of the highest derivative to compute (default value is 2)
  */
 function curveDers( deg, knot, ctrl, t, n = 2 ) {
 
@@ -254,7 +272,11 @@ function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
 /*
  * Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
- */
+ * deg : degree
+ * knot : knot vector
+ * ctrl : control points
+ * t : parameteric point
+*/
 function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
@@ -277,6 +299,11 @@ function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, 
 
 /*
  * Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
+ * deg : degree
+ * knot : knot vector
+ * ctrl : control points
+ * t : parameteric point
+ * n : order of the highest derivative to compute (default value is 2)
  */
 function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 
@@ -357,8 +384,11 @@ function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
 /*
  * Modify control points by knots insertion. See The NURBS Book, page 151, algorithm A5.1.
- */
-
+ * deg : degree
+ * knot : knot vector
+ * ctrl : control points
+ * t : parameteric point
+*/
 function knotsInsert( deg, knot, ctrl, t ) {
 
 	var q = [];
@@ -390,6 +420,9 @@ function knotsInsert( deg, knot, ctrl, t ) {
 
 }
 
+/*
+ * Assign parameter values to each point by centripetal (or chordal) length method.
+ */
 function parameterize( points, curveType ) {
 
 	const n = points.length;
@@ -418,6 +451,9 @@ function parameterize( points, curveType ) {
 
 }
 
+/*
+ * Assign knot vector, having multiplicity of degree + 1, averaged over degree number of parameters.
+ */
 function deBoorKnots( deg, prm ) {
 
 	const n = prm.length;
@@ -453,6 +489,9 @@ function deBoorKnots( deg, prm ) {
 
 }
 
+/*
+ * Assign uniformly spaced knot vector.
+ */
 function uniformlySpacedknots( deg, n ) {
 
 	const knot = [];
@@ -543,9 +582,9 @@ function binomial( k, i ) {
 /*
  * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
  * deg: degree
- * prm: parameterized value at each point
- * knot: knot vector (knot[i]: knots)
- * pole: to store points having slope constraints(option)
+ * prm: parameterized values at each point
+ * knot: knot vector
+ * pole: to store points having slope constraints(optional)
  */
 function globalCurveInterp( deg, prm, knot, pole ) {
 
