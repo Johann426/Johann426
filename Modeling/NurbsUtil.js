@@ -580,7 +580,7 @@ function binomial( k, i ) {
 }
 
 /*
- * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1
+ * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1.
  * deg: degree
  * prm: parameterized values at each point
  * knot: knot vector
