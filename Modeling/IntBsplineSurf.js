@@ -88,7 +88,7 @@ class IntBsplineSurf {
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlp[ j ] = globalCurveInterp( this.degU, this.para.row, this.knots.row, this.pole[ j ] );
+			this.ctrlp[ j ] = generalCurveInterp( this.degU, this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -102,7 +102,7 @@ class IntBsplineSurf {
 
 			}
 
-			const ctrl = globalCurveInterp( this.degV, this.para.col, this.knots.col, r );
+			const ctrl = generalCurveInterp( this.degV, this.para.col, this.knots.col, r );
 
 			for ( let j = 0; j < nj; j ++ ) {
 
