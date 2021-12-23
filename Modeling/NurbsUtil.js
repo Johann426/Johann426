@@ -1,4 +1,128 @@
 /*
+ * Compute the value of nth-degree Bernstein polynomials. See The NURBS Book, page 20, algorithm A1.2
+ * i : index number
+ * n : number of control points
+ * t : parametric point
+ */
+function basisBernstein( i, n, t ) {
+
+	const nm1 = n - 1;
+	const t1 = 1.0 - t;
+	const arr = new Array( n ).fill( 0.0 );
+	arr[ nm1 - 1 ] = 1.0;
+
+	for (let j = 1; j <= nm1; j ++) {
+	
+		for (let i = nm1; i >= j; i --) {
+		
+			arr[ i ] = t1 * arr[ i ] + t * arr[ i - 1 ];
+			
+		}
+	
+	}
+	
+	return arr[ nm1 ]
+}
+
+/*
+ * Compute all nth-degree Bernstein polynomials. See The NURBS Book, page 21, algorithm A1.3
+ * n : number of control points
+ * t : parametric point
+ */
+function allBernstein( n, t ) {
+	
+	const t1 = 1.0 - t;
+	const arr = new Array( n )
+	arr[ 0 ] = 1.0;
+	
+	for (let j = 1; j < n; j ++) {
+	
+		let saved = 0.0;
+		
+		for (let i = 0; i < j; i ++) {
+		
+			const tmp = arr [ i ];
+			arr [ i ] = saved * t1 * tmp;
+			saved = t * tmp;
+		
+		}
+		
+		arr[ j ] = saved;
+	
+	}
+	
+	return arr;
+
+}
+
+/*
+ * Compute point on Bezier curve. See The NURBS Book, page 22, algorithm A1.4
+ * ctrl : control points
+ * t : parameteric point
+ */
+function pointOnBezierCurve( ctrl, t ) {
+	
+	const n = ctrl.length;
+	const v = new Vector3( 0, 0, 0 );
+	const b = allBernstein( n , t );
+
+	for ( let j = 0; j < n; j ++ ) {
+
+		v.x += b[ j ] * ctrl[ j ].x;
+		v.y += b[ j ] * ctrl[ j ].y;
+		v.z += b[ j ] * ctrl[ j ].z;
+
+	}
+
+	return v;
+	
+}
+
+/*
+ * Return end derivatives of a Bezier curve
+ * ctrl : control points
+ */
+function endDersBezierCurve( ctrl ) {
+
+	const n = ctrl.length
+	const nm1 = n - 1;
+	const ders = [];
+	ders.push( nm1 * ( ctrl[ 1 ].clone().sub( ctrl[ 0 ] ) ) );
+	ders.push( nm1 * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ) ) );
+	ders.push( nm1 * ( nm1 - 1) * ( ctrl[ 0 ].clone().sub( ctrl[ 1 ].clone().mul( 2.0 ) ).add( ctrl[ 2 ] ) ) );
+	ders.push( nm1 * ( nm1 - 1) * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ].clone().mul( 2.0 ) ).add( ctrl[ nm1 - 2 ] ) ) );
+	
+	return ders
+
+}
+
+/*
+ * Compute point on Bezier curve by deCasteljau algorithm. See The NURBS Book, page 24, algorithm A1.5
+ * ctrl : control points
+ * t : parameteric point
+ */
+function deCasteljau1( ctrl, t) {
+	
+	const n = ctrl.length;
+	const v = new Vector3( 0, 0, 0 );
+	
+	for ( let j = 1; j < n; j ++ ) {
+		
+		const sum[ j ] = ctrl[ j ].clone()
+		
+		for (let i = 0; i < n - j; i ++) {
+
+			sum[ i ] = sum[ i ].clone().mul( 1.0 - t ).add( sum[ i + 1 ].clone().mul( t ) );
+			
+		}
+
+	}
+	
+	return sum[ 0 ];
+	
+}
+
+/*
  * Determine the span index of knot vector in which parameter lies. See The NURBS Book, page 68, algorithm A2.1
  * deg : degree
  * knot : knot vector
