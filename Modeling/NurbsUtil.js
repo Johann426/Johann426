@@ -826,14 +826,16 @@ function generalCurveInterp( deg, prm, knot, pole ) {
 
 						arr[ i + m ][ 0 ] = - 1.0;
 						arr[ i + m ][ 1 ] = 1.0;
-						b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
+						const tmp = new Vector3()
+						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
 						break;
 
 					case n - 1 :
 
 						arr[ i + m ][ nCtrlp - 2 ] = - 1.0;
 						arr[ i + m ][ nCtrlp - 1 ] = 1.0;
-						b[ i + m ] = pole[ i ].slope.clone().multiplyScalar( ( knot[ nCtrlp + deg ] - knot[ nCtrlp - 1 ] ) / deg );
+						const tmp = new Vector3()
+						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ nCtrlp + deg ] - knot[ nCtrlp - 1 ] ) / deg );
 						break;
 
 					default :
@@ -1096,6 +1098,11 @@ class Vector3 {
 		return new this.constructor( this.x, this.y, this.z );
 
 	}
+	
+	copy( v ) {
+
+		return new this.constructor( v.x, v.y, v.z );
+	}
 
 	add( v ) {
 
@@ -1189,6 +1196,11 @@ class Vector4 {
 
 		return new this.constructor( this.x, this.y, this.z, this.w );
 
+	}
+	
+	copy( v ) {
+
+		return new this.constructor( v.x, v.y, v.z, v.w );
 	}
 
 	add( v ) {
