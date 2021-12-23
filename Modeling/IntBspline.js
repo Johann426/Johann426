@@ -241,7 +241,11 @@ class IntBspline {
 		const points = this.pole.map( e => e.point );
 		this.param = parameterize( points, this.type );
 		this.knots = calcKnots( this.deg, this.param, this.pole );
-		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		
+		//this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		this.assignEndDers();
+		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.poleCopy );
+		
 		this.needsUpdate = false;
 
 	}
@@ -250,12 +254,13 @@ class IntBspline {
 
 	_assignEndDers() {
 
-		globalCurveInterp( this.deg, this.param, this.knots, this.pole );
-		
 		const nm1 = this.pole.length - 1;
+		const points = this.pole.map( e => e.point );
+		this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, points );
 		
-		this.pole[ 0 ].slope == undefined ? this.pole[ 0 ].slope = this.ctrlp[ 1 ].clone().sub( this.ctrlp[ 0 ] ).normalize() : void( 0 );
-		this.pole[ nm1 ].slope == undefined ? this.pole[ nm1 ].slope = this.ctrlp[ nm1 ].clone().sub( this.ctrlp[ nm1 - 1 ] ).normalize() : void( 0 );
+		this.poleCopy = this.pole.slice(0);
+		this.poleCopy[ 0 ].slope == undefined ? this.poleCopy[ 0 ].slope = this.ctrlp[ 1 ].clone().sub( this.ctrlp[ 0 ] ).normalize() : void( 0 );
+		this.poleCopy[ nm1 ].slope == undefined ? this.poleCopy[ nm1 ].slope = this.ctrlp[ nm1 ].clone().sub( this.ctrlp[ nm1 - 1 ] ).normalize() : void( 0 );
 
 	}
 
