@@ -241,7 +241,7 @@ class IntBspline {
 		const points = this.pole.map( e => e.point );
 		this.param = parameterize( points, this.type );
 		this.knots = calcKnots( this.deg, this.param, this.pole );
-		this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
 		this.needsUpdate = false;
 
 	}
