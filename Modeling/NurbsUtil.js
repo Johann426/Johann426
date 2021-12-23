@@ -1249,4 +1249,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, generalCurveInterp, deWeight, knotsInsert, calcNodes };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, generalCurveInterp, deWeight, knotsInsert, calcNodes };
