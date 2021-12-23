@@ -105,10 +105,11 @@ function deCasteljau1( ctrl, t) {
 	
 	const n = ctrl.length;
 	const v = new Vector3( 0, 0, 0 );
+	const sum = [];
 	
 	for ( let j = 1; j < n; j ++ ) {
 		
-		const sum[ j ] = ctrl[ j ].clone()
+		sum[ j ] = ctrl[ j ].clone()
 		
 		for (let i = 0; i < n - j; i ++) {
 
@@ -1248,4 +1249,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, deWeight, knotsInsert, calcNodes };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, generalCurveInterp, deWeight, knotsInsert, calcNodes };
