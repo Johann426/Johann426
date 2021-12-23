@@ -704,13 +704,48 @@ function binomial( k, i ) {
 }
 
 /*
+ * Global interpolation through points. See The NURBS Book, page 369, algorithm A9.1.
+ * deg: degree
+ * prm: parameterized values at each point
+ * knot: knot vector
+ * pts: to store points having slope constraints(optional)
+ */
+function globalCurveInterp( deg, prm, knot, pts ) {
+
+	const n = pts.length;
+	var arr = [];
+
+	for ( let i = 0; i < n; i ++ ) {
+
+		const span = findIndexSpan( deg, knot, n, prm[ i ] );
+		const nj = basisFuncs( deg, knot, span, prm[ i ] );
+		arr[ i ] = new Array( n ).fill( 0.0 );
+
+		for ( let j = 0; j <= deg; j ++ ) {
+
+			arr[ i ][ span - deg + j ] = nj[ j ];
+
+		}
+
+	}
+
+	const ctrlp = pts.slice();
+	const index = [];
+	ludcmp( n, arr, index );
+	lubksb( n, arr, index, ctrlp );
+	return ctrlp;
+
+}
+
+
+/*
  * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1.
  * deg: degree
  * prm: parameterized values at each point
  * knot: knot vector
  * pole: to store points having slope constraints(optional)
  */
-function globalCurveInterp( deg, prm, knot, pole ) {
+function generalCurveInterp( deg, prm, knot, pole ) {
 
 	const n = pole.length;
 	const point = pole.map( e => e.point );
