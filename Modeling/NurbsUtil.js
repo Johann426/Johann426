@@ -819,6 +819,7 @@ function generalCurveInterp( deg, prm, knot, pole ) {
 
 				m ++;
 				arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
+				const tmp = new Vector3();
 
 				switch ( i ) {
 
@@ -826,7 +827,6 @@ function generalCurveInterp( deg, prm, knot, pole ) {
 
 						arr[ i + m ][ 0 ] = - 1.0;
 						arr[ i + m ][ 1 ] = 1.0;
-						const tmp = new Vector3()
 						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
 						break;
 
@@ -834,7 +834,6 @@ function generalCurveInterp( deg, prm, knot, pole ) {
 
 						arr[ i + m ][ nCtrlp - 2 ] = - 1.0;
 						arr[ i + m ][ nCtrlp - 1 ] = 1.0;
-						const tmp = new Vector3()
 						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ nCtrlp + deg ] - knot[ nCtrlp - 1 ] ) / deg );
 						break;
 
