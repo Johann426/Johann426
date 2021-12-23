@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, parameterize, deBoorKnots, generalCurveInterp, knotsInsert, calcNodes } from './NurbsUtil.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, generalCurveInterp, knotsInsert, calcNodes } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -243,7 +243,7 @@ class IntBspline {
 		this.knots = calcKnots( this.deg, this.param, this.pole );
 		
 		//this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
-		this.assignEndDers();
+		this._assignEndDers();
 		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.poleCopy );
 		
 		this.needsUpdate = false;
