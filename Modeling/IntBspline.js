@@ -240,28 +240,63 @@ class IntBspline {
 
 		const points = this.pole.map( e => e.point );
 		this.param = parameterize( points, this.type );
-		this.knots = calcKnots( this.deg, this.param, this.pole );
 		
+		//this.knots = calcKnotsMult( this.deg, this.param, this.pole );
 		//this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
-		this._assignEndDers();
-		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.poleCopy );
 		
+		this._assignEndDers();
+	
 		this.needsUpdate = false;
 
 	}
 	
 	// Assign end derivatives at corner point. Written by Johann426
-
 	_assignEndDers() {
 
-		const nm1 = this.pole.length - 1;
-		const points = this.pole.map( e => e.point );
-		this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, points );
+		const n = this.pole.length;
+		const index = [];
+		index.push( 0 );
 		
-		this.poleCopy = this.pole.slice(0);
-		this.poleCopy[ 0 ].slope == undefined ? this.poleCopy[ 0 ].slope = this.ctrlp[ 1 ].clone().sub( this.ctrlp[ 0 ] ).normalize() : void( 0 );
-		this.poleCopy[ nm1 ].slope == undefined ? this.poleCopy[ nm1 ].slope = this.ctrlp[ nm1 ].clone().sub( this.ctrlp[ nm1 - 1 ] ).normalize() : void( 0 );
+		for ( let i = 1; i < n; i ++ ) {
 
+			this.pole[ i ].knuckle == true? index.push( i ) : void( 0 );
+
+		}
+
+		index.push( n - 1 );
+		
+		const lPole = []; // local pole points
+		
+		for ( let i = 1; i < index.length; i ++ ) {
+			
+			const copy = this.pole.map( e => Object.assign( {}, e ) );
+			lPole.push( copy.slice( index[ i - 1 ], index[ i ] + 1 ) );
+			
+		}
+		
+		
+		this.vPole = this.pole.map( e => Object.assign( {}, e ) ); // virtual pole
+		
+		for ( let i = 0; i < lPole.length; i ++ ) {
+		
+			const nm1 = lPole[ i ].length - 1;
+			const deg = nm1 > this.deg ? this.deg : nm1;
+			const pts = lPole[ i ].map( e => e.point );
+			const prm = parameterize( pts, this.type );
+			const knot = calcKnots( deg, prm, lPole[ i ] );
+			lPole[i].map( e => e.knuckle = undefined );
+			const ctrl = generalCurveInterp( deg, prm, knot, lPole[ i ] );
+			const chordL = this.getChordLength( pts );
+			
+			this.vPole[ index[i] ].slope == undefined ? this.vPole[ index[ i ] ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL );
+			this.vPole[ index[i] + nm1 ].slope == undefined ? this.vPole[ index[ i ] + nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL );
+		}
+		
+		console.log( this.vPole );
+			
+		this.knots = calKnotsMult( this.deg, this.param, this.vPole );
+		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.vPole );
+		
 	}
 
 }
@@ -312,9 +347,15 @@ function calcKnots( deg, prm, pole ) {
 
 	}
 
-	const knots = deBoorKnots( deg, a ); //uniformlySpacedknots( deg, a.length ); need parameter at basis maxima
+	return = deBoorKnots( deg, a ); //uniformlySpacedknots( deg, a.length ); need parameter at basis maxima
+	
+}
 
-	m = 0;
+function calcKnotsMult( deg, prm, pole ) {
+	
+	const knots = calcKnots( deg, prm, pole );
+	const n = pole.length;
+	let m = 0;
 
 	for ( let i = 0; i < n; i ++ ) {
 
@@ -331,8 +372,6 @@ function calcKnots( deg, prm, pole ) {
 
 	}
 
-	console.log( knots );
-	console.log( calcNodes( deg, knots ) );
 	return knots; //.sort( ( a, b ) => { return a - b } );
 
 }
