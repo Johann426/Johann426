@@ -245,6 +245,19 @@ class IntBspline {
 		this.needsUpdate = false;
 
 	}
+	
+	// Assign end derivatives at corner point. Written by Johann426
+
+	_assignEndDers() {
+
+		globalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		
+		const nm1 = this.pole.length - 1;
+		
+		this.pole[ 0 ].slope == undefined ? this.pole[ 0 ].slope = this.ctrlp[ 1 ].clone().sub( this.ctrlp[ 0 ] ).normalize() : void( 0 );
+		this.pole[ nm1 ].slope == undefined ? this.pole[ nm1 ].slope = this.ctrlp[ nm1 ].clone().sub( this.ctrlp[ nm1 - 1 ] ).normalize() : void( 0 );
+
+	}
 
 }
 
