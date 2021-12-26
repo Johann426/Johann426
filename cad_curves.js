@@ -720,7 +720,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	}
 
 	//update control points
-	pts = curve.getCtrlPoints();
+	pts = curve.ctrlPoints;
 	geo = ctrlPoints.geometry;
 	geo.setDrawRange( 0, pts.length );
 	pos = geo.attributes.position;

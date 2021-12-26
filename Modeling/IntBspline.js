@@ -17,14 +17,19 @@ class IntBspline {
 
 		this.pole = [];
 
-		this.needsUpdate = false;
-
 	}
 
 	get deg() {
 
 		const nm1 = this.pole.length - 1;
 		return ( nm1 > this.dmax ? this.dmax : nm1 );
+
+	}
+
+	get ctrlPoints() {
+
+		if ( this.needsUpdate ) this._calcCtrlPoints();
+		return this.ctrlp;
 
 	}
 
@@ -60,7 +65,7 @@ class IntBspline {
 
 		const points = this.pole.map( e => e.point );
 		const chordL = this.getChordLength( points );
-		v.normalize().multiplyScalar( chordL );
+		v.normalize().multiplyScalar( chordL * 0.5 );
 		this.pole[ i ].slope = v;
 		this.needsUpdate = true;
 
@@ -110,13 +115,6 @@ class IntBspline {
 
 	}
 
-	getCtrlPoints() {
-
-		if ( this.needsUpdate ) this._calcCtrlPoints();
-		return this.ctrlp;
-
-	}
-
 	getPointAt( t ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
@@ -155,7 +153,7 @@ class IntBspline {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = curveDers( this.deg, this.knots, this.ctrlp, t, 2 );
+			const ders = this.getDerivatives( t, 2 );
 			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
 			const normal = binormal.clone().cross( ders[ 1 ] );
 
@@ -177,13 +175,12 @@ class IntBspline {
 
 	closestPosition( v ) {
 
-		if ( this.needsUpdate ) this._calcCtrlPoints();
-		var t = 0;
-		var l = curvePoint( this.deg, this.knots, this.ctrlp, 0 ).sub( v ).length();
+		let t = 0;
+		let l = this.getPointAt( 0 ).sub( v ).length();
 
 		for ( let i = 1; i <= 20; i ++ ) {
 
-			const len = curvePoint( this.deg, this.knots, this.ctrlp, i / 20 ).sub( v ).length();
+			const len = this.getPointAt( i / 20 ).sub( v ).length();
 
 			if ( len < l ) {
 
@@ -194,14 +191,16 @@ class IntBspline {
 
 		}
 
-		var i = 0;
-		var isOrthogonal = false;
-		var isConverged = false;
+		let i = 0;
+		let pts;
+		let isOrthogonal = false;
+		let isConverged = false;
 
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
-			const ders = curveDers( this.deg, this.knots, this.ctrlp, t, 2 );
-			const sub = ders[ 0 ].clone().sub( v );
+			const ders = this.getDerivatives( t, 2 );
+			pts = ders[ 0 ];
+			const sub = pts.clone().sub( v );
 			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
 			t -= del;
@@ -225,14 +224,14 @@ class IntBspline {
 
 		}
 
-		return t;
+		return [ t, pts ];
 
 	}
 
 	closestPoint( v ) {
 
-		const t = this.closestPosition( v );
-		return curvePoint( this.deg, this.knots, this.ctrlp, t );
+		const res = this.closestPosition( v );
+		return res[ 1 ];
 
 	}
 
@@ -254,23 +253,23 @@ class IntBspline {
 	_assignEndDers() {
 
 		const n = this.pole.length;
-		const index = [];
-		index.push( 0 );
+		const index = []; // index array of corner points
+		index.push( 0 ); // start point into index
 
 		for ( let i = 1; i < n; i ++ ) {
 
-			this.pole[ i ].knuckle == true ? index.push( i ) : null;
+			this.pole[ i ].knuckle == true ? index.push( i ) : null; // knuckle points into index
 
 		}
 
-		index.push( n - 1 );
+		index.push( n - 1 ); // end point into index
 
 		const lPole = []; // local pole points
 
 		for ( let i = 1; i < index.length; i ++ ) {
 
-			const copy = this.pole.map( e => Object.assign( {}, e ) );
-			lPole.push( copy.slice( index[ i - 1 ], index[ i ] + 1 ) );
+			const tmp = this.pole.slice( index[ i - 1 ], index[ i ] + 1 );
+			lPole.push( tmp.map( e => Object.assign( {}, e ) ) );
 
 		}
 
@@ -288,15 +287,17 @@ class IntBspline {
 			const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
 			const chordL = this.getChordLength( pts );
 
-			lPole[ i ][ 0 ].slope == undefined ? lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL ) : null;
-			lPole[ i ][ nm1 ].slope == undefined ? lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL ) : null;
+			if ( lPole.length > 1 ) {
+
+				lPole[ i ][ 0 ].slope == undefined ? lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL ) : null;
+				lPole[ i ][ nm1 ].slope == undefined ? lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL ) : null;
+
+			}
+
 			lKnot.push( calcKnots( this.deg, prm, lPole[ i ] ) );
 			lCtrl.push( globalCurveInterpTngt( this.deg, prm, lKnot[ i ], lPole[ i ] ) );
 
 		}
-
-		console.log( lKnot );
-		console.log( lCtrl );
 
 		this.knots = lKnot[ 0 ];
 		this.ctrlp = lCtrl[ 0 ];
@@ -309,7 +310,7 @@ class IntBspline {
 
 			}
 
-			this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( 4 ) );
+			this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( this.deg + 1 ) );
 			this.ctrlp = this.ctrlp.concat( lCtrl[ i ].slice( 1 ) );
 
 		}
@@ -326,8 +327,6 @@ class IntBspline {
 	}
 
 }
-
-
 
 function calcKnots( deg, prm, pole ) {
 

@@ -4,11 +4,9 @@ class NurbsCurve {
 
 	constructor( deg, knots, ctrlp, weight ) {
 
-		this.knots = knots;
-
-		this.ctrlp = ctrlp;
-
 		this.dmax = deg;
+
+		this.knots = knots;
 
 		for ( let i = 0; i < ctrlp.length; i ++ ) {
 
@@ -20,14 +18,14 @@ class NurbsCurve {
 
 	get deg() {
 
-		const nm1 = this.pole.length - 1;
+		const nm1 = this.ctrlpw.length - 1;
 		return ( nm1 > this.dmax ? this.dmax : nm1 );
 
 	}
 
 	getPointAt( t ) {
 
-		return nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, t );
+		return nurbsCurvePoint( this.deg, this.knots, this.ctrlpw, t );
 
 	}
 
@@ -38,7 +36,7 @@ class NurbsCurve {
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			p[ i ] = nurbsCurvePoint( this.deg(), this.knots, this.ctrlpw, t );
+			p[ i ] = this.getPointAt( t );
 
 		}
 
@@ -48,7 +46,7 @@ class NurbsCurve {
 
 	getDerivatives( t, k ) {
 
-		return nurbsCurveDers( this.deg(), this.knots, this.ctrlpw, t, k );
+		return nurbsCurveDers( this.deg, this.knots, this.ctrlpw, t, k );
 
 	}
 
