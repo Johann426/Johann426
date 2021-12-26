@@ -11,17 +11,18 @@ function basisBernstein( i, n, t ) {
 	const arr = new Array( n ).fill( 0.0 );
 	arr[ nm1 - 1 ] = 1.0;
 
-	for (let j = 1; j <= nm1; j ++) {
-	
-		for (let i = nm1; i >= j; i --) {
-		
+	for ( let j = 1; j <= nm1; j ++ ) {
+
+		for ( let i = nm1; i >= j; i -- ) {
+
 			arr[ i ] = t1 * arr[ i ] + t * arr[ i - 1 ];
-			
+
 		}
-	
+
 	}
-	
-	return arr[ nm1 ]
+
+	return arr[ nm1 ];
+
 }
 
 /*
@@ -30,27 +31,27 @@ function basisBernstein( i, n, t ) {
  * t : parametric point
  */
 function allBernstein( n, t ) {
-	
+
 	const t1 = 1.0 - t;
-	const arr = new Array( n )
+	const arr = new Array( n );
 	arr[ 0 ] = 1.0;
-	
-	for (let j = 1; j < n; j ++) {
-	
+
+	for ( let j = 1; j < n; j ++ ) {
+
 		let saved = 0.0;
-		
-		for (let i = 0; i < j; i ++) {
-		
-			const tmp = arr [ i ];
-			arr [ i ] = saved * t1 * tmp;
+
+		for ( let i = 0; i < j; i ++ ) {
+
+			const tmp = arr[ i ];
+			arr[ i ] = saved * t1 * tmp;
 			saved = t * tmp;
-		
+
 		}
-		
+
 		arr[ j ] = saved;
-	
+
 	}
-	
+
 	return arr;
 
 }
@@ -61,10 +62,10 @@ function allBernstein( n, t ) {
  * t : parameteric point
  */
 function pointOnBezierCurve( ctrl, t ) {
-	
+
 	const n = ctrl.length;
 	const v = new Vector3( 0, 0, 0 );
-	const b = allBernstein( n , t );
+	const b = allBernstein( n, t );
 
 	for ( let j = 0; j < n; j ++ ) {
 
@@ -75,7 +76,7 @@ function pointOnBezierCurve( ctrl, t ) {
 	}
 
 	return v;
-	
+
 }
 
 /*
@@ -84,15 +85,15 @@ function pointOnBezierCurve( ctrl, t ) {
  */
 function endDersBezierCurve( ctrl ) {
 
-	const n = ctrl.length
+	const n = ctrl.length;
 	const nm1 = n - 1;
 	const ders = [];
 	ders.push( nm1 * ( ctrl[ 1 ].clone().sub( ctrl[ 0 ] ) ) );
 	ders.push( nm1 * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ) ) );
-	ders.push( nm1 * ( nm1 - 1) * ( ctrl[ 0 ].clone().sub( ctrl[ 1 ].clone().mul( 2.0 ) ).add( ctrl[ 2 ] ) ) );
-	ders.push( nm1 * ( nm1 - 1) * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ].clone().mul( 2.0 ) ).add( ctrl[ nm1 - 2 ] ) ) );
-	
-	return ders
+	ders.push( nm1 * ( nm1 - 1 ) * ( ctrl[ 0 ].clone().sub( ctrl[ 1 ].clone().mul( 2.0 ) ).add( ctrl[ 2 ] ) ) );
+	ders.push( nm1 * ( nm1 - 1 ) * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ].clone().mul( 2.0 ) ).add( ctrl[ nm1 - 2 ] ) ) );
+
+	return ders;
 
 }
 
@@ -101,26 +102,26 @@ function endDersBezierCurve( ctrl ) {
  * ctrl : control points
  * t : parameteric point
  */
-function deCasteljau1( ctrl, t) {
-	
+function deCasteljau1( ctrl, t ) {
+
 	const n = ctrl.length;
 	const v = new Vector3( 0, 0, 0 );
 	const sum = [];
-	
+
 	for ( let j = 1; j < n; j ++ ) {
-		
-		sum[ j ] = ctrl[ j ].clone()
-		
-		for (let i = 0; i < n - j; i ++) {
+
+		sum[ j ] = ctrl[ j ].clone();
+
+		for ( let i = 0; i < n - j; i ++ ) {
 
 			sum[ i ] = sum[ i ].clone().mul( 1.0 - t ).add( sum[ i + 1 ].clone().mul( t ) );
-			
+
 		}
 
 	}
-	
+
 	return sum[ 0 ];
-	
+
 }
 
 /*
@@ -1097,10 +1098,11 @@ class Vector3 {
 		return new this.constructor( this.x, this.y, this.z );
 
 	}
-	
+
 	copy( v ) {
 
 		return new this.constructor( v.x, v.y, v.z );
+
 	}
 
 	add( v ) {
@@ -1196,10 +1198,11 @@ class Vector4 {
 		return new this.constructor( this.x, this.y, this.z, this.w );
 
 	}
-	
+
 	copy( v ) {
 
 		return new this.constructor( v.x, v.y, v.z, v.w );
+
 	}
 
 	add( v ) {
