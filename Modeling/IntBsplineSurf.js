@@ -114,7 +114,7 @@ class IntBsplineSurf {
 
 	}
 
-	_calcKnots( ni, nj, degU, degV, prm, pole ) {
+	_calcKnots( degU, degV, prm ) {
 
 		const knot = {
 

@@ -125,7 +125,6 @@ function init() {
 
 	let index = 0;
 	let isAdd = false;
-	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
 
@@ -220,8 +219,6 @@ function init() {
 				}
 
 		}
-
-		previousIntersect = intersect;
 
 	} );
 
