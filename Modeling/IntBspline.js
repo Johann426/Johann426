@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, generalCurveInterp, knotsInsert, calcNodes } from './NurbsUtil.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert, calcNodes } from './NurbsUtil.js';
 
 class IntBspline {
 
@@ -242,7 +242,7 @@ class IntBspline {
 		this.param = parameterize( points, this.type );
 
 		//this.knots = calcKnotsMult( this.deg, this.param, this.pole );
-		//this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.pole );
+		//this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, this.pole );
 
 		this._assignEndDers();
 
@@ -274,8 +274,8 @@ class IntBspline {
 
 		}
 
-
-		this.vPole = this.pole.map( e => Object.assign( {}, e ) ); // virtual pole
+		const lKnot = []; // local knot vector
+		const lCtrl = []; // local control points
 
 		for ( let i = 0; i < lPole.length; i ++ ) {
 
@@ -284,19 +284,44 @@ class IntBspline {
 			const pts = lPole[ i ].map( e => e.point );
 			const prm = parameterize( pts, this.type );
 			const knot = calcKnots( deg, prm, lPole[ i ] );
-			lPole[ i ].map( e => e.knuckle = undefined );
-			const ctrl = generalCurveInterp( deg, prm, knot, lPole[ i ] );
+			//lPole[ i ].map( e => e.knuckle = undefined );
+			const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
 			const chordL = this.getChordLength( pts );
 
-			this.vPole[ index[ i ] ].slope == undefined ? this.vPole[ index[ i ] ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL ) : null;
-			this.vPole[ index[ i ] + nm1 ].slope == undefined ? this.vPole[ index[ i ] + nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL ) : null;
+			lPole[ i ][ 0 ].slope == undefined ? lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL ) : null;
+			lPole[ i ][ nm1 ].slope == undefined ? lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL ) : null;
+			lKnot.push( calcKnots( this.deg, prm, lPole[ i ] ) );
+			lCtrl.push( globalCurveInterpTngt( this.deg, prm, lKnot[ i ], lPole[ i ] ) );
 
 		}
 
-		console.log( this.vPole );
+		console.log( lKnot );
+		console.log( lCtrl );
 
-		this.knots = calcKnotsMult( this.deg, this.param, this.vPole );
-		this.ctrlp = generalCurveInterp( this.deg, this.param, this.knots, this.vPole );
+		this.knots = lKnot[ 0 ];
+		this.ctrlp = lCtrl[ 0 ];
+
+		for ( let i = 1; i < lCtrl.length; i ++ ) {
+
+			for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
+
+				lKnot[ i ][ j ] += i;
+
+			}
+
+			this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( 4 ) );
+			this.ctrlp = this.ctrlp.concat( lCtrl[ i ].slice( 1 ) );
+
+		}
+
+		for ( let j = 0; j < this.knots.length; j ++ ) {
+
+			this.knots[ j ] /= lKnot.length;
+
+		}
+
+		console.log( this.knots );
+		console.log( this.ctrlp );
 
 	}
 

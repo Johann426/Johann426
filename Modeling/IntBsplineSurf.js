@@ -1,4 +1,4 @@
-import { surfacePoint, deBoorKnots, generalCurveInterp } from './NurbsUtil.js';
+import { surfacePoint, deBoorKnots, globalCurveInterpTngt } from './NurbsUtil.js';
 
 class IntBsplineSurf {
 
@@ -88,7 +88,7 @@ class IntBsplineSurf {
 
 		for ( let j = 0; j < nj; j ++ ) {
 
-			this.ctrlp[ j ] = generalCurveInterp( this.degU, this.para.row, this.knots.row, this.pole[ j ] );
+			this.ctrlp[ j ] = globalCurveInterpTngt( this.degU, this.para.row, this.knots.row, this.pole[ j ] );
 
 		}
 
@@ -102,7 +102,7 @@ class IntBsplineSurf {
 
 			}
 
-			const ctrl = generalCurveInterp( this.degV, this.para.col, this.knots.col, r );
+			const ctrl = globalCurveInterpTngt( this.degV, this.para.col, this.knots.col, r );
 
 			for ( let j = 0; j < nj; j ++ ) {
 

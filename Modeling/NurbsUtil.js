@@ -741,13 +741,116 @@ function globalCurveInterp( deg, prm, knot, pts ) {
 
 
 /*
- * Determine control points of curve interpolating given points with directional constraints. See Piegl et al (2008) and The NURBS Book, page 369, algorithm A9.1.
+ * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008).
  * deg: degree
  * prm: parameterized values at each point
  * knot: knot vector
- * pole: to store points having slope constraints(optional)
+ * pole: to store points having slope constraints(tangent vector, optional)
  */
-function generalCurveInterp( deg, prm, knot, pole ) {
+function globalCurveInterpTngt( deg, prm, knot, pole ) {
+
+	const n = pole.length;
+	const point = pole.map( e => e.point );
+	const slope = pole.map( e => e.slope ).filter( Boolean );
+	var arr = [];
+
+	if ( ! slope.length ) { // no directional constraint
+
+		for ( let i = 0; i < n; i ++ ) {
+
+			const span = findIndexSpan( deg, knot, n, prm[ i ] );
+			const nj = basisFuncs( deg, knot, span, prm[ i ] );
+			arr[ i ] = new Array( n ).fill( 0.0 );
+
+			for ( let j = 0; j <= deg; j ++ ) {
+
+				arr[ i ][ span - deg + j ] = nj[ j ];
+
+			}
+
+		}
+
+		const ctrlp = point.slice();
+		const index = [];
+		ludcmp( n, arr, index );
+		lubksb( n, arr, index, ctrlp );
+		return ctrlp;
+
+	} else { // if directional constraint(s) exist
+
+		const nCtrlp = n + slope.length;
+		const b = new Array( nCtrlp ).fill( new Vector3() );
+		var m = 0;
+
+		for ( let i = 0; i < n; i ++ ) {
+
+			const span = findIndexSpan( deg, knot, nCtrlp, prm[ i ] );
+			const nj = basisFuncs( deg, knot, span, prm[ i ] );
+			arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
+
+			for ( let j = 0; j <= deg; j ++ ) {
+
+				arr[ i + m ][ span - deg + j ] = nj[ j ];
+
+			}
+
+			b[ i + m ] = point[ i ];
+
+			const hasValue = pole[ i ].slope ? true : false;
+
+			if ( hasValue ) { // additional ctrlp for directional constraint
+
+				m ++;
+				arr[ i + m ] = new Array( nCtrlp ).fill( 0.0 );
+				const tmp = new Vector3();
+
+				switch ( i ) {
+
+					case 0 :
+
+						arr[ i + m ][ 0 ] = - 1.0;
+						arr[ i + m ][ 1 ] = 1.0;
+						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ deg + 1 ] - knot[ 0 ] ) / deg );
+						break;
+
+					case n - 1 :
+
+						arr[ i + m ][ nCtrlp - 2 ] = - 1.0;
+						arr[ i + m ][ nCtrlp - 1 ] = 1.0;
+						b[ i + m ] = tmp.copy( pole[ i ].slope ).mul( ( knot[ nCtrlp + deg ] - knot[ nCtrlp - 1 ] ) / deg );
+						break;
+
+					default :
+
+						const span = findIndexSpan( deg, knot, nCtrlp, prm[ i ] );
+						const nder = dersBasisFunc( deg, knot, span, 1, prm[ i ] );
+
+						for ( let j = 0; j <= deg; j ++ ) {
+
+							arr[ i + m ][ span - deg + j ] = nder[ 1 ][ j ]; // set the first derivative
+
+						}
+
+						b[ i + m ] = pole[ i ].slope; // to be equal with directional constraint
+
+				}
+
+			}
+
+		}
+
+		const ctrlp = b.slice();
+		const index = [];
+		ludcmp( nCtrlp, arr, index );
+		lubksb( nCtrlp, arr, index, ctrlp );
+		return ctrlp;
+
+	}
+
+}
+
+// experimental interpolation with kunckle (pre-calculated multiplicity of knots are needed)
+function tempCurveInterp( deg, prm, knot, pole ) {
 
 	const n = pole.length;
 	const point = pole.map( e => e.point );
@@ -1263,4 +1366,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, generalCurveInterp, deWeight, knotsInsert, calcNodes };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, deWeight, knotsInsert, calcNodes };
