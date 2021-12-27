@@ -1,4 +1,122 @@
 /*
+ * Assign parameter values to each point by chordal (or centripetal) length method.
+ */
+function parameterize( points, curveType ) {
+
+	const n = points.length;
+	const prm = [];
+	var sum = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		const del = points[ i ].clone().sub( points[ i - 1 ] );
+		const len = curveType === 'chordal' ? del.length() : Math.sqrt( del.length() ); // Otherwise, use centripetal
+		sum += len;
+		prm[ i ] = sum;
+
+	}
+
+	prm[ 0 ] = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		prm[ i ] /= sum;
+
+	}
+
+	prm[ n - 1 ] = 1.0;
+
+	return prm;
+
+}
+
+/*
+ * Assign knot vector, having multiplicity of degree + 1, averaged over degree number of parameters.
+ */
+function deBoorKnots( deg, prm ) {
+
+	const n = prm.length;
+	const knot = [];
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i ] = 0.0;
+		knot[ i + n ] = 1.0;
+
+	}
+
+	for ( let i = 1; i < n - deg; i ++ ) {
+
+		let sum = 0.0;
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			sum += prm[ j ];
+
+		}
+
+		knot[ i + deg ] = sum / deg;
+
+	}
+
+	return knot;
+
+}
+
+/*
+ * Assign uniformly spaced knot vector.
+ */
+function uniformlySpacedknots( deg, n ) {
+
+	const knot = [];
+
+	for ( let i = 0; i <= deg; i ++ ) {
+
+		knot[ i ] = 0.0;
+		knot[ i + n ] = 1.0;
+
+	}
+
+	for ( let i = 1; i < n - deg; i ++ ) {
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			knot[ i + deg ] = i / ( n - deg );
+
+		}
+
+	}
+
+	return knot;
+
+}
+
+/*
+ * Compute Greville points (Greville abscissae) averaged over degree number of knots
+ */
+function calcGreville( deg, knot ) {
+
+	const prm = [];
+
+	for ( let i = 1; i < knot.length - deg; i ++ ) {
+
+		let sum = 0;
+
+		for ( let j = i; j < i + deg; j ++ ) {
+
+			sum += knot[ j ];
+
+		}
+
+		prm.push( sum / deg );
+
+	}
+
+	return prm;
+
+}
+
+/*
  * Compute the value of nth-degree Bernstein polynomials. See The NURBS Book, page 20, algorithm A1.2
  * i : index number
  * n : number of control points
@@ -80,24 +198,6 @@ function pointOnBezierCurve( ctrl, t ) {
 }
 
 /*
- * Return end derivatives of a Bezier curve
- * ctrl : control points
- */
-function endDersBezierCurve( ctrl ) {
-
-	const n = ctrl.length;
-	const nm1 = n - 1;
-	const ders = [];
-	ders.push( nm1 * ( ctrl[ 1 ].clone().sub( ctrl[ 0 ] ) ) );
-	ders.push( nm1 * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ) ) );
-	ders.push( nm1 * ( nm1 - 1 ) * ( ctrl[ 0 ].clone().sub( ctrl[ 1 ].clone().mul( 2.0 ) ).add( ctrl[ 2 ] ) ) );
-	ders.push( nm1 * ( nm1 - 1 ) * ( ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ].clone().mul( 2.0 ) ).add( ctrl[ nm1 - 2 ] ) ) );
-
-	return ders;
-
-}
-
-/*
  * Compute point on Bezier curve by deCasteljau algorithm. See The NURBS Book, page 24, algorithm A1.5
  * ctrl : control points
  * t : parameteric point
@@ -105,7 +205,6 @@ function endDersBezierCurve( ctrl ) {
 function deCasteljau1( ctrl, t ) {
 
 	const n = ctrl.length;
-	const v = new Vector3( 0, 0, 0 );
 	const sum = [];
 
 	for ( let j = 1; j < n; j ++ ) {
@@ -547,132 +646,100 @@ function knotsInsert( deg, knot, ctrl, t ) {
 }
 
 /*
- * Assign parameter values to each point by centripetal (or chordal) length method.
+ * Create arbitrary Nurbs circular arc. See The NURBS Book, page 308, algorithm A7.1.
+ * o : origin of local coordinates
+ * x : unit length vector in the reference plane of the circle
+ * y : unit length vector in the ref. plane, and orthogonal to x
+ * a0, a1 : start and end angles in relative to horizontal coordinate of x
  */
-function parameterize( points, curveType ) {
+function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 
-	const n = points.length;
-	const prm = [];
-	var sum = 0.0;
+	a1 < a0 ? a1 = 360.0 + a1 : null;
 
-	for ( let i = 1; i < n; i ++ ) {
+	const theta = a1 - a0;
+	let narcs;
 
-		const del = points[ i ].clone().sub( points[ i - 1 ] );
-		const len = curveType === 'centripetal' ? Math.sqrt( del.length() ) : del.length(); // Otherwise, use chordal
-		sum += len;
-		prm[ i ] = sum;
+	if ( theta <= 90.0 ) {
+
+		narcs = 1;
+
+	} else if ( theta <= 180.0 ) {
+
+		narcs = 2;
+
+	} else if ( theta <= 270.0 ) {
+
+		narcs = 3;
+
+	} else {
+
+		narcs = 4;
 
 	}
 
-	prm[ 0 ] = 0.0;
+	const dtheta = theta / narcs;
+	//const nm1 = 2 * narcs;
+	const w1 = Math.cos( 0.5 * dtheta ); // 0.5 * dtheta is base angle
+	const p0 = o.clone();
+	p0.add( x.mul( r * Math.cos( a0 ) ) );
+	p0.add( y.mul( r * Math.sin( a0 ) ) );
+	const t0 = y.mul( Math.cos( a0 ) ).sub( x.mul( Math.sin( a0 ) ) ); // Initialize start values
+	const pw = [];
+	pw[ 0 ] = p0.clone();
+	let index = 0;
+	let angle = a0;
 
-	for ( let i = 1; i < n; i ++ ) {
+	for ( let i = 1; i <= narcs; i ++ ) {
 
-		prm[ i ] /= sum;
+		angle += dtheta;
+		const p2 = o.clone();
+		p2.add( x.mul( r * Math.cos( angle ) ) );
+		p2.add( y.mul( r * Math.sin( angle ) ) );
+		pw[ index + 2 ] = new Vector4( p2.x, p2.y, p2.z, 1.0 );
+		const t2 = y.mul( Math.cos( angle ) ).sub( x.mul( Math.sin( angle ) ) );
+		const p1 = //intersectLines( p0, t0, p2, t2 );
+		pw[ index + 1 ] = new Vector4( p1.x, p1.y, p1.z, w1 );
+		index += 2;
+		p0.copy( p2 );
+		t0.copy( t2 );
 
 	}
 
-	prm[ n - 1 ] = 1.0; //last one to be 1.0 instead of 0.999999..
-	return prm;
-
-}
-
-/*
- * Assign knot vector, having multiplicity of degree + 1, averaged over degree number of parameters.
- */
-function deBoorKnots( deg, prm ) {
-
-	const n = prm.length;
+	let j = 2 * narcs + 1;
 	const knot = [];
 
-	for ( let i = 0; i <= deg; i ++ ) {
+	for ( let i = 0; i < 3; i ++ ) {
 
 		knot[ i ] = 0.0;
+		knot[ i + j ] = 1.0;
 
 	}
 
-	for ( let i = 1; i < n - deg; i ++ ) {
+	switch ( narcs ) {
 
-		let sum = 0.0;
+		case 1:
+			break;
 
-		for ( let j = i; j < i + deg; j ++ ) {
+		case 2:
+			knot[ 3 ] = knot[ 4 ] = 0.5;
+			break;
 
-			sum += prm[ j ];
+		case 3:
+			knot[ 3 ] = knot[ 4 ] = 1.0 / 3.0;
+			knot[ 5 ] = knot[ 6 ] = 2.0 / 3.0;
+			break;
 
-		}
-
-		knot[ i + deg ] = sum / deg;
+		case 4:
+			knot[ 3 ] = knot[ 4 ] = 0.25;
+			knot[ 5 ] = knot[ 6 ] = 0.5;
+			knot[ 7 ] = knot[ 8 ] = 0.75;
+			break;
 
 	}
 
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i + n ] = 1.0;
-
-	}
-
-	return knot;
+	return knot, pw;
 
 }
-
-/*
- * Assign uniformly spaced knot vector.
- */
-function uniformlySpacedknots( deg, n ) {
-
-	const knot = [];
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i ] = 0.0;
-
-	}
-
-	for ( let i = 1; i < n - deg; i ++ ) {
-
-		for ( let j = i; j < i + deg; j ++ ) {
-
-			knot[ i + deg ] = i / ( n - deg );
-
-		}
-
-	}
-
-	for ( let i = 0; i <= deg; i ++ ) {
-
-		knot[ i + n ] = 1.0;
-
-	}
-
-	return knot;
-
-}
-
-/*
- * Compute Nodes (Greville points or Greville abscissae) averaged over degree number of knots
- */
-function calcNodes( deg, knot ) {
-
-	const prm = [];
-
-	for ( let i = 1; i < knot.length - deg; i ++ ) {
-
-		let sum = 0;
-
-		for ( let j = i; j < i + deg; j ++ ) {
-
-			sum += knot[ j ];
-
-		}
-
-		prm.push( sum / deg );
-
-	}
-
-	return prm;
-
-}
-
 
 /*
  * Compute binomial coefficient, k! / ( i! * ( k - i )! )
@@ -1366,4 +1433,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, deWeight, knotsInsert, calcNodes };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, deWeight, knotsInsert };

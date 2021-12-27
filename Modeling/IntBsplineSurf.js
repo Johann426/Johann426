@@ -1,4 +1,4 @@
-import { surfacePoint, deBoorKnots, globalCurveInterpTngt } from './NurbsUtil.js';
+import { surfacePoint, deBoorKnots, globalCurveInterpTngt } from './NurbsLib.js';
 
 class IntBsplineSurf {
 

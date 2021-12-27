@@ -1,4 +1,4 @@
-import { nurbsCurvePoint, nurbsCurveDers, Vector4 } from './NurbsUtil.js';
+import { nurbsCurvePoint, nurbsCurveDers, Vector4 } from './NurbsLib.js';
 
 class NurbsCurve {
 

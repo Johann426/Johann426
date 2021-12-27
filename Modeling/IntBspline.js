@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert, calcNodes } from './NurbsUtil.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
 
 class IntBspline {
 
