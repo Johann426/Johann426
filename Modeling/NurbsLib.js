@@ -464,7 +464,11 @@ function curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 /*
  * Compute B-Spline surface point. See The NURBS Book, page 103, algorithm A3.5.
- */
+ * degU, degV : degrees of B-Spline surface
+ * knotU, knotV : knot vectors
+ * ctrl : control points
+ * t1, t2 : parametric points
+*/
 function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
 	const spanU = findIndexSpan( degU, knotU, n, t1 );
@@ -523,7 +527,7 @@ function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, 
 }
 
 /*
- * Compute derivatives of a rational B-Spline. See The NURBS Book, page 127, algorithm A4.2.
+ * Compute derivatives of a Non Uniform Rational B-Spline curve. See The NURBS Book, page 127, algorithm A4.2.
  * deg : degree
  * knot : knot vector
  * ctrl : control points
@@ -574,7 +578,42 @@ function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 }
 
 /*
+ * Compute binomial coefficient, k! / ( i! * ( k - i )! )
+ */
+function binomial( k, i ) {
+
+	let nom = 1;
+
+	for ( let j = 2; j <= k; j ++ ) {
+
+		nom *= j;
+
+	}
+
+	let den = 1;
+
+	for ( let j = 2; j <= i; j ++ ) {
+
+		den *= j;
+
+	}
+
+	for ( let j = 2; j <= k - i; j ++ ) {
+
+		den *= j;
+
+	}
+
+	return nom / den;
+
+}
+
+/*
  * Compute Nurbs surface point. See The NURBS Book, page 134, algorithm A4.3.
+ * degU, degV : degrees of Nurbs surface
+ * knotU, knotV : knot vectors
+ * ctrl : control points
+ * t1, t2 : parametric points
  */
 function nurbsSurfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
 
@@ -697,7 +736,7 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 		p2.add( y.mul( r * Math.sin( angle ) ) );
 		pw[ index + 2 ] = new Vector4( p2.x, p2.y, p2.z, 1.0 );
 		const t2 = y.mul( Math.cos( angle ) ).sub( x.mul( Math.sin( angle ) ) );
-		const p1 = //intersectLines( p0, t0, p2, t2 );
+		const p1 = intersect3DLines( p0, t0.clone().mul( r ), p2, t2.clone().mul( - r ) );
 		pw[ index + 1 ] = new Vector4( p1.x, p1.y, p1.z, w1 );
 		index += 2;
 		p0.copy( p2 );
@@ -742,42 +781,49 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 }
 
 /*
- * Compute binomial coefficient, k! / ( i! * ( k - i )! )
+ * Check intersection of two 3D lines
+ * p0, p1 : start point
+ * d1, d2 : direction of parametric representations of the line
+ * C(t) = p0 + d0 x s
+ * C(s) = p1 + d1 x t
+ * where 0 ≤ t ,s ≤ 1
  */
-function binomial( k, i ) {
+function intersect3DLines( p0, d0, p1, d1 ) {
 
-	let nom = 1;
+	const a = [];
+	const b = [];
+	a[ 0 ][ 0 ] = d0.x;
+	a[ 0 ][ 1 ] = - d1.x;
+	a[ 1 ][ 0 ] = d0.y;
+	a[ 1 ][ 1 ] = - d1.y;
+	b[ 0 ] = p1.x - p0.x;
+	b[ 1 ] = p1.y - p0.y;
 
-	for ( let j = 2; j <= k; j ++ ) {
+	const index = [];
+	ludcmp( 2, a, index );
+	lubksb( 2, a, index, b );
 
-		nom *= j;
+	const c1 = p0.z + d0.z * b[ 0 ];
+	const c2 = p1.z + d1.z * b[ 1 ];
+
+	if ( c1 - c2 < 1e-20 ) {
+
+		return b; // return [s, t]
+
+	} else {
+
+		return 0; // no intersection
 
 	}
-
-	let den = 1;
-
-	for ( let j = 2; j <= i; j ++ ) {
-
-		den *= j;
-
-	}
-
-	for ( let j = 2; j <= k - i; j ++ ) {
-
-		den *= j;
-
-	}
-
-	return nom / den;
 
 }
 
 /*
  * Global interpolation through points. See The NURBS Book, page 369, algorithm A9.1.
- * deg: degree
- * prm: parameterized values at each point
- * knot: knot vector
- * pts: to store points having slope constraints(optional)
+ * deg : degree
+ * prm : parameterized values at each point
+ * knot : knot vector
+ * pts : to store points having slope constraints(optional)
  */
 function globalCurveInterp( deg, prm, knot, pts ) {
 
@@ -809,10 +855,10 @@ function globalCurveInterp( deg, prm, knot, pts ) {
 
 /*
  * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008).
- * deg: degree
- * prm: parameterized values at each point
- * knot: knot vector
- * pole: to store points having slope constraints(tangent vector, optional)
+ * deg : degree
+ * prm : parameterized values at each point
+ * knot : knot vector
+ * pole : to store points having slope constraints(tangent vector, optional)
  */
 function globalCurveInterpTngt( deg, prm, knot, pole ) {
 
