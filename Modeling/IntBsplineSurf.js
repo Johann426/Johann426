@@ -83,7 +83,7 @@ class IntBsplineSurf {
 		const nj = this.nj;
 		const points = this.points; //this.pole.map( e => e.point )
 		this.para = this._parameterize( ni, nj, points, this.type );
-		this.knots = this._calcKnots( ni, nj, this.degU, this.degV, this.para, this.pole );
+		this.knots = this._calcKnots( this.degU, this.degV, this.para );
 		this.ctrlp = [];
 
 		for ( let j = 0; j < nj; j ++ ) {

@@ -1,6 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
+import { Circle } from '../Modeling/Circle.js';
 import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
@@ -165,7 +166,15 @@ class Menubar extends UIElement {
 
 		items.dom.children[ 1 ].addEventListener( 'click', () => {
 
-
+			const geo = this.buffer.lines.geometry.clone();
+			const mat = this.buffer.lines.material.clone();
+			const lines = new THREE.Line( geo, mat );
+			const curve = new Circle();
+			Object.defineProperty( lines, 'curve', { value: curve } );
+			mat.color.set( 0x808080 );
+			this.pickable.add( lines );
+			this.selected.lines = lines;
+			this.state = 'Circle';
 
 		} );
 

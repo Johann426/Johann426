@@ -1265,7 +1265,26 @@ function lubksb( n, a, indx, b ) {
 
 }
 
-// Convert from nonrational form in homogeneous coordinates (four-dimensional) to the rational form in three-dimensional coordinates
+// Compute weighted control points to make use of nonrational form (four-dimensional coordinates)
+function weightedCtrlp( v3, weight ) {
+
+	const v4 = [];
+
+	for ( let i = 0; i < v3.length; i ++ ) {
+
+		const x = v3[ i ].x;
+		const y = v3[ i ].y;
+		const z = v3[ i ].z;
+		const w = weight[ i ];
+		v4.push( new Vector4( x, y, z, w ) );
+
+	}
+
+	return v4;
+
+}
+
+// Convert weighted control points () into control points (in three-dimensional coordinates)
 function deWeight( v4 ) {
 
 	const isArray = Array.isArray( v4 );
@@ -1479,4 +1498,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, deWeight, knotsInsert };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3 };
