@@ -307,7 +307,7 @@ function init() {
 			case 'Knot insert':
 
 				raycaster.ray.intersectPlane( plane, intersect );
-				const t = curve.closestPosition( intersect );
+				const t = curve.closestPosition( intersect )[ 0 ];
 				curve.insertKnotAt( t );
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );

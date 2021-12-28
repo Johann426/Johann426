@@ -1,4 +1,4 @@
-import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville } from './NurbsLib.js';
+import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville, knotsInsert } from './NurbsLib.js';
 
 class NurbsCurve {
 
@@ -38,6 +38,12 @@ class NurbsCurve {
 
 		//console.log( pole );
 		return pole;
+
+	}
+
+	insertKnotAt( t = 0.5 ) {
+
+		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlpw, t );
 
 	}
 
@@ -95,14 +101,14 @@ class NurbsCurve {
 
 	}
 
-	closestPoint( v ) {
+	closestPosition( v ) {
 
-		var t = 0;
-		var l = nurbsCurvePoint( this.deg, this.knots, this.ctrlpw, 0 ).sub( v ).length();
+		let t = 0;
+		let l = this.getPointAt( 0 ).sub( v ).length();
 
 		for ( let i = 1; i <= 20; i ++ ) {
 
-			const len = nurbsCurvePoint( this.deg, this.knots, this.ctrlpw, i / 20 ).sub( v ).length();
+			const len = this.getPointAt( i / 20 ).sub( v ).length();
 
 			if ( len < l ) {
 
@@ -113,14 +119,16 @@ class NurbsCurve {
 
 		}
 
-		var i = 0;
-		var isOrthogonal = false;
-		var isConverged = false;
+		let i = 0;
+		let pts;
+		let isOrthogonal = false;
+		let isConverged = false;
 
 		while ( ! ( isOrthogonal || isConverged ) ) {
 
-			const ders = nurbsCurveDers( this.deg, this.knots, this.ctrlpw, t, 2 );
-			const sub = ders[ 0 ].clone().sub( v );
+			const ders = this.getDerivatives( t, 2 );
+			pts = ders[ 0 ];
+			const sub = pts.clone().sub( v );
 			if ( sub.length() < 1E-9 ) break;
 			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
 			t -= del;
@@ -144,7 +152,14 @@ class NurbsCurve {
 
 		}
 
-		return nurbsCurvePoint( this.deg, this.knots, this.ctrlpw, t );
+		return [ t, pts ];
+
+	}
+
+	closestPoint( v ) {
+
+		const res = this.closestPosition( v );
+		return res[ 1 ];
 
 	}
 
