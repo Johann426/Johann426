@@ -1,4 +1,4 @@
-import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp } from './NurbsLib.js';
+import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville } from './NurbsLib.js';
 
 class NurbsCurve {
 
@@ -16,6 +16,28 @@ class NurbsCurve {
 
 		const nm1 = this.ctrlpw.length - 1;
 		return ( nm1 > this.dmax ? this.dmax : nm1 );
+
+	}
+
+	get ctrlPoints() {
+
+		return deWeight( this.ctrlpw );
+
+	}
+
+	get pole() {
+
+		const prm = calcGreville( this.deg, this.knots );
+		const pole = [];
+
+		for ( let i = 0; i < prm.length; i ++ ) {
+
+			pole.push( { point: this.getPointAt( prm[ i ] ) } );
+
+		}
+
+		//console.log( pole );
+		return pole;
 
 	}
 

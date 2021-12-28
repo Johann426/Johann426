@@ -1,5 +1,5 @@
 /*
- * Assign parameter values to each point by chordal (or centripetal) length method.
+ * Assign parametric values to each point by chordal length (or centripetal) method.
  */
 function parameterize( points, curveType ) {
 
@@ -31,7 +31,7 @@ function parameterize( points, curveType ) {
 }
 
 /*
- * Assign knot vector, having multiplicity of degree + 1, averaged over degree number of parameters.
+ * Having multiplicity of degree + 1 at corner, assign knot vector averaged over degree number of parameters.
  */
 function deBoorKnots( deg, prm ) {
 
@@ -503,10 +503,10 @@ function surfacePoint( n, m, degU, degV, knotU, knotV, ctrl, t1, t2 ) {
  * Compute the point on a Non Uniform Rational B-Spline curve. See The NURBS Book, page 124, algorithm A4.1.
  * deg : degree
  * knot : knot vector
- * ctrl : control points
+ * ctrl = (wx, wy, wz, w) : weighted control points in four-dimensional space
  * t : parameteric point
 */
-function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, wy, wz, w)
+function nurbsCurvePoint( deg, knot, ctrl, t ) {
 
 	const span = findIndexSpan( deg, knot, ctrl.length, t );
 	const nj = basisFuncs( deg, knot, span, t );
@@ -514,11 +514,10 @@ function nurbsCurvePoint( deg, knot, ctrl, t ) { // four-dimensional point (wx, 
 
 	for ( let j = 0; j <= deg; j ++ ) {
 
-		const wNj = ctrl[ span - deg + j ].w * nj[ j ];
-		v.x += wNj * ctrl[ span - deg + j ].x;
-		v.y += wNj * ctrl[ span - deg + j ].y;
-		v.z += wNj * ctrl[ span - deg + j ].z;
-		v.w += wNj;
+		v.x += nj[ j ] * ctrl[ span - deg + j ].x;
+		v.y += nj[ j ] * ctrl[ span - deg + j ].y;
+		v.z += nj[ j ] * ctrl[ span - deg + j ].z;
+		v.w += nj[ j ] * ctrl[ span - deg + j ].w;
 
 	}
 
@@ -695,18 +694,21 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 
 	a1 < a0 ? a1 = 360.0 + a1 : null;
 
+	const pi = 4.0 * Math.atan( 1.0 );
+	a0 *= pi / 180.0;
+	a1 *= pi / 180.0;
 	const theta = a1 - a0;
 	let narcs;
 
-	if ( theta <= 90.0 ) {
+	if ( theta <= 0.5 * pi ) {
 
 		narcs = 1;
 
-	} else if ( theta <= 180.0 ) {
+	} else if ( theta <= pi ) {
 
 		narcs = 2;
 
-	} else if ( theta <= 270.0 ) {
+	} else if ( theta <= 1.5 * pi ) {
 
 		narcs = 3;
 
@@ -720,11 +722,11 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 	//const nm1 = 2 * narcs;
 	const w1 = Math.cos( 0.5 * dtheta ); // 0.5 * dtheta is base angle
 	const p0 = o.clone();
-	p0.add( x.mul( r * Math.cos( a0 ) ) );
-	p0.add( y.mul( r * Math.sin( a0 ) ) );
-	const t0 = y.mul( Math.cos( a0 ) ).sub( x.mul( Math.sin( a0 ) ) ); // Initialize start values
+	p0.add( x.clone().mul( r * Math.cos( a0 ) ) );
+	p0.add( y.clone().mul( r * Math.sin( a0 ) ) );
+	const t0 = y.clone().mul( Math.cos( a0 ) ).sub( x.clone().mul( Math.sin( a0 ) ) ); // Initialize start values
 	const pw = [];
-	pw[ 0 ] = p0.clone();
+	pw[ 0 ] = new Vector4( p0.x, p0.y, p0.z, 1.0 );
 	let index = 0;
 	let angle = a0;
 
@@ -732,15 +734,17 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 
 		angle += dtheta;
 		const p2 = o.clone();
-		p2.add( x.mul( r * Math.cos( angle ) ) );
-		p2.add( y.mul( r * Math.sin( angle ) ) );
+		p2.add( x.clone().mul( r * Math.cos( angle ) ) );
+		p2.add( y.clone().mul( r * Math.sin( angle ) ) );
 		pw[ index + 2 ] = new Vector4( p2.x, p2.y, p2.z, 1.0 );
-		const t2 = y.mul( Math.cos( angle ) ).sub( x.mul( Math.sin( angle ) ) );
-		const p1 = intersect3DLines( p0, t0.clone().mul( r ), p2, t2.clone().mul( - r ) );
-		pw[ index + 1 ] = new Vector4( p1.x, p1.y, p1.z, w1 );
+		const t2 = y.clone().mul( Math.cos( angle ) ).sub( x.clone().mul( Math.sin( angle ) ) );
+		const p1 = intersect3DLines( p0, t0.clone(), p2, t2.clone() );
+		pw[ index + 1 ] = new Vector4( w1 * p1.x, w1 * p1.y, w1 * p1.z, w1 );
 		index += 2;
 		p0.copy( p2 );
+		console.log( p0 )
 		t0.copy( t2 );
+		console.log( t0 )
 
 	}
 
@@ -776,7 +780,7 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 
 	}
 
-	return knot, pw;
+	return [ knot, pw ];
 
 }
 
@@ -792,8 +796,10 @@ function intersect3DLines( p0, d0, p1, d1 ) {
 
 	const a = [];
 	const b = [];
+	a[ 0 ] = new Array( 2 ).fill( 0.0 );
 	a[ 0 ][ 0 ] = d0.x;
 	a[ 0 ][ 1 ] = - d1.x;
+	a[ 1 ] = new Array( 2 ).fill( 0.0 );
 	a[ 1 ][ 0 ] = d0.y;
 	a[ 1 ][ 1 ] = - d1.y;
 	b[ 0 ] = p1.x - p0.x;
@@ -801,14 +807,15 @@ function intersect3DLines( p0, d0, p1, d1 ) {
 
 	const index = [];
 	ludcmp( 2, a, index );
-	lubksb( 2, a, index, b );
+	_lubksb( 2, a, index, b );
 
 	const c1 = p0.z + d0.z * b[ 0 ];
 	const c2 = p1.z + d1.z * b[ 1 ];
 
 	if ( c1 - c2 < 1e-20 ) {
 
-		return b; // return [s, t]
+		const res = p0.clone().add( d0.clone().mul( b[ 0 ] ) );
+		return res;
 
 	} else {
 
@@ -1183,8 +1190,6 @@ function ludcmp( n, a, indx ) {
 
 	}
 
-	//return [ a, indx ];
-
 }
 
 function _lubksb( n, a, indx, b ) {
@@ -1276,7 +1281,7 @@ function weightedCtrlp( v3, weight ) {
 		const y = v3[ i ].y;
 		const z = v3[ i ].z;
 		const w = weight[ i ];
-		v4.push( new Vector4( x, y, z, w ) );
+		v4.push( new Vector4( w * x, w * y, w * z, w ) );
 
 	}
 
@@ -1336,7 +1341,10 @@ class Vector3 {
 
 	copy( v ) {
 
-		return new this.constructor( v.x, v.y, v.z );
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		return this;
 
 	}
 
@@ -1436,7 +1444,11 @@ class Vector4 {
 
 	copy( v ) {
 
-		return new this.constructor( v.x, v.y, v.z, v.w );
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		this.w = v.w;
+		return this;
 
 	}
 
@@ -1498,4 +1510,4 @@ class Vector4 {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3 };
+export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };

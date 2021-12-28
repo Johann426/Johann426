@@ -5,7 +5,7 @@
  * js code by Johann426.github
  */
 
-import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
 
 class IntBspline {
 
@@ -320,9 +320,6 @@ class IntBspline {
 			this.knots[ j ] /= lKnot.length;
 
 		}
-
-		console.log( this.knots );
-		console.log( this.ctrlp );
 
 	}
 

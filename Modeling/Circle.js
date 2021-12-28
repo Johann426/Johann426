@@ -1,5 +1,5 @@
 import { NurbsCurve } from './NurbsCurve.js';
-import { Vector4 } from './NurbsLib.js';
+import { Vector3 } from './NurbsLib.js';
 
 class Circle extends NurbsCurve {
 

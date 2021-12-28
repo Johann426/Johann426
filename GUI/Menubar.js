@@ -2,6 +2,7 @@ import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
 import { Circle } from '../Modeling/Circle.js';
+import { Arc } from '../Modeling/Arc.js';
 import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
@@ -155,6 +156,7 @@ class Menubar extends UIElement {
 		menu.add( new MenuHeader( 'Lines' ) );
 		const items = new MenuItems();
 		items.add( new MenuItem( 'Line' ) );
+		items.add( new MenuItem( 'Arc' ) );
 		items.add( new MenuItem( 'Circle' ) );
 		items.add( new MenuDivider() );
 		items.add( new MenuItem( 'Curve' ) );
@@ -169,16 +171,34 @@ class Menubar extends UIElement {
 			const geo = this.buffer.lines.geometry.clone();
 			const mat = this.buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
+			const curve = new Arc();
+			Object.defineProperty( lines, 'curve', { value: curve } );
+			mat.color.set( 0x808080 );
+			this.pickable.add( lines );
+			this.selected.lines = lines;
+			this.state = 'Arc';
+			const buffer = this.buffer;
+			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
+
+		} );
+
+		items.dom.children[ 2 ].addEventListener( 'click', () => {
+
+			const geo = this.buffer.lines.geometry.clone();
+			const mat = this.buffer.lines.material.clone();
+			const lines = new THREE.Line( geo, mat );
 			const curve = new Circle();
 			Object.defineProperty( lines, 'curve', { value: curve } );
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );
 			this.selected.lines = lines;
 			this.state = 'Circle';
+			const buffer = this.buffer;
+			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
 		} );
 
-		items.dom.children[ 3 ].addEventListener( 'click', () => {
+		items.dom.children[ 4 ].addEventListener( 'click', () => {
 
 			const geo = this.buffer.lines.geometry.clone();
 			const mat = this.buffer.lines.material.clone();

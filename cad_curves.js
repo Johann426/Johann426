@@ -194,6 +194,9 @@ function init() {
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
 
+				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
+				updateLines( curve, selected.lines );
+
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
@@ -403,7 +406,7 @@ function init() {
 
 	for ( let j = 0; j < 10; j ++ ) {
 
-		menubar.dom.children[ 2 ].children[ 1 ].children[ 3 ].click();
+		menubar.dom.children[ 2 ].children[ 1 ].children[ 4 ].click();
 		const curve = selected.lines.curve;
 
 		for ( let i = 0; i < 10; i ++ ) {
@@ -665,7 +668,7 @@ function preBuffer() {
 	pos = new Float32Array( 2 * 3 );
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	geo.setDrawRange( 0, 2 );
-	mat.color.set( 0x00ff00 );
+	mat.color.set( 0x006000 );
 	const distance = new THREE.Line( geo, mat );
 
 	point.renderOrder = 100;
