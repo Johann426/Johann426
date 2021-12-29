@@ -143,7 +143,7 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 
-				if ( curve.pole.length == 0 ) {
+				if ( curve.designPoints.length == 0 ) {
 
 					curve.add( new THREE.Vector3() );
 
@@ -156,7 +156,7 @@ function init() {
 
 					} else {
 
-						curve.mod( curve.pole.length - 1, intersect );
+						curve.mod( curve.designPoints.length - 1, intersect );
 
 					}
 
@@ -171,9 +171,9 @@ function init() {
 				break;
 
 			case 'Tangent':
-				for ( let i = 0; i < curve.pole.length; i ++ ) {
+				for ( let i = 0; i < curve.designPoints.length; i ++ ) {
 
-					const v = curve.pole[ i ].point;
+					const v = curve.designPoints[ i ];
 					const distance = raycaster.ray.distanceToPoint( v );
 					if ( distance < 0.2 ) {
 
@@ -193,9 +193,6 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-
-				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
-				updateLines( curve, selected.lines );
 
 				if ( intPoints.length > 0 ) {
 
@@ -260,7 +257,7 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;
-					updateSelectedPoint( buffer.point, curve.pole[ index ].point );
+					updateSelectedPoint( buffer.point, curve.designPoints[ index ] );
 
 				}
 
@@ -701,7 +698,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	let pts, geo, pos, arr, index;
 
 	//update design points
-	pts = curve.pole.map( e => e.point );
+	pts = curve.designPoints;
 	geo = points.geometry;
 	geo.setDrawRange( 0, pts.length );
 	geo.computeBoundingBox();

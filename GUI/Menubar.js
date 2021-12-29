@@ -176,7 +176,7 @@ class Menubar extends UIElement {
 			mat.color.set( 0x808080 );
 			this.pickable.add( lines );
 			this.selected.lines = lines;
-			this.state = 'Arc';
+			this.state = 'Add';
 			const buffer = this.buffer;
 			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 

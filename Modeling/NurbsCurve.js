@@ -28,19 +28,18 @@ class NurbsCurve extends Parametric {
 
 	}
 
-	get pole() {
+	get designPoints() {
 
 		const prm = calcGreville( this.deg, this.knots );
-		const pole = [];
+		const pts = [];
 
 		for ( let i = 0; i < prm.length; i ++ ) {
 
-			pole.push( { point: this.getPointAt( prm[ i ] ) } );
+			pts.push( this.getPointAt( prm[ i ] ) );
 
 		}
 
-		//console.log( pole );
-		return pole;
+		return pts;
 
 	}
 

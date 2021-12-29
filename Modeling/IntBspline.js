@@ -34,23 +34,29 @@ class IntBspline extends Parametric {
 
 	}
 
-	add( point ) {
+	get designPoints() {
 
-		this.pole.push( { point: point } );
+		return this.pole.map( e => e.point );
+
+	}
+
+	add( v ) {
+
+		this.pole.push( { point: v } );
 		this.needsUpdate = true;
 
 	}
 
-	mod( i, point ) {
+	mod( i, v ) {
 
-		this.pole[ i ].point = point;
+		this.pole[ i ].point = v;
 		this.needsUpdate = true;
 
 	}
 
-	incert( i, point ) {
+	incert( i, v ) {
 
-		this.pole.splice( i, 0, { point: point } );
+		this.pole.splice( i, 0, { point: v } );
 		this.needsUpdate = true;
 
 	}

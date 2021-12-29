@@ -2,7 +2,7 @@
  * A number of pseudo code from The NURBS Book are implemented in js functions here.
  * code by Johann426
  */
-import { array } from '../vectorious/index.esm.js';
+import { array, range } from '../vectorious/index.esm.js';
 
 /*
  * Assign parametric values to each point by chordal length (or centripetal) method.
@@ -1063,6 +1063,7 @@ function tempCurveInterp( deg, prm, knot, pole ) {
 
 }
 
+// deprecated routine of lu backsubstitution
 function lubksbV3( n, arr, indx, pts ) {
 
 	console.warn( 'lubksbV3() has been deprecated' );
@@ -1091,38 +1092,34 @@ function lubksbV3( n, arr, indx, pts ) {
 
 }
 
-function solve( arr, pts ) {
+/*
+ * Solve linear equations of Ax = b, where the solutions for each component of Vector3 are needed.
+ */
+function solve( a, pts ) {
 
 	const n = pts.length;
-
-	const r = [];
-	r[ 0 ] = [];
-	r[ 1 ] = [];
-	r[ 2 ] = [];
+	var x = [];
+	var y = [];
+	var z = [];
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		r[ 0 ].push( pts[ i ].x );
-		r[ 1 ].push( pts[ i ].y );
-		r[ 2 ].push( pts[ i ].z );
+		x[ i ] = pts[ i ].x;
+		y[ i ] = pts[ i ].y;
+		z[ i ] = pts[ i ].z;
 
 	}
 
-	const x = [];
-
-	for ( let i = 0; i < 3; i ++ ) {
-
-		const a = array( arr );
-		const b = array( r[ i ] ).reshape( n, 1 );
-		x[ i ] = a.solve( b );
-
-	}
+	// solve Ax = b
+	x = array( a ).solve( array( x ).reshape( n, 1 ) ).data;
+	y = array( a ).solve( array( y ).reshape( n, 1 ) ).data;
+	z = array( a ).solve( array( z ).reshape( n, 1 ) ).data;
 
 	const v = [];
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		v[ i ] = new Vector3( x[ 0 ].data[ i ], x[ 1 ].data[ i ], x[ 2 ].data[ i ] );
+		v[ i ] = new Vector3( x[ i ], y[ i ], z[ i ] );
 
 	}
 
