@@ -1,15 +1,16 @@
 /*
- * If the given data consists of only points (and constraints), on the basis of The NURBS Book,
- * this class provides a global algorithm to solve the linear equations to evaluate an unknown B-Spline,
- * i.e., parameterized value, knot vector, and control points.
- * js code by Johann426.github
+ * If the given data consists of points (and constraints), this class provides methods to evaluate parameterized values, knot vector,
+ * and a global algorithm to solve the linear equations finding unknown control points.
+ * code by Johann426
  */
-
 import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
+import { Parametric } from './Parametric.js';
 
-class IntBspline {
+class IntBspline extends Parametric {
 
 	constructor( deg, type = 'chordal' ) {
+
+		super();
 
 		this.dmax = deg;
 
@@ -122,21 +123,6 @@ class IntBspline {
 
 	}
 
-	getPoints( n ) {
-
-		const p = [];
-
-		for ( let i = 0; i < n; i ++ ) {
-
-			const t = i / ( n - 1 );
-			p[ i ] = this.getPointAt( t );
-
-		}
-
-		return p;
-
-	}
-
 	getDerivatives( t, k ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
@@ -148,90 +134,7 @@ class IntBspline {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
 
-		const p = [];
-
-		for ( let i = 0; i < n; i ++ ) {
-
-			const t = i / ( n - 1 );
-			const ders = this.getDerivatives( t, 2 );
-			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
-			const normal = binormal.clone().cross( ders[ 1 ] );
-
-			p.push( {
-
-				point: ders[ 0 ],
-				curvature: binormal.length() / ders[ 1 ].length() ** 3,
-				tangent: ders[ 1 ].normalize(),
-				normal: normal.normalize(),
-				binormal: binormal.normalize()
-
-			} );
-
-		}
-
-		return p;
-
-	}
-
-	closestPosition( v ) {
-
-		let t = 0;
-		let l = this.getPointAt( 0 ).sub( v ).length();
-
-		for ( let i = 1; i <= 20; i ++ ) {
-
-			const len = this.getPointAt( i / 20 ).sub( v ).length();
-
-			if ( len < l ) {
-
-				t = i / 20;
-				l = len;
-
-			}
-
-		}
-
-		let i = 0;
-		let pts;
-		let isOrthogonal = false;
-		let isConverged = false;
-
-		while ( ! ( isOrthogonal || isConverged ) ) {
-
-			const ders = this.getDerivatives( t, 2 );
-			pts = ders[ 0 ];
-			const sub = pts.clone().sub( v );
-			if ( sub.length() < 1E-9 ) break;
-			const del = ders[ 1 ].dot( sub ) / ( ders[ 2 ].dot( sub ) + ders[ 1 ].dot( ders[ 1 ] ) );
-			t -= del;
-
-			if ( t > 1.0 ) {
-
-				t = 1.0;
-
-			}
-
-			if ( t < 0.0 ) {
-
-				t = 0.0;
-
-			}
-
-			isOrthogonal = Math.abs( ders[ 1 ].dot( sub ) ) < 1E-9;
-			isConverged = ( ders[ 1 ].clone().mul( del ) ) < 1E-9;
-			i ++;
-			if ( i > 20 ) break;
-
-		}
-
-		return [ t, pts ];
-
-	}
-
-	closestPoint( v ) {
-
-		const res = this.closestPosition( v );
-		return res[ 1 ];
+		return super.interrogating( n );
 
 	}
 

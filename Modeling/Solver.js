@@ -82,7 +82,7 @@ function ludcmp( n, a, indx ) {
 		/*If the pivot element is zero the matrix is singular (at least to the precision of the
 			algorithm). For some applications on singular matrices, it is desirable to substitute
 			TINY for zero.*/
-		if ( parseFloat( a[ j ][ j ] ) === 0 ) {
+		if ( a[ j ][ j ] == 0 ) {
 
 			a[ j ][ j ] = TINY;
 

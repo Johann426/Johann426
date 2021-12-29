@@ -1,4 +1,9 @@
+/*
+ * A number of pseudo code from The NURBS Book are implemented in js functions here.
+ * code by Johann426
+ */
 import { ludcmp, lubksb } from './Solver.js';
+import { array, range } from '../vectorious/index.esm.js';
 
 /*
  * Assign parametric values to each point by chordal length (or centripetal) method.
@@ -66,7 +71,7 @@ function deBoorKnots( deg, prm ) {
 }
 
 /*
- * Assign uniformly spaced knot vector.
+ * Having multiplicity of degree + 1 at corner, assign uniformly spaced knot vector.
  */
 function uniformlySpacedknots( deg, n ) {
 
@@ -890,11 +895,13 @@ function globalCurveInterpTngt( deg, prm, knot, pole ) {
 
 		}
 
-		const ctrlp = point.slice();
-		const index = [];
-		ludcmp( n, arr, index );
-		lubksbV3( n, arr, index, ctrlp );
-		return ctrlp;
+		// const ctrlp = point.slice();
+		// const index = [];
+		// ludcmp( n, arr, index );
+		// lubksbV3( n, arr, index, ctrlp );
+		// return ctrlp;
+
+		return solve( arr, point.slice() );
 
 	} else { // if directional constraint(s) exist
 
@@ -959,11 +966,13 @@ function globalCurveInterpTngt( deg, prm, knot, pole ) {
 
 		}
 
-		const ctrlp = b.slice();
-		const index = [];
-		ludcmp( nCtrlp, arr, index );
-		lubksbV3( nCtrlp, arr, index, ctrlp );
-		return ctrlp;
+		// const ctrlp = b.slice();
+		// const index = [];
+		// ludcmp( nCtrlp, arr, index );
+		// lubksbV3( nCtrlp, arr, index, ctrlp );
+		// return ctrlp;
+
+		return solve( arr, b.slice() );
 
 	}
 
@@ -1090,7 +1099,7 @@ function tempCurveInterp( deg, prm, knot, pole ) {
 
 }
 
-function lubksbV3( n, a, indx, b ) {
+function lubksbV3( n, arr, indx, pts ) {
 
 	const x = [];
 	const y = [];
@@ -1098,21 +1107,60 @@ function lubksbV3( n, a, indx, b ) {
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		x.push( b[ i ].x );
-		y.push( b[ i ].y );
-		z.push( b[ i ].z );
+		x.push( pts[ i ].x );
+		y.push( pts[ i ].y );
+		z.push( pts[ i ].z );
 
 	}
 
-	lubksb( n, a, indx, x );
-	lubksb( n, a, indx, y );
-	lubksb( n, a, indx, z );
+	lubksb( n, arr, indx, x );
+	lubksb( n, arr, indx, y );
+	lubksb( n, arr, indx, z );
 
 	for ( let i = 0; i < n; i ++ ) {
 
-		b[ i ] = new Vector3( x[ i ], y[ i ], z[ i ] );
+		pts[ i ] = new Vector3( x[ i ], y[ i ], z[ i ] );
 
 	}
+
+}
+
+function solve( arr, pts ) {
+
+	const n = pts.length;
+
+	const r = [];
+	r[ 0 ] = [];
+	r[ 1 ] = [];
+	r[ 2 ] = [];
+
+	for ( let i = 0; i < n; i ++ ) {
+
+		r[ 0 ].push( pts[ i ].x );
+		r[ 1 ].push( pts[ i ].y );
+		r[ 2 ].push( pts[ i ].z );
+
+	}
+
+	const x = [];
+
+	for ( let i = 0; i < 3; i ++ ) {
+
+		const a = array( arr );
+		const b = array( r[ i ] ).reshape( n, 1 );
+		x[ i ] = a.solve( b );
+
+	}
+
+	const v = [];
+
+	for ( let i = 0; i < n; i ++ ) {
+
+		v[ i ] = new Vector3( x[ 0 ].data[ i ], x[ 1 ].data[ i ], x[ 2 ].data[ i ] );
+
+	}
+
+	return v;
 
 }
 
