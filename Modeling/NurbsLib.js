@@ -2,8 +2,7 @@
  * A number of pseudo code from The NURBS Book are implemented in js functions here.
  * code by Johann426
  */
-import { ludcmp, lubksb } from './Solver.js';
-import { array, range } from '../vectorious/index.esm.js';
+import { array } from '../vectorious/index.esm.js';
 
 /*
  * Assign parametric values to each point by chordal length (or centripetal) method.
@@ -799,27 +798,16 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
  */
 function intersect3DLines( p0, d0, p1, d1 ) {
 
-	const a = [];
-	const b = [];
-	a[ 0 ] = new Array( 2 ).fill( 0.0 );
-	a[ 0 ][ 0 ] = d0.x;
-	a[ 0 ][ 1 ] = - d1.x;
-	a[ 1 ] = new Array( 2 ).fill( 0.0 );
-	a[ 1 ][ 0 ] = d0.y;
-	a[ 1 ][ 1 ] = - d1.y;
-	b[ 0 ] = p1.x - p0.x;
-	b[ 1 ] = p1.y - p0.y;
+	const a = array( [[ d0.x, - d1.x ], [ d0.y, - d1.y ]] );
+	const b = array( [[ p1.x - p0.x ], [ p1.y - p0.y ]] );
+	const x = a.solve( b );
 
-	const index = [];
-	ludcmp( 2, a, index );
-	lubksb( 2, a, index, b );
-
-	const c1 = p0.z + d0.z * b[ 0 ];
-	const c2 = p1.z + d1.z * b[ 1 ];
+	const c1 = p0.z + d0.z * x.data[ 0 ];
+	const c2 = p1.z + d1.z * x.data[ 1 ];
 
 	if ( c1 - c2 < 1e-20 ) {
 
-		const res = p0.clone().add( d0.clone().mul( b[ 0 ] ) );
+		const res = p0.clone().add( d0.clone().mul( x.data[ 0 ] ) );
 		return res;
 
 	} else {
@@ -856,11 +844,7 @@ function globalCurveInterp( deg, prm, knot, pts ) {
 
 	}
 
-	const ctrlp = pts.slice();
-	const index = [];
-	ludcmp( n, arr, index );
-	lubksbV3( n, arr, index, ctrlp );
-	return ctrlp;
+	return solve( arr, pts );
 
 }
 
@@ -895,13 +879,7 @@ function globalCurveInterpTngt( deg, prm, knot, pole ) {
 
 		}
 
-		// const ctrlp = point.slice();
-		// const index = [];
-		// ludcmp( n, arr, index );
-		// lubksbV3( n, arr, index, ctrlp );
-		// return ctrlp;
-
-		return solve( arr, point.slice() );
+		return solve( arr, point );
 
 	} else { // if directional constraint(s) exist
 
@@ -966,13 +944,7 @@ function globalCurveInterpTngt( deg, prm, knot, pole ) {
 
 		}
 
-		// const ctrlp = b.slice();
-		// const index = [];
-		// ludcmp( nCtrlp, arr, index );
-		// lubksbV3( nCtrlp, arr, index, ctrlp );
-		// return ctrlp;
-
-		return solve( arr, b.slice() );
+		return solve( arr, b );
 
 	}
 
@@ -1011,11 +983,7 @@ function tempCurveInterp( deg, prm, knot, pole ) {
 
 		}
 
-		const ctrlp = point.slice();
-		const index = [];
-		ludcmp( n, arr, index );
-		lubksbV3( n, arr, index, ctrlp );
-		return ctrlp;
+		return solve( arr, point );
 
 	} else { // if directional constraint(s) exist
 
@@ -1089,17 +1057,15 @@ function tempCurveInterp( deg, prm, knot, pole ) {
 
 		}
 
-		const ctrlp = b.slice();
-		const index = [];
-		ludcmp( nCtrlp, arr, index );
-		lubksbV3( nCtrlp, arr, index, ctrlp );
-		return ctrlp;
+		return solve( arr, b );
 
 	}
 
 }
 
 function lubksbV3( n, arr, indx, pts ) {
+
+	console.warn( 'lubksbV3() has been deprecated' );
 
 	const x = [];
 	const y = [];
