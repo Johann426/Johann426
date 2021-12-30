@@ -698,23 +698,22 @@ function knotsInsert( deg, knot, ctrl, t ) {
  */
 function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 
-	a1 < a0 ? a1 = 360.0 + a1 : null;
-
-	const pi = 4.0 * Math.atan( 1.0 );
-	a0 *= pi / 180.0;
-	a1 *= pi / 180.0;
+	o = new Vector3().copy( o );
+	x = new Vector3().copy( x );
+	y = new Vector3().copy( y );
+	//a1 < a0 ? a1 = 2.0 * Math.PI + a1 : null;
 	const theta = a1 - a0;
 	let narcs;
 
-	if ( theta <= 0.5 * pi ) {
+	if ( theta <= 0.5 * Math.PI ) {
 
 		narcs = 1;
 
-	} else if ( theta <= pi ) {
+	} else if ( theta <= Math.PI ) {
 
 		narcs = 2;
 
-	} else if ( theta <= 1.5 * pi ) {
+	} else if ( theta <= 1.5 * Math.PI ) {
 
 		narcs = 3;
 
@@ -725,7 +724,6 @@ function makeNurbsCircle( o, x, y, r, a0, a1 ) {
 	}
 
 	const dtheta = theta / narcs;
-	//const nm1 = 2 * narcs;
 	const w1 = Math.cos( 0.5 * dtheta ); // 0.5 * dtheta is base angle
 	const p0 = o.clone();
 	p0.add( x.clone().mul( r * Math.cos( a0 ) ) );

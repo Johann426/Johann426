@@ -9,11 +9,9 @@ class Arc extends NurbsCurve {
 		const o = new Vector3( 0.0, 0.0, 0.0 );
 		const x = new Vector3( 1.0, 0.0, 0.0 );
 		const y = new Vector3( 0.0, 1.0, 0.0 );
-		//this.normal = new Vector3( 0, 0, 1 );
 		const r = 1.0;
 		const a0 = 0.0;
-		const a1 = 360.0;
-
+		const a1 = 2.0 * Math.PI;
 		const tmp = makeNurbsCircle( o, x, y, r, a0, a1 );
 		const knots = tmp[ 0 ];
 		const ctrlp = deWeight( tmp[ 1 ] );
@@ -21,12 +19,6 @@ class Arc extends NurbsCurve {
 		super( deg, knots, ctrlp, weight );
 
 		this.pole = [];
-
-	}
-
-	set normal( v ) {
-
-		return v;
 
 	}
 
@@ -38,13 +30,22 @@ class Arc extends NurbsCurve {
 
 	get x() {
 
-		return this.pole[ 1 ].point;
+		const v = this.pole[ 1 ].point.clone().sub( this.o );
+		return v.normalize();
 
 	}
 
 	get y() {
 
-		return this.normal.cross( this.x );
+		const v = this.normal.clone().cross( this.x );
+		return v.normalize();
+
+	}
+
+	get r() {
+
+		const v = this.pole[ 1 ].point.clone().sub( this.o );
+		return v.length();
 
 	}
 
@@ -56,11 +57,11 @@ class Arc extends NurbsCurve {
 
 	get a1() {
 
-		const p1 = this.pole[ 1 ].point;
-		const p2 = this.pole[ 2 ].point;
-		const dot = p1.clone().dot( p2 );
-		const cos = dot / p1.length() / p2.length();
-		return Math.acos( cos ) * 180 / 3.141592653589793;
+		const p1 = this.pole[ 1 ].point.clone().sub( this.o );
+		const p2 = this.pole[ 2 ].point.clone().sub( this.o );
+		var theta = p1.clone().dot( p2 ) / p1.length() / p2.length();
+		theta = Math.acos( theta );
+		return theta;
 
 	}
 
@@ -72,16 +73,49 @@ class Arc extends NurbsCurve {
 
 	add( v ) {
 
-		this.pole.length < 3 ? this.pole.push( { point: v } ) : null;
-		this.needsUpdate = true;
+		if ( this.pole.length < 3 ) {
+
+			this.pole.push( { point: v } );
+			this.needsUpdate = true;
+
+		}
 
 	}
 
 	mod( i, v ) {
 
-		this.pole[ i ].point = v;
+		const u1 = v.clone().sub( this.o );
+
+		switch ( i ) {
+
+			case 0 :
+				this.pole[ 0 ].point = v;
+				//this.pole[ 1 ].point.add( del );
+				//this.pole[ 2 ].point.add( del );
+				break;
+
+			case 1 :
+				this.pole[ 1 ].point = v;
+				break;
+
+			case 2 :
+				const u2 = this.pole[ 1 ].point.clone().sub( this.o );
+				this.normal = u2.cross( u1 ).normalize();
+				this._calcCtrlPoints( this.o, this.x, this.y, this.r, 0.0, 2.0 * Math.PI );
+				const tmp = this.closestPoint( v );
+				console.log( tmp.length() );
+				isNaN( tmp.length() ) ? console.log( 'error!' ) : this.pole[ 2 ].point = tmp;
+
+		}
+
 		this.needsUpdate = true;
-		console.log( this.pole );
+
+	}
+
+	getPointAt( t ) {
+
+		if ( this.needsUpdate ) this._calcCtrlPoints( this.o, this.x, this.y, this.r, this.a0, this.a1 );
+		return super.getPointAt( t );
 
 	}
 
