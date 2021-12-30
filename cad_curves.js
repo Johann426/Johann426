@@ -687,9 +687,9 @@ function preBuffer() {
 
 function updateCurveBuffer( curve, buffer ) {
 
+	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 	updateLines( curve, buffer.lines );
 	updateCurvature( curve, buffer.curvature );
-	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 }
 

@@ -2,7 +2,7 @@
  * A number of pseudo code from The NURBS Book are implemented in js functions here.
  * code by Johann426
  */
-import { array, range } from '../vectorious/index.esm.js';
+import { array } from '../vectorious/index.esm.js';
 
 /*
  * Assign parametric values to each point by chordal length (or centripetal) method.
@@ -456,9 +456,10 @@ function curveDers( deg, knot, ctrl, t, n = 2 ) {
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
-			v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
-			v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
+			const nder = nders[ k ][ j ];
+			v[ k ].x += nder * ctrl[ span - deg + j ].x;
+			v[ k ].y += nder * ctrl[ span - deg + j ].y;
+			v[ k ].z += nder * ctrl[ span - deg + j ].z;
 
 		}
 
@@ -551,28 +552,35 @@ function nurbsCurveDers( deg, knot, ctrl, t, n = 2 ) {
 
 		for ( let j = 0; j <= deg; j ++ ) {
 
-			v[ k ].x += nders[ k ][ j ] * ctrl[ span - deg + j ].x;
-			v[ k ].y += nders[ k ][ j ] * ctrl[ span - deg + j ].y;
-			v[ k ].z += nders[ k ][ j ] * ctrl[ span - deg + j ].z;
-			v[ k ].w += nders[ k ][ j ] * ctrl[ span - deg + j ].w;
+			const nder = nders[ k ][ j ];
+			// Sigma( N' x ctrlpw )
+			v[ k ].x += nder * ctrl[ span - deg + j ].x;
+			v[ k ].y += nder * ctrl[ span - deg + j ].y;
+			v[ k ].z += nder * ctrl[ span - deg + j ].z;
+			// Sigma( N' x w )
+			v[ k ].w += nder * ctrl[ span - deg + j ].w;
 
 		}
 
 	}
 
+	const w = v[ 0 ].w;
+
 	for ( let k = 0; k <= n; k ++ ) {
 
 		for ( let i = 1; i <= k; i ++ ) {
 
-			v[ k ].x -= binomial( k, i ) * v[ k ].w * v[ k - i ].x;
-			v[ k ].y -= binomial( k, i ) * v[ k ].w * v[ k - i ].y;
-			v[ k ].z -= binomial( k, i ) * v[ k ].w * v[ k - i ].z;
+			const binw = binomial( k, i ) * v[ k ].w;
+			v[ k ].x -= binw * v[ k - i ].x;
+			v[ k ].y -= binw * v[ k - i ].y;
+			v[ k ].z -= binw * v[ k - i ].z;
 
 		}
 
-		v[ k ].x /= v[ 0 ].w;
-		v[ k ].y /= v[ 0 ].w;
-		v[ k ].z /= v[ 0 ].w;
+		// deweight
+		v[ k ].x /= w;
+		v[ k ].y /= w;
+		v[ k ].z /= w;
 
 	}
 
@@ -810,7 +818,7 @@ function intersect3DLines( p0, d0, p1, d1 ) {
 
 	} else {
 
-		return 0; // no intersection
+		return p0; // no intersection
 
 	}
 
@@ -1125,7 +1133,9 @@ function solve( a, pts ) {
 
 }
 
-// Compute weighted control points to make use of nonrational form (four-dimensional coordinates)
+/*
+ * Compute weighted control points to make use of (four-dimensional) homogeneous coordinates representing nonrational form.
+ */
 function weightedCtrlp( v3, weight ) {
 
 	const v4 = [];
@@ -1144,7 +1154,6 @@ function weightedCtrlp( v3, weight ) {
 
 }
 
-// Convert weighted control points () into control points (in three-dimensional coordinates)
 function deWeight( v4 ) {
 
 	const isArray = Array.isArray( v4 );
