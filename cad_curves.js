@@ -125,7 +125,6 @@ function init() {
 
 	let index = 0;
 	let isAdd = false;
-	var previousIntersect = new THREE.Vector3();
 
 	document.addEventListener( 'pointermove', e => {
 
@@ -136,12 +135,19 @@ function init() {
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
+		const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
+
 		switch ( menubar.state ) {
 
 			case 'Add':
 
 				raycaster.ray.intersectPlane( plane, intersect );
-				if ( curve.pole !== undefined ) {
+
+				if ( curve.designPoints.length == 0 ) {
+
+					curve.add( new THREE.Vector3() );
+
+				} else {
 
 					if ( isAdd ) {
 
@@ -150,10 +156,9 @@ function init() {
 
 					} else {
 
-						curve.mod( curve.pole.length - 1, intersect );
+						curve.mod( curve.designPoints.length - 1, intersect );
 
 					}
-
 
 				}
 
@@ -166,13 +171,14 @@ function init() {
 				break;
 
 			case 'Tangent':
-				for ( let i = 0; i < curve.pole.length; i ++ ) {
+				for ( let i = 0; i < curve.designPoints.length; i ++ ) {
 
-					const v = curve.pole[ i ].point;
+					const v = curve.designPoints[ i ];
 					const distance = raycaster.ray.distanceToPoint( v );
 					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
+						curve.removeKnuckle( i );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
@@ -183,13 +189,11 @@ function init() {
 
 				break;
 
-			default:
+			default: // curve point editting
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				updateDistance( curve, buffer.distance, intersect );
-				const intPoints = raycaster.intersectObjects( [ buffer.points ], true );
 
-				// Modify curve point
 				if ( intPoints.length > 0 ) {
 
 					const pos = new THREE.Vector3( intPoints[ 0 ].point.x, intPoints[ 0 ].point.y, intPoints[ 0 ].point.z );
@@ -215,8 +219,6 @@ function init() {
 				}
 
 		}
-
-		previousIntersect = intersect;
 
 	} );
 
@@ -255,7 +257,7 @@ function init() {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;
-					updateSelectedPoint( buffer.point, curve.pole[ index ].point );
+					updateSelectedPoint( buffer.point, curve.designPoints[ index ] );
 
 				}
 
@@ -278,7 +280,6 @@ function init() {
 					curve.remove( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
-					renderer.render( scene, camera );
 
 				}
 
@@ -295,7 +296,41 @@ function init() {
 					curve.removeTangent( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
-					renderer.render( scene, camera );
+
+				}
+
+				break;
+
+			case 'Knot insert':
+
+				raycaster.ray.intersectPlane( plane, intersect );
+				const t = curve.closestPosition( intersect )[ 0 ];
+				curve.insertKnotAt( t );
+				updateCurveBuffer( curve, buffer );
+				updateLines( curve, selected.lines );
+
+				break;
+
+			case 'Knuckle':
+
+				if ( intPoints.length > 0 ) {
+
+					curve.removeTangent( intPoints[ 0 ].index ); // tangent removed as knuckle added
+					curve.addKnuckle( intPoints[ 0 ].index );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.lines );
+
+				}
+
+				break;
+
+			case 'Remove knuckle':
+
+				if ( intPoints.length > 0 ) {
+
+					curve.removeKnuckle( intPoints[ 0 ].index );
+					updateCurveBuffer( curve, buffer );
+					updateLines( curve, selected.lines );
 
 				}
 
@@ -331,7 +366,7 @@ function init() {
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
 	// Create model and menubar
-	const geometry = new THREE.SphereGeometry( 0.01 );
+	const geometry = new THREE.SphereGeometry( 0.02 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;
@@ -368,7 +403,7 @@ function init() {
 
 	for ( let j = 0; j < 10; j ++ ) {
 
-		menubar.dom.children[ 2 ].children[ 1 ].children[ 3 ].click();
+		menubar.dom.children[ 2 ].children[ 1 ].children[ 4 ].click();
 		const curve = selected.lines.curve;
 
 		for ( let i = 0; i < 10; i ++ ) {
@@ -630,7 +665,7 @@ function preBuffer() {
 	pos = new Float32Array( 2 * 3 );
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	geo.setDrawRange( 0, 2 );
-	mat.color.set( 0x00ff00 );
+	mat.color.set( 0x006000 );
 	const distance = new THREE.Line( geo, mat );
 
 	point.renderOrder = 100;
@@ -652,9 +687,9 @@ function preBuffer() {
 
 function updateCurveBuffer( curve, buffer ) {
 
+	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 	updateLines( curve, buffer.lines );
 	updateCurvature( curve, buffer.curvature );
-	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
 
 }
 
@@ -663,7 +698,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	let pts, geo, pos, arr, index;
 
 	//update design points
-	pts = curve.pole.map( e => e.point );
+	pts = curve.designPoints;
 	geo = points.geometry;
 	geo.setDrawRange( 0, pts.length );
 	geo.computeBoundingBox();
@@ -682,7 +717,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	}
 
 	//update control points
-	pts = curve.getCtrlPoints();
+	pts = curve.ctrlPoints;
 	geo = ctrlPoints.geometry;
 	geo.setDrawRange( 0, pts.length );
 	pos = geo.attributes.position;
