@@ -34,6 +34,18 @@ class Arc extends NurbsCurve {
 
 	}
 
+	get r1() {
+
+		return this.p1.clone().sub( this.p0 );
+
+	}
+
+	get r2() {
+
+		return this.p2.clone().sub( this.p0 );
+
+	}
+
 	get x() {
 
 		const v = this.p1.clone().sub( this.p0 );
@@ -50,7 +62,7 @@ class Arc extends NurbsCurve {
 
 	get r() {
 
-		const v = this.p1.clone().sub( this.p0 );
+		const v = this.r1;
 		return v.length();
 
 	}
@@ -63,12 +75,12 @@ class Arc extends NurbsCurve {
 
 	get a1() {
 
-		const d1 = this.p1.clone().sub( this.p0 );
-		const d2 = this.p2.clone().sub( this.p0 );
-		var theta = d1.clone().dot( d2 ) / ( d1.length() * d2.length() );
+		const r1 = this.r1;
+		const r2 = this.r2;
+		var theta = r1.clone().dot( r2 ) / ( r1.length() * r2.length() );
 		theta = Math.acos( theta );
 
-		const isFlipped = d1.cross( d2 ).normalize().add( this.normal ).length() < 1e-9;
+		const isFlipped = r1.cross( r2 ).normalize().add( this.normal ).length() < 1e-9;
 		return isFlipped ? 2.0 * Math.PI - theta : theta;
 
 	}
@@ -93,6 +105,7 @@ class Arc extends NurbsCurve {
 	mod( i, v ) {
 
 		v = new Vector3( v.x, v.y, v.z );
+
 		switch ( i ) {
 
 			case 0 :
@@ -102,7 +115,13 @@ class Arc extends NurbsCurve {
 
 			case 1 :
 				this.p1.copy( v );
-				this.pole.length == 3 ? this.p2.sub( this.p0 ).normalize().mul( this.r ).add( this.p0 ) : null;
+				if ( this.pole.length == 3 ) {
+
+					v.copy( this.r2 ).normalize().mul( this.r );
+					this.p2.copy( v.add( this.p0 ) );
+
+				}
+
 				break;
 
 			case 2 :

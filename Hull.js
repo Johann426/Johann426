@@ -11,11 +11,11 @@ class Hull {
 		this.HubD_face = Number( arr[ 5 ].split( /\s+/ )[ 1 ] );
 		this.rbyR = arr[ 6 ].split( /\s+/ ).map( e => Number( e ) );
 		this.rbyR.splice( 0, 1 );
-		
+
 		console.log( txt );
 
 	}
-	
+
 	getCurves() {
 	}
 

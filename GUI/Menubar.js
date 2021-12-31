@@ -57,7 +57,7 @@ class Menubar extends UIElement {
 				hull.readTxt( txt );
 
 			};
-			
+
 			reader.readAsText( file );
 
 		} );
@@ -111,6 +111,7 @@ class Menubar extends UIElement {
 		items.add( new MenuItem( 'knot insert' ) );
 		items.add( new MenuItem( 'add knuckle' ) );
 		items.add( new MenuItem( 'remove knuckle' ) );
+		items.add( new MenuItem( 'incert point' ) );
 		menu.add( items );
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
@@ -153,6 +154,12 @@ class Menubar extends UIElement {
 		items.dom.children[ 6 ].addEventListener( 'click', () => {
 
 			this.state = 'Remove knuckle';
+
+		} );
+
+		items.dom.children[ 7 ].addEventListener( 'click', () => {
+
+			this.state = 'Incert Point';
 
 		} );
 

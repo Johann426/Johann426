@@ -47,6 +47,13 @@ class IntBspline extends Parametric {
 
 	}
 
+	remove( i ) {
+
+		this.pole.splice( i, 1 );
+		this.needsUpdate = true;
+
+	}
+
 	mod( i, v ) {
 
 		this.pole[ i ].point = v;
@@ -61,10 +68,16 @@ class IntBspline extends Parametric {
 
 	}
 
-	remove( i ) {
+	incertPointAt( t, v ) {
 
-		this.pole.splice( i, 1 );
-		this.needsUpdate = true;
+		if ( t > 0.0 && t < 1.0 ) {
+
+			const pts = this.pole.map( e => e.point );
+			const prm = parameterize( pts, this.type );
+			const i = prm.findIndex( e => e > t );
+			this.incert( i, v );
+
+		}
 
 	}
 
@@ -192,7 +205,6 @@ class IntBspline extends Parametric {
 			const pts = lPole[ i ].map( e => e.point );
 			const prm = parameterize( pts, this.type );
 			const knot = calcKnots( deg, prm, lPole[ i ] );
-			//lPole[ i ].map( e => e.knuckle = undefined );
 			const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
 			const chordL = this.getChordLength( pts );
 
