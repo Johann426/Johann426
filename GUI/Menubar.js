@@ -1,6 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
+import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
 import { updateProp, drawProp } from '../cad_curves.js';
@@ -12,14 +13,10 @@ class Menubar extends UIElement {
 		super( 'div' );
 		this.setId( 'menubar' );
 		this.add( this.file( scene, hull, prop ) );
-		this.add( this.edit() );
-		this.add( this.curve() );
+		this.add( this.edit( selected ) );
+		this.add( this.curve( buffer, pickable, selected ) );
 		this.add( this.surface() );
 		this.state = 'view';
-		this.scene = scene;
-		this.buffer = buffer;
-		this.pickable = pickable;
-		this.selected = selected;
 
 	}
 
@@ -46,7 +43,7 @@ class Menubar extends UIElement {
 
 		const hullOpen = document.createElement( 'input' );
 		hullOpen.type = 'file';
-		hullOpen.addEventListener( 'change', function () {
+		hullOpen.onchange = function () {
 
 			const file = this.files[ 0 ];
 			const reader = new FileReader();
@@ -54,13 +51,14 @@ class Menubar extends UIElement {
 			reader.onload = function ( e ) {
 
 				const txt = e.target.result;
+				console.log( txt );
 				hull.readTxt( txt );
 
 			};
 
 			reader.readAsText( file );
 
-		} );
+		};
 
 		const propOpen = document.createElement( 'input' );
 		propOpen.type = 'file';
@@ -99,139 +97,142 @@ class Menubar extends UIElement {
 
 	}
 
-	edit() {
+	edit( selected ) {
 
+		var item;
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'Edit' ) );
 		const items = new MenuItems();
-		items.add( new MenuItem( 'Add point' ) );
-		items.add( new MenuItem( 'Add tangent' ) );
-		items.add( new MenuItem( 'Remove point' ) );
-		items.add( new MenuItem( 'Remove tangent' ) );
-		items.add( new MenuItem( 'knot insert' ) );
-		items.add( new MenuItem( 'add knuckle' ) );
-		items.add( new MenuItem( 'remove knuckle' ) );
-		items.add( new MenuItem( 'incert point' ) );
-		menu.add( items );
+		item = new MenuItem( 'Add point' );
+		item.dom.onclick = () => {
 
-		items.dom.children[ 0 ].addEventListener( 'click', () => {
-
-			this.selected.lines.curve.add( new THREE.Vector3() );
+			selected.lines.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
-		} );
+		};
 
-		items.dom.children[ 1 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'Add tangent' );
+		item.dom.onclick = () => {
 
 			this.state = 'Tangent';
 
-		} );
+		};
 
-		items.dom.children[ 2 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'Remove point' );
+		item.dom.onclick = () => {
 
 			this.state = 'Remove';
 
-		} );
+		};
 
-		items.dom.children[ 3 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'Remove tangent' );
+		item.dom.onclick = () => {
 
 			this.state = 'Remove tangent';
 
-		} );
+		};
 
-		items.dom.children[ 4 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'knot insert' );
+		item.dom.onclick = () => {
 
 			this.state = 'Knot insert';
 
-		} );
+		};
 
-		items.dom.children[ 5 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'add knuckle' );
+		item.dom.onclick = () => {
 
 			this.state = 'Knuckle';
 
-		} );
+		};
 
-		items.dom.children[ 6 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'remove knuckle' );
+		item.dom.onclick = () => {
 
 			this.state = 'Remove knuckle';
 
-		} );
+		};
 
-		items.dom.children[ 7 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'incert point' );
+		item.dom.onclick = () => {
 
 			this.state = 'Incert Point';
 
-		} );
+		};
+
+		items.add( item );
+		menu.add( items );
 
 		return menu;
 
 	}
 
-	curve() {
+	curve( buffer, pickable, selected ) {
 
+		var item;
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'Lines' ) );
 		const items = new MenuItems();
-		items.add( new MenuItem( 'Line' ) );
-		items.add( new MenuItem( 'Arc' ) );
-		items.add( new MenuItem( 'Circle' ) );
+		item = new MenuItem( 'Line' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+		item = new MenuItem( 'Arc' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+		item = new MenuItem( 'Circle' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
 		items.add( new MenuDivider() );
-		items.add( new MenuItem( 'Curve' ) );
+		item = new MenuItem( 'Curve' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
 		menu.add( items );
 
-		items.dom.children[ 0 ].addEventListener( 'click', () => {
-
-		} );
-
-		items.dom.children[ 1 ].addEventListener( 'click', () => {
-
-			const geo = this.buffer.lines.geometry.clone();
-			const mat = this.buffer.lines.material.clone();
-			const lines = new THREE.Line( geo, mat );
-			const curve = new Arc();
-			Object.defineProperty( lines, 'curve', { value: curve } );
-			mat.color.set( 0x808080 );
-			this.pickable.add( lines );
-			this.selected.lines = lines;
-			this.state = 'Add';
-			const buffer = this.buffer;
-			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
-
-		} );
-
-		items.dom.children[ 2 ].addEventListener( 'click', () => {
-
-			const geo = this.buffer.lines.geometry.clone();
-			const mat = this.buffer.lines.material.clone();
-			const lines = new THREE.Line( geo, mat );
-			const curve = new Circle();
-			Object.defineProperty( lines, 'curve', { value: curve } );
-			mat.color.set( 0x808080 );
-			this.pickable.add( lines );
-			this.selected.lines = lines;
-			this.state = 'Add';
-			const buffer = this.buffer;
-			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
-
-		} );
-
-		items.dom.children[ 4 ].addEventListener( 'click', () => {
-
-			const geo = this.buffer.lines.geometry.clone();
-			const mat = this.buffer.lines.material.clone();
-			const lines = new THREE.Line( geo, mat );
-			const curve = new IntBspline( 3 );
-			Object.defineProperty( lines, 'curve', { value: curve } );
-			mat.color.set( 0x808080 );
-			this.pickable.add( lines );
-			this.selected.lines = lines;
-			this.state = 'Add';
-			const buffer = this.buffer;
-			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
-
-		} );
-
 		return menu;
+
+	}
+
+	curveItemClick( item, buffer, pickable, selected ) {
+
+		const dom = item.dom;
+
+		dom.onclick = ( ) => {
+
+			const geo = buffer.lines.geometry.clone();
+			const mat = buffer.lines.material.clone();
+			const lines = new THREE.Line( geo, mat );
+
+			switch ( dom.textContent ) {
+
+				case 'Line':
+					Object.defineProperty( lines, 'curve', { value: new Line() } );
+					break;
+				case 'Arc':
+					Object.defineProperty( lines, 'curve', { value: new Arc() } );
+					break;
+				case 'Circle':
+					Object.defineProperty( lines, 'curve', { value: new Circle() } );
+					break;
+				case 'Curve':
+					Object.defineProperty( lines, 'curve', { value: new IntBspline( 3 ) } );
+					break;
+
+			}
+
+			mat.color.set( 0x808080 );
+			pickable.add( lines );
+			selected.lines = lines;
+			this.state = 'Add';
+			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
+
+		};
 
 	}
 
