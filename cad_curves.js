@@ -7,6 +7,7 @@ import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './Propeller.js';
+import { Hull } from './Hull.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -178,7 +179,6 @@ function init() {
 					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
-						curve.removeKnuckle( i );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
 						updateLines( curve, selected.lines );
@@ -315,7 +315,6 @@ function init() {
 
 				if ( intPoints.length > 0 ) {
 
-					curve.removeTangent( intPoints[ 0 ].index ); // tangent removed as knuckle added
 					curve.addKnuckle( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
 					updateLines( curve, selected.lines );
@@ -333,6 +332,16 @@ function init() {
 					updateLines( curve, selected.lines );
 
 				}
+
+				break;
+
+			case 'Incert Point':
+
+				raycaster.ray.intersectPlane( plane, intersect );
+				const p = curve.closestPosition( intersect );
+				curve.incertPointAt( p[ 0 ], p[ 1 ] );
+				updateCurveBuffer( curve, buffer );
+				updateLines( curve, selected.lines );
 
 				break;
 
@@ -373,7 +382,8 @@ function init() {
 	scene.add( sphereInter );
 
 	const prop = new Propeller();
-	const menubar = new Menubar( scene, preBuffer(), pickable, selected, prop );
+	const hull = new Hull();
+	const menubar = new Menubar( scene, preBuffer(), pickable, selected, hull, prop );
 	document.body.appendChild( menubar.dom );
 	const sidebar = new UITabbedPanel();
 	document.body.appendChild( sidebar.dom );
@@ -398,8 +408,8 @@ function init() {
 	// } );
 
 
-	const hull = new wigleyHull();
-	const pts = hull.getSectionLines();
+	const wHull = new wigleyHull();
+	const pts = wHull.getSectionLines();
 
 	for ( let j = 0; j < 10; j ++ ) {
 

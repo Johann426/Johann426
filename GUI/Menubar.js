@@ -7,11 +7,11 @@ import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, buffer, pickable, selected, prop ) {
+	constructor( scene, buffer, pickable, selected, hull, prop ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.add( this.file( scene, prop ) );
+		this.add( this.file( scene, hull, prop ) );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
@@ -23,7 +23,7 @@ class Menubar extends UIElement {
 
 	}
 
-	file( scene, prop ) {
+	file( scene, hull, prop ) {
 
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
@@ -48,7 +48,17 @@ class Menubar extends UIElement {
 		hullOpen.type = 'file';
 		hullOpen.addEventListener( 'change', function () {
 
-			// do something
+			const file = this.files[ 0 ];
+			const reader = new FileReader();
+
+			reader.onload = function ( e ) {
+
+				const txt = e.target.result;
+				hull.readTxt( txt );
+
+			};
+
+			reader.readAsText( file );
 
 		} );
 
@@ -101,6 +111,7 @@ class Menubar extends UIElement {
 		items.add( new MenuItem( 'knot insert' ) );
 		items.add( new MenuItem( 'add knuckle' ) );
 		items.add( new MenuItem( 'remove knuckle' ) );
+		items.add( new MenuItem( 'incert point' ) );
 		menu.add( items );
 
 		items.dom.children[ 0 ].addEventListener( 'click', () => {
@@ -143,6 +154,12 @@ class Menubar extends UIElement {
 		items.dom.children[ 6 ].addEventListener( 'click', () => {
 
 			this.state = 'Remove knuckle';
+
+		} );
+
+		items.dom.children[ 7 ].addEventListener( 'click', () => {
+
+			this.state = 'Incert Point';
 
 		} );
 
