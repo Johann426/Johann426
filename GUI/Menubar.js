@@ -7,11 +7,11 @@ import { updateProp, drawProp } from '../cad_curves.js';
 
 class Menubar extends UIElement {
 
-	constructor( scene, buffer, pickable, selected, prop ) {
+	constructor( scene, buffer, pickable, selected, hull, prop ) {
 
 		super( 'div' );
 		this.setId( 'menubar' );
-		this.add( this.file( scene, prop ) );
+		this.add( this.file( scene, hull, prop ) );
 		this.add( this.edit() );
 		this.add( this.curve() );
 		this.add( this.surface() );
@@ -48,7 +48,17 @@ class Menubar extends UIElement {
 		hullOpen.type = 'file';
 		hullOpen.addEventListener( 'change', function () {
 
-			// do something
+			const file = this.files[ 0 ];
+			const reader = new FileReader();
+
+			reader.onload = function ( e ) {
+
+				const txt = e.target.result;
+				hull.readTxt( txt );
+
+			};
+			
+			reader.readAsText( file );
 
 		} );
 
