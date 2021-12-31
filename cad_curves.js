@@ -373,6 +373,7 @@ function init() {
 	scene.add( sphereInter );
 
 	const prop = new Propeller();
+	const hull = new Hull();
 	const menubar = new Menubar( scene, preBuffer(), pickable, selected, prop );
 	document.body.appendChild( menubar.dom );
 	const sidebar = new UITabbedPanel();
