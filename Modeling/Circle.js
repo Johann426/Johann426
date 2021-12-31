@@ -7,8 +7,6 @@ class Circle extends NurbsCurve {
 
 		super( 2 );
 
-		this.knots = [ 0.0, 0.0, 0.0, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1.0, 1.0, 1.0 ];
-
 		this.pole = [];
 
 		this.normal = new Vector3( 0, 0, 1 );
@@ -73,13 +71,30 @@ class Circle extends NurbsCurve {
 
 	getPointAt( t ) {
 
-		this.needsUpdate ? this._calcCtrlPoints() : null;
+		if ( this.pole.length == 1 ) {
+
+			this.knots = [ 0.0, 1.0 ];
+			this.ctrlpw = [ weightedCtrlp( this.p0, 1.0 ) ];
+
+		} else {
+
+			this.needsUpdate ? this._calcCtrlPoints( this.r ) : null;
+
+		}
 
 		return super.getPointAt( t );
 
 	}
 
-	_calcCtrlPoints() {
+	_calcCtrlPoints( r ) {
+
+		this.ninePtsSquare( r );
+		this.needsUpdate = false;
+
+	}
+
+	// nine-point square control polygon
+	ninePtsSquare( r ) {
 
 		const ctrlp = [];
 		ctrlp[ 0 ] = new Vector3( 1.0, 0.0, 0.0 );
@@ -91,16 +106,49 @@ class Circle extends NurbsCurve {
 		ctrlp[ 6 ] = new Vector3( 0.0, - 1.0, 0.0 );
 		ctrlp[ 7 ] = new Vector3( 1.0, - 1.0, 0.0 );
 		ctrlp[ 8 ] = new Vector3( 1.0, 0.0, 0.0 );
+		ctrlp.map( e => e.mul( r ).add( this.p0 ) );
 		const w1 = 0.5 * Math.sqrt( 2.0 );
 		const weight = [ 1.0, w1, 1.0, w1, 1.0, w1, 1.0, w1, 1.0 ];
-
-		this.pole.length == 2 ? ctrlp.map( e => e.mul( this.r ) ) : null;
-
-		ctrlp.map( e => e.add( this.p0 ) );
-
+		this.knots = [ 0.0, 0.0, 0.0, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1.0, 1.0, 1.0 ];
 		this.ctrlpw = weightedCtrlp( ctrlp, weight );
 
-		this.needsUpdate = false;
+	}
+
+	// seven-point triangular control polygon
+	sevenPtsTriangle( r ) {
+
+		const ctrlp = [];
+		const a = 0.5 * Math.sqrt( 3.0 );
+		ctrlp[ 0 ] = new Vector3( a, 0.5, 0.0 );
+		ctrlp[ 1 ] = new Vector3( 0.0, 2.0, 0.0 );
+		ctrlp[ 2 ] = new Vector3( - a, 0.5, 0.0 );
+		ctrlp[ 3 ] = new Vector3( - 2.0 * a, - 1.0, 0.0 );
+		ctrlp[ 4 ] = new Vector3( 0.0, - 1.0, 0.0 );
+		ctrlp[ 5 ] = new Vector3( 2.0 * a, - 1.0, 0.0 );
+		ctrlp[ 6 ] = new Vector3( a, 0.5, 0.0 );
+		ctrlp.map( e => e.mul( r ).add( this.p0 ) );
+		const weight = [ 1, 0.5, 1.0, 0.5, 1.0, 0.5, 1.0 ];
+		const one3rd = 1.0 / 3.0, two3rd = 2.0 / 3.0;
+		this.knots = [ 0.0, 0.0, 0.0, one3rd, one3rd, two3rd, two3rd, 1.0, 1.0, 1.0 ];
+		this.ctrlpw = weightedCtrlp( ctrlp, weight );
+
+	}
+
+	// seven-point square control polygon
+	sevenPtsSquare( r ) {
+
+		const ctrlp = [];
+		ctrlp[ 0 ] = new Vector3( 1.0, 0.0, 0.0 );
+		ctrlp[ 1 ] = new Vector3( 1.0, 1.0, 0.0 );
+		ctrlp[ 2 ] = new Vector3( - 1.0, 1.0, 0.0 );
+		ctrlp[ 3 ] = new Vector3( - 1.0, 0.0, 0.0 );
+		ctrlp[ 4 ] = new Vector3( - 1.0, - 1.0, 0.0 );
+		ctrlp[ 5 ] = new Vector3( 1.0, - 1.0, 0.0 );
+		ctrlp[ 6 ] = new Vector3( 1.0, 0.0, 0.0 );
+		ctrlp.map( e => e.mul( r ).add( this.p0 ) );
+		const weight = [ 1, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0 ];
+		this.knots = [ 0.0, 0.0, 0.0, 0.25, 0.5, 0.5, 0.75, 1.0, 1.0, 1.0 ];
+		this.ctrlpw = weightedCtrlp( ctrlp, weight );
 
 	}
 

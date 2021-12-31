@@ -1138,19 +1138,34 @@ function solve( a, pts ) {
  */
 function weightedCtrlp( v3, weight ) {
 
-	const v4 = [];
+	const isArray = Array.isArray( v3 );
 
-	for ( let i = 0; i < v3.length; i ++ ) {
+	if ( isArray ) {
 
-		const x = v3[ i ].x;
-		const y = v3[ i ].y;
-		const z = v3[ i ].z;
-		const w = weight[ i ];
-		v4.push( new Vector4( w * x, w * y, w * z, w ) );
+		const v4 = [];
+
+		for ( let i = 0; i < v3.length; i ++ ) {
+
+			const x = v3[ i ].x;
+			const y = v3[ i ].y;
+			const z = v3[ i ].z;
+			const w = weight[ i ];
+			v4.push( new Vector4( w * x, w * y, w * z, w ) );
+
+		}
+
+		return v4;
+
+	} else {
+
+		const x = v3.x;
+		const y = v3.y;
+		const z = v3.z;
+		const w = weight;
+
+		return new Vector4( x, y, z, w );
 
 	}
-
-	return v4;
 
 }
 

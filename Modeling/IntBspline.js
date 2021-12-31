@@ -40,6 +40,24 @@ class IntBspline extends Parametric {
 
 	}
 
+	get chordL() {
+
+		const points = this.pole.map( e => e.point );
+		const n = points.length;
+		var sum = 0.0;
+
+		for ( let i = 1; i < n; i ++ ) {
+
+			const del = points[ i ].clone().sub( points[ i - 1 ] );
+			const len = del.length();
+			sum += len;
+
+		}
+
+		return sum;
+
+	}
+
 	add( v ) {
 
 		this.pole.push( { point: v } );
@@ -83,9 +101,7 @@ class IntBspline extends Parametric {
 
 	addTangent( i, v ) {
 
-		const points = this.pole.map( e => e.point );
-		const chordL = this.getChordLength( points );
-		v.normalize().multiplyScalar( chordL * 0.5 );
+		v.normalize().multiplyScalar( this.chordL * 0.5 );
 		this.pole[ i ].slope = v;
 		this.needsUpdate = true;
 
@@ -93,8 +109,25 @@ class IntBspline extends Parametric {
 
 	addKnuckle( i ) {
 
+		console.warn( 'addKnuckle( i ) has been deprecated' );
 		this.pole[ i ].knuckle = true;
 		this.needsUpdate = true;
+
+	}
+
+	addKnuckle( i, v ) {
+
+		if ( i == 0 || i == this.pole.length - 1 ) {
+
+			v.length() == 0 ? null : this.addTangent( i, v );
+
+		} else {
+
+			v.normalize().multiplyScalar( this.chordL * 0.5 );
+			this.pole[ i ].knuckle = v;
+			this.needsUpdate = true;
+
+		}
 
 	}
 
@@ -115,23 +148,6 @@ class IntBspline extends Parametric {
 	insertKnotAt( t = 0.5 ) {
 
 		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
-
-	}
-
-	getChordLength( points ) {
-
-		const n = points.length;
-		var sum = 0.0;
-
-		for ( let i = 1; i < n; i ++ ) {
-
-			const del = points[ i ].clone().sub( points[ i - 1 ] );
-			const len = del.length();
-			sum += len;
-
-		}
-
-		return sum;
 
 	}
 
@@ -171,20 +187,20 @@ class IntBspline extends Parametric {
 
 	}
 
-	// Assign end derivatives at corner point. Written by Johann426
+	// After dividing a curve into local parts, assign end derivatives to each of coner points
 	_assignEndDers() {
 
 		const n = this.pole.length;
 		const index = []; // index array of corner points
-		index.push( 0 ); // start point into index
+		index.push( 0 ); // the first into index
 
 		for ( let i = 1; i < n; i ++ ) {
 
-			this.pole[ i ].knuckle == true ? index.push( i ) : null; // knuckle points into index
+			this.pole[ i ].knuckle ? index.push( i ) : null; // knuckle into index
 
 		}
 
-		index.push( n - 1 ); // end point into index
+		index.push( n - 1 ); // the last into index
 
 		const lPole = []; // local pole points
 
@@ -206,12 +222,39 @@ class IntBspline extends Parametric {
 			const prm = parameterize( pts, this.type );
 			const knot = calcKnots( deg, prm, lPole[ i ] );
 			const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
-			const chordL = this.getChordLength( pts );
 
+			// specify end derivatives
 			if ( lPole.length > 1 ) {
 
-				lPole[ i ][ 0 ].slope == undefined ? lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( chordL ) : null;
-				lPole[ i ][ nm1 ].slope == undefined ? lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( chordL ) : null;
+				// at the first index
+				if ( lPole[ i ][ 0 ].slope == undefined ) {
+
+					lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( this.chordL );
+
+				}
+
+				// at the last index
+				if ( lPole[ i ][ nm1 ].knuckle == undefined ) {
+
+					if ( lPole[ i ][ nm1 ].slope == undefined ) {
+
+						lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( this.chordL );
+
+					}
+
+				} else {
+
+					if ( lPole[ i ][ nm1 ].knuckle.length() == 0.0 ) {
+
+						lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( this.chordL );
+
+					} else {
+
+						lPole[ i ][ nm1 ].slope = lPole[ i ][ nm1 ].knuckle;
+
+					}
+
+				}
 
 			}
 

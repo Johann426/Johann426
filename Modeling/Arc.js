@@ -1,5 +1,5 @@
+import { Vector3, makeNurbsCircle } from './NurbsLib.js';
 import { NurbsCurve } from './NurbsCurve.js';
-import { Vector3, makeNurbsCircle, deWeight } from './NurbsLib.js';
 
 class Arc extends NurbsCurve {
 

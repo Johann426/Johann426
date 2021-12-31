@@ -189,6 +189,24 @@ function init() {
 
 				break;
 
+			case 'Knuckle':
+				for ( let i = 0; i < curve.designPoints.length; i ++ ) {
+
+					const v = curve.designPoints[ i ];
+					const distance = raycaster.ray.distanceToPoint( v );
+					if ( distance < 0.2 ) {
+
+						raycaster.ray.intersectPlane( plane, intersect );
+						curve.addKnuckle( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
+						updateCurveBuffer( curve, buffer );
+						updateLines( curve, selected.lines );
+
+					}
+
+				}
+
+				break;
+
 			default: // curve point editting
 
 				raycaster.ray.intersectPlane( plane, intersect );
@@ -312,14 +330,6 @@ function init() {
 				break;
 
 			case 'Knuckle':
-
-				if ( intPoints.length > 0 ) {
-
-					curve.addKnuckle( intPoints[ 0 ].index );
-					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
-
-				}
 
 				break;
 
