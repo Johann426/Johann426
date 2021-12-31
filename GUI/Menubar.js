@@ -23,7 +23,7 @@ class Menubar extends UIElement {
 
 	}
 
-	file( scene, prop ) {
+	file( scene, hull, prop ) {
 
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
