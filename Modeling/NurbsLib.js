@@ -1429,4 +1429,36 @@ class Vector4 {
 
 }
 
+class Quaternion {
+
+	constructor( x = 0, y = 0, z = 0, w = 1 ) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+
+	}
+
+setFromAxisAngle( axis, angle ) {
+
+		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
+
+		// assumes axis is normalized
+
+		s = Math.sin( 0.5 * angle );
+
+		this.x = axis.x * s;
+		this.y = axis.y * s;
+		this.z = axis.z * s;
+		this.w = Math.cos( 0.5 * angle );
+
+		this._onChangeCallback();
+
+		return this;
+
+	}
+
+}
+
 export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
