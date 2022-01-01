@@ -3,7 +3,7 @@
  * and a global algorithm to solve the linear equations finding unknown control points.
  * code by Johann426
  */
-import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
+import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class IntBspline extends Parametric {
@@ -37,24 +37,6 @@ class IntBspline extends Parametric {
 	get designPoints() {
 
 		return this.pole.map( e => e.point );
-
-	}
-
-	get chordL() {
-
-		const points = this.pole.map( e => e.point );
-		const n = points.length;
-		var sum = 0.0;
-
-		for ( let i = 1; i < n; i ++ ) {
-
-			const del = points[ i ].clone().sub( points[ i - 1 ] );
-			const len = del.length();
-			sum += len;
-
-		}
-
-		return sum;
 
 	}
 
@@ -101,7 +83,8 @@ class IntBspline extends Parametric {
 
 	addTangent( i, v ) {
 
-		v.normalize().multiplyScalar( this.chordL * 0.5 );
+		const chordL = getChordLength( this.pole.map( e => e.point ) );
+		v.normalize().multiplyScalar( chordL * 0.5 );
 		this.pole[ i ].slope = v;
 		this.needsUpdate = true;
 
@@ -123,7 +106,8 @@ class IntBspline extends Parametric {
 
 		} else {
 
-			v.normalize().multiplyScalar( this.chordL * 0.5 );
+			const chordL = getChordLength( this.pole.map( e => e.point ) );
+			v.normalize().multiplyScalar( chordL * 0.5 );
 			this.pole[ i ].knuckle = v;
 			this.needsUpdate = true;
 
@@ -175,12 +159,6 @@ class IntBspline extends Parametric {
 
 	_calcCtrlPoints() {
 
-		const points = this.pole.map( e => e.point );
-		this.param = parameterize( points, this.type );
-
-		//this.knots = calcKnotsMult( this.deg, this.param, this.pole );
-		//this.ctrlp = globalCurveInterp( this.deg, this.param, this.knots, this.pole );
-
 		this._assignEndDers();
 
 		this.needsUpdate = false;
@@ -220,37 +198,45 @@ class IntBspline extends Parametric {
 			const deg = nm1 > this.deg ? this.deg : nm1;
 			const pts = lPole[ i ].map( e => e.point );
 			const prm = parameterize( pts, this.type );
-			const knot = calcKnots( deg, prm, lPole[ i ] );
-			const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
+			//const knot = calcKnots( deg, prm, lPole[ i ] );
+			//const ctrl = globalCurveInterpTngt( deg, prm, knot, lPole[ i ] );
+			const knot = deBoorKnots( deg, prm );
+			const ctrl = globalCurveInterp( deg, prm, knot, pts );
 
 			// specify end derivatives
 			if ( lPole.length > 1 ) {
 
-				// at the first index
-				if ( lPole[ i ][ 0 ].slope == undefined ) {
+				const p0 = lPole[ i ][ 0 ];
+				const p1 = lPole[ i ][ nm1 ];
+				const d0 = ctrl[ 1 ].clone().sub( ctrl[ 0 ] );
+				const d1 = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] );
+				const chordL = getChordLength( lPole[ i ].map( e => e.point ) );
 
-					lPole[ i ][ 0 ].slope = ctrl[ 1 ].clone().sub( ctrl[ 0 ] ).normalize().mul( this.chordL );
+				// at the first index
+				if ( p0.slope == undefined ) {
+
+					p0.slope = d0.normalize().mul( chordL );
 
 				}
 
 				// at the last index
-				if ( lPole[ i ][ nm1 ].knuckle == undefined ) {
+				if ( p1.knuckle == undefined ) {
 
-					if ( lPole[ i ][ nm1 ].slope == undefined ) {
+					if ( p1.slope == undefined ) {
 
-						lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( this.chordL );
+						p1.slope = d1.normalize().mul( chordL );
 
 					}
 
 				} else {
 
-					if ( lPole[ i ][ nm1 ].knuckle.length() == 0.0 ) {
+					if ( p1.knuckle.length() == 0.0 ) {
 
-						lPole[ i ][ nm1 ].slope = ctrl[ nm1 ].clone().sub( ctrl[ nm1 - 1 ] ).normalize().mul( this.chordL );
+						p1.slope = d1.normalize().mul( chordL );
 
 					} else {
 
-						lPole[ i ][ nm1 ].slope = lPole[ i ][ nm1 ].knuckle;
+						p1.slope = lPole[ i ][ nm1 ].knuckle;
 
 					}
 
@@ -359,6 +345,23 @@ function calcKnotsMult( deg, prm, pole ) {
 	}
 
 	return knots; //.sort( ( a, b ) => { return a - b } );
+
+}
+
+function getChordLength( pts ) {
+
+	const n = pts.length;
+	var sum = 0.0;
+
+	for ( let i = 1; i < n; i ++ ) {
+
+		const del = pts[ i ].clone().sub( pts[ i - 1 ] );
+		const len = del.length();
+		sum += len;
+
+	}
+
+	return sum;
 
 }
 
