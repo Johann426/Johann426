@@ -72,9 +72,7 @@ class IntBspline extends Parametric {
 
 		if ( t > 0.0 && t < 1.0 ) {
 
-			const pts = this.pole.map( e => e.point );
-			const prm = parameterize( pts, this.type );
-			const i = prm.findIndex( e => e > t );
+			const i = this.prm.findIndex( e => e > t );
 			this.incert( i, v );
 
 		}
@@ -189,10 +187,12 @@ class IntBspline extends Parametric {
 
 		}
 
+		const nl = lPole.length;
+		const lPrm = []; // local parameters
 		const lKnot = []; // local knot vector
 		const lCtrl = []; // local control points
 
-		for ( let i = 0; i < lPole.length; i ++ ) {
+		for ( let i = 0; i < nl; i ++ ) {
 
 			const nm1 = lPole[ i ].length - 1;
 			const deg = nm1 > this.deg ? this.deg : nm1;
@@ -204,7 +204,7 @@ class IntBspline extends Parametric {
 			const ctrl = globalCurveInterp( deg, prm, knot, pts );
 
 			// specify end derivatives
-			if ( lPole.length > 1 ) {
+			if ( nl > 1 ) {
 
 				const p0 = lPole[ i ][ 0 ];
 				const p1 = lPole[ i ][ nm1 ];
@@ -244,30 +244,42 @@ class IntBspline extends Parametric {
 
 			}
 
+			lPrm.push( prm );
 			lKnot.push( calcKnots( this.deg, prm, lPole[ i ] ) );
 			lCtrl.push( globalCurveInterpTngt( this.deg, prm, lKnot[ i ], lPole[ i ] ) );
 
 		}
 
+		this.prm = lPrm[ 0 ];
 		this.knots = lKnot[ 0 ];
 		this.ctrlp = lCtrl[ 0 ];
 
-		for ( let i = 1; i < lCtrl.length; i ++ ) {
+		for ( let i = 1; i < nl; i ++ ) {
 
 			for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
 
+				lPrm[ i ][ j ] += i;
 				lKnot[ i ][ j ] += i;
 
 			}
 
+			this.prm = this.prm.concat( lPrm[ i ].slice( 1 ) );
 			this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( this.deg + 1 ) );
 			this.ctrlp = this.ctrlp.concat( lCtrl[ i ].slice( 1 ) );
 
 		}
 
+		// normalize parameter 0 < t < 1
+		for ( let j = 0; j < this.prm.length; j ++ ) {
+
+			this.prm[ j ] /= nl;
+
+		}
+
+		// normalize knot vector
 		for ( let j = 0; j < this.knots.length; j ++ ) {
 
-			this.knots[ j ] /= lKnot.length;
+			this.knots[ j ] /= nl;
 
 		}
 
