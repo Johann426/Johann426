@@ -1,10 +1,10 @@
-/*
+/**
  * A number of pseudo code from The NURBS Book are implemented in js functions here.
  * code by Johann426
  */
 import { array } from '../vectorious/index.esm.js';
 
-/*
+/**
  * Assign parametric values to each point by chordal length (or centripetal) method.
  */
 function parameterize( points, curveType ) {
@@ -36,7 +36,7 @@ function parameterize( points, curveType ) {
 
 }
 
-/*
+/**
  * Having multiplicity of degree + 1 at corner, assign knot vector averaged over degree number of parameters.
  */
 function deBoorKnots( deg, prm ) {
@@ -69,7 +69,7 @@ function deBoorKnots( deg, prm ) {
 
 }
 
-/*
+/**
  * Having multiplicity of degree + 1 at corner, assign uniformly spaced knot vector.
  */
 function uniformlySpacedknots( deg, n ) {
@@ -97,7 +97,7 @@ function uniformlySpacedknots( deg, n ) {
 
 }
 
-/*
+/**
  * Compute Greville points (Greville abscissae) averaged over degree number of knots
  */
 function calcGreville( deg, knot ) {
@@ -122,7 +122,7 @@ function calcGreville( deg, knot ) {
 
 }
 
-/*
+/**
  * Compute the value of nth-degree Bernstein polynomials. See The NURBS Book, page 20, algorithm A1.2
  * i : index number
  * n : number of control points
@@ -149,7 +149,7 @@ function basisBernstein( i, n, t ) {
 
 }
 
-/*
+/**
  * Compute all nth-degree Bernstein polynomials. See The NURBS Book, page 21, algorithm A1.3
  * n : number of control points
  * t : parametric point
@@ -180,7 +180,7 @@ function allBernstein( n, t ) {
 
 }
 
-/*
+/**
  * Compute point on Bezier curve. See The NURBS Book, page 22, algorithm A1.4
  * ctrl : control points
  * t : parameteric point
@@ -855,7 +855,7 @@ function globalCurveInterp( deg, prm, knot, pts ) {
 }
 
 
-/*
+/**
  * Determine control points of curve interpolation with directional constraints. See Piegl et al (2008).
  * deg : degree
  * prm : parameterized values at each point
