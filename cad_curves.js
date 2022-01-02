@@ -829,7 +829,7 @@ function updateDistance( curve, distance, v ) {
 
 	let pts, pos, arr, index;
 	pts = [ v, curve.closestPoint( v ) ];
-	console.log( "distance=", v.clone().sub( curve.closestPoint( v ) ).length() );
+	//console.log( "distance=", v.clone().sub( curve.closestPoint( v ) ).length() );
 	pos = distance.geometry.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;

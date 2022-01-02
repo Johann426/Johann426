@@ -1302,7 +1302,7 @@ class Vector3 {
 
 	}
 
-applyQuaternion( q ) {
+	applyQuaternion( q ) {
 
 		const x = this.x, y = this.y, z = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -1440,13 +1440,13 @@ class Quaternion {
 
 	}
 
-setFromAxisAngle( axis, angle ) {
+	setFromAxisAngle( axis, angle ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 
 		// assumes axis is normalized
 
-		s = Math.sin( 0.5 * angle );
+		const s = Math.sin( 0.5 * angle );
 
 		this.x = axis.x * s;
 		this.y = axis.y * s;
