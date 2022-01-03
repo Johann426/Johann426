@@ -348,8 +348,9 @@ function init() {
 			case 'Incert Point':
 
 				raycaster.ray.intersectPlane( plane, intersect );
-				const p = curve.closestPosition( intersect );
-				curve.incertPointAt( p[ 0 ], p[ 1 ] );
+				//const p = curve.closestPosition( intersect );
+				//curve.incertPointAt( p[ 0 ], p[ 1 ] );
+				curve.addressPoint( intersect );
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
 
