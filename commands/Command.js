@@ -1,14 +1,14 @@
-class CurveEditCommand {
+class Command {
 
-	constructor( curve ) {
+	constructor( selected ) {
 
-		this.curve = curve;
+		this.selected = selected;
 
 	}
 
 	excute( action, points ) {
 
-		const curve = this.curve;
+		const curve = this.selected.lines.curve;
 
 		switch ( action ) {
 
@@ -16,11 +16,9 @@ class CurveEditCommand {
 
 				if ( points.length > 0 ) {
 
-					this.point = points[ 0 ];
+					this.point = points[ 0 ].point;
 					this.index = points[ 0 ].index;
 					curve.remove( this.index );
-					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
 
 				}
 
@@ -32,11 +30,12 @@ class CurveEditCommand {
 
 	undo() {
 
-		const curve = this.curve;
-		curve.incertPointAt( this.index, this.point );
-		updateCurveBuffer( curve, buffer );
-		updateLines( curve, selected.lines );
+		const curve = this.selected.lines.curve;
+		curve.incert( this.index, this.point );
+		console.log( this.point );
 
 	}
 
 }
+
+export { Command };

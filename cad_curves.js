@@ -8,6 +8,7 @@ import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './Propeller.js';
 import { Hull } from './Hull.js';
+import { Command } from './commands/Command.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -75,6 +76,16 @@ function init() {
 
 	document.addEventListener( 'keydown', e => {
 
+		if ( e.code == 'KeyZ' && e.ctrlKey ) {
+
+			console.log( 'ctrl + z' );
+			command.undo();
+			const curve = selected.lines.curve;
+			updateCurveBuffer( curve, buffer );
+			updateLines( curve, selected.lines );
+
+		}
+
 		switch ( e.code ) {
 
 			case 'ShiftLeft':
@@ -82,6 +93,10 @@ function init() {
 				break;
 
 			case 'ControlLeft':
+
+				break;
+
+			case 'KeyZ':
 
 				break;
 
@@ -292,13 +307,16 @@ function init() {
 
 			case 'Remove':
 
-				if ( intPoints.length > 0 ) {
+				command.excute( 'Remove', intPoints );
+				updateCurveBuffer( curve, buffer );
+				updateLines( curve, selected.lines );
+				// if ( intPoints.length > 0 ) {
 
-					curve.remove( intPoints[ 0 ].index );
-					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
+				// 	curve.remove( intPoints[ 0 ].index );
+				// 	updateCurveBuffer( curve, buffer );
+				// 	updateLines( curve, selected.lines );
 
-				}
+				// }
 
 				break;
 
@@ -383,6 +401,8 @@ function init() {
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+
+	const command = new Command( selected );
 
 	// Create model and menubar
 	const geometry = new THREE.SphereGeometry( 0.02 );
