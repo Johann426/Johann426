@@ -22,24 +22,27 @@ class Menubar extends UIElement {
 
 	file( scene, hull, prop ) {
 
+		var item;
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
 		const items = new MenuItems();
-		items.add( new MenuItem( 'Import hull' ) );
-		items.add( new MenuItem( 'Import Propeller' ) );
-		menu.add( items );
-
-		items.dom.children[ 0 ].addEventListener( 'click', () => {
+		item = new MenuItem( 'Import hull' )
+		item.dom.onclick = () => {
 
 			hullOpen.click();
 
 		} );
 
-		items.dom.children[ 1 ].addEventListener( 'click', () => {
+		items.add( item );
+		item = new MenuItem( 'Import Propeller' )
+		item.dom.onclick = () => {
 
 			propOpen.click();
 
 		} );
+		
+		items.add( item );
+		menu.add( items );
 
 		const hullOpen = document.createElement( 'input' );
 		hullOpen.type = 'file';
