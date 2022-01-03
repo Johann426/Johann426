@@ -31,7 +31,7 @@ class Menubar extends UIElement {
 
 			hullOpen.click();
 
-		} );
+		};
 
 		items.add( item );
 		item = new MenuItem( 'Import Propeller' )
@@ -39,7 +39,7 @@ class Menubar extends UIElement {
 
 			propOpen.click();
 
-		} );
+		};
 		
 		items.add( item );
 		menu.add( items );
