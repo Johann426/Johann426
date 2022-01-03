@@ -79,7 +79,6 @@ function init() {
 
 			case 'ShiftLeft':
 
-				menubar.state = 'Add';
 				break;
 
 			case 'ControlLeft':

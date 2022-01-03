@@ -26,7 +26,7 @@ class Menubar extends UIElement {
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
 		const items = new MenuItems();
-		item = new MenuItem( 'Import hull' )
+		item = new MenuItem( 'Import hull' );
 		item.dom.onclick = () => {
 
 			hullOpen.click();
@@ -34,13 +34,13 @@ class Menubar extends UIElement {
 		};
 
 		items.add( item );
-		item = new MenuItem( 'Import Propeller' )
+		item = new MenuItem( 'Import Propeller' );
 		item.dom.onclick = () => {
 
 			propOpen.click();
 
 		};
-		
+
 		items.add( item );
 		menu.add( items );
 
