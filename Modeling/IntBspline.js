@@ -79,6 +79,29 @@ class IntBspline extends Parametric {
 
 	}
 
+	addressPoint( v ) {
+
+		const e = this.closestPosition( v );
+		const t = e[ 0 ];
+		const p = e[ 1 ];
+		
+		if ( t > 0.0 && t < 1.0 ) {
+
+			const i = this.prm.findIndex( e => e > t );
+			this.incert( i, p );
+
+		} else if( t == 0 ) {
+
+			this.incert( 0, v );
+
+		} else if( t == 1 ) {
+
+			this.add( v );
+
+		}
+
+	}
+
 	addTangent( i, v ) {
 
 		const chordL = getChordLength( this.pole.map( e => e.point ) );
