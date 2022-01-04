@@ -35,7 +35,7 @@ class Menubar extends UIElement {
 
 		items.add( item );
 		item = new MenuItem( 'Import Propeller' );
-		item.onclick( () => {
+		item.onClick( () => {
 
 			propOpen.click();
 
