@@ -6,6 +6,12 @@ class UIElement {
 
 	}
 
+	get textContent() {
+
+		return this.dom.textContent;
+
+	}
+
 	add() {
 
 		for ( let i = 0; i < arguments.length; i ++ ) {

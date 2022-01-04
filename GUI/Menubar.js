@@ -23,78 +23,47 @@ class Menubar extends UIElement {
 	file( scene, hull, prop ) {
 
 		var item;
+		var file;
 		const menu = new Menu();
 		menu.add( new MenuHeader( 'File' ) );
 		const items = new MenuItems();
-		item = new MenuItem( 'Import hull' );
-		item.onClick( () => {
+		item = new MenuItem( 'Hull :' );
+		file = new SelectFile();
+		file.onLoad( function ( e ) {
 
-			hullOpen.click();
+			const txt = e.target.result;
+			console.log( txt );
+			hull.readTxt( txt );
 
 		} );
-
+		item.add( file );
 		items.add( item );
-		item = new MenuItem( 'Import Propeller' );
-		item.onClick( () => {
+		item = new MenuItem( 'Propeller :' );
+		file = new SelectFile();
+		file.onLoad( function ( e ) {
 
-			propOpen.click();
+			const NoBlade = prop.NoBlade;
+			const txt = e.target.result;
+			prop.readTxt( txt );
+
+			const meshList = [];
+			prop.ids.map( e => meshList.push( scene.getObjectById( e ) ) );
+
+			if ( NoBlade == prop.NoBlade ) {
+
+				updateProp( meshList, prop );
+
+			} else {
+
+				meshList.map( e => scene.remove( e ) );
+				drawProp( prop ).map( e => scene.add( e ) );
+
+			}
 
 		} );
-
+		item.add( file );
 		items.add( item );
 		menu.add( items );
-
-		const hullOpen = document.createElement( 'input' );
-		hullOpen.type = 'file';
-		hullOpen.onchange = function () {
-
-			const file = this.files[ 0 ];
-			const reader = new FileReader();
-
-			reader.onload = function ( e ) {
-
-				const txt = e.target.result;
-				console.log( txt );
-				hull.readTxt( txt );
-
-			};
-
-			reader.readAsText( file );
-
-		};
-
-		const propOpen = document.createElement( 'input' );
-		propOpen.type = 'file';
-		propOpen.onchange = function () {
-
-			const file = this.files[ 0 ];
-			const reader = new FileReader();
-
-			reader.onload = function ( e ) {
-
-				const NoBlade = prop.NoBlade;
-				const txt = e.target.result;
-				prop.readTxt( txt );
-
-				const meshList = [];
-				prop.ids.map( e => meshList.push( scene.getObjectById( e ) ) );
-
-				if ( NoBlade == prop.NoBlade ) {
-
-					updateProp( meshList, prop );
-
-				} else {
-
-					meshList.map( e => scene.remove( e ) );
-					drawProp( prop ).map( e => scene.add( e ) );
-
-				}
-
-			};
-
-			reader.readAsText( file );
-
-		};
 
 		return menu;
 
@@ -107,68 +76,68 @@ class Menubar extends UIElement {
 		menu.add( new MenuHeader( 'Edit' ) );
 		const items = new MenuItems();
 		item = new MenuItem( 'Add point' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			selected.lines.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'Add tangent' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Tangent';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'Remove point' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Remove';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'Remove tangent' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Remove tangent';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'knot insert' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Knot insert';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'add knuckle' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Knuckle';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'remove knuckle' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Remove knuckle';
 
-		};
+		} );
 
 		items.add( item );
 		item = new MenuItem( 'incert point' );
-		item.dom.onclick = () => {
+		item.onClick( () => {
 
 			this.state = 'Incert Point';
 
-		};
+		} );
 
 		items.add( item );
 		menu.add( items );
@@ -204,15 +173,13 @@ class Menubar extends UIElement {
 
 	curveItemClick( item, buffer, pickable, selected ) {
 
-		const dom = item.dom;
-
-		dom.onclick = ( ) => {
+		item.onClick( ( ) => {
 
 			const geo = buffer.lines.geometry.clone();
 			const mat = buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
 
-			switch ( dom.textContent ) {
+			switch ( item.textContent ) {
 
 				case 'Line':
 					Object.defineProperty( lines, 'curve', { value: new Line() } );
@@ -235,7 +202,7 @@ class Menubar extends UIElement {
 			this.state = 'Add';
 			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
-		};
+		} );
 
 	}
 
@@ -286,7 +253,6 @@ class MenuItems extends UIElement {
 
 }
 
-
 class MenuItem extends UIElement {
 
 	constructor( name ) {
@@ -310,6 +276,31 @@ class MenuDivider extends UIElement {
 
 }
 
+class SelectFile extends UIElement {
 
+	constructor() {
+
+		super( 'input' );
+		this.setClass( 'item' );
+		this.dom.type = 'file';
+
+	}
+
+	onLoad( func ) {
+
+		this.dom.onchange = function () {
+
+			const file = this.files[ 0 ];
+			const reader = new FileReader();
+
+			reader.onload = func;
+
+			reader.readAsText( file );
+
+		};
+
+	}
+
+}
 
 export { Menubar };
