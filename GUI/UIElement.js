@@ -132,15 +132,15 @@ class UIElement {
 
 	}
 
-	addEventListener( name, func ) {
-
-		this.dom.addEventListener( name, func );
-
-	}
-
 	removeEventListener( name, func ) {
 
 		this.dom.removeEventListener( name, func );
+
+	}
+
+	onClick( func ) {
+
+		this.dom.addEventListener( 'click', func );
 
 	}
 
