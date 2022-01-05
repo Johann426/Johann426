@@ -1,16 +1,17 @@
 import * as THREE from '../Rendering/three.module.js';
-import { UIElement } from './UIElement.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
 import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
 import { updateProp, drawProp } from '../cad_curves.js';
+import { UIElement } from './UIElement.js';
+import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
-class Menubar extends UIElement {
+class Menubar extends UIPanel {
 
 	constructor( scene, buffer, pickable, selected, hull, prop ) {
 
-		super( 'div' );
+		super();
 		this.setId( 'menubar' );
 		this.add( this.file( scene, hull, prop ) );
 		this.add( this.edit( selected ) );
@@ -24,11 +25,26 @@ class Menubar extends UIElement {
 
 		var item;
 		var file;
-		const menu = new Menu();
-		menu.add( new MenuHeader( 'File' ) );
-		const items = new MenuItems();
-		item = new MenuItem( 'Hull :' );
-		file = new SelectFile();
+
+		const menu = new UIPanel();
+		menu.setClass( 'menu' );
+
+		const head = new UIPanel();
+		head.setTextContent( 'File' );
+		head.setClass( 'head' );
+		menu.add( head );
+
+		const items = new UIPanel();
+		items.setClass( 'items' );
+		menu.add( items );
+
+		// Import hull
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Hull :' );
+
+		file = new UIFile();
 		file.onLoad( function ( e ) {
 
 			const txt = e.target.result;
@@ -36,10 +52,17 @@ class Menubar extends UIElement {
 			hull.readTxt( txt );
 
 		} );
+
 		item.add( file );
 		items.add( item );
-		item = new MenuItem( 'Propeller :' );
-		file = new SelectFile();
+
+		// Import propeller
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Propeller :' );
+
+		file = new UIFile();
 		file.onLoad( function ( e ) {
 
 			const NoBlade = prop.NoBlade;
@@ -61,9 +84,9 @@ class Menubar extends UIElement {
 			}
 
 		} );
+
 		item.add( file );
 		items.add( item );
-		menu.add( items );
 
 		return menu;
 
@@ -72,10 +95,22 @@ class Menubar extends UIElement {
 	edit( selected ) {
 
 		var item;
-		const menu = new Menu();
-		menu.add( new MenuHeader( 'Edit' ) );
-		const items = new MenuItems();
-		item = new MenuItem( 'Add point' );
+
+		const menu = new UIPanel();
+		menu.setClass( 'menu' );
+
+		const head = new UIPanel();
+		head.setTextContent( 'Edit' );
+		head.setClass( 'head' );
+		menu.add( head );
+
+		const items = new UIPanel();
+		items.setClass( 'items' );
+		menu.add( items );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Add point' );
 		item.onClick( () => {
 
 			selected.lines.curve.add( new THREE.Vector3() );
@@ -84,7 +119,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'Add tangent' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Add tangent' );
 		item.onClick( () => {
 
 			this.state = 'Tangent';
@@ -92,7 +129,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'Remove point' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Remove point' );
 		item.onClick( () => {
 
 			this.state = 'Remove';
@@ -100,7 +139,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'Remove tangent' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Remove tangent' );
 		item.onClick( () => {
 
 			this.state = 'Remove tangent';
@@ -108,7 +149,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'knot insert' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'knot insert' );
 		item.onClick( () => {
 
 			this.state = 'Knot insert';
@@ -116,7 +159,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'add knuckle' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'add knuckle' );
 		item.onClick( () => {
 
 			this.state = 'Knuckle';
@@ -124,7 +169,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'remove knuckle' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'remove knuckle' );
 		item.onClick( () => {
 
 			this.state = 'Remove knuckle';
@@ -132,7 +179,9 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		item = new MenuItem( 'incert point' );
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'incert point' );
 		item.onClick( () => {
 
 			this.state = 'Incert Point';
@@ -140,7 +189,6 @@ class Menubar extends UIElement {
 		} );
 
 		items.add( item );
-		menu.add( items );
 
 		return menu;
 
@@ -149,23 +197,44 @@ class Menubar extends UIElement {
 	curve( buffer, pickable, selected ) {
 
 		var item;
-		const menu = new Menu();
-		menu.add( new MenuHeader( 'Lines' ) );
-		const items = new MenuItems();
-		item = new MenuItem( 'Line' );
-		this.curveItemClick( item, buffer, pickable, selected );
-		items.add( item );
-		item = new MenuItem( 'Arc' );
-		this.curveItemClick( item, buffer, pickable, selected );
-		items.add( item );
-		item = new MenuItem( 'Circle' );
-		this.curveItemClick( item, buffer, pickable, selected );
-		items.add( item );
-		items.add( new MenuDivider() );
-		item = new MenuItem( 'Curve' );
-		this.curveItemClick( item, buffer, pickable, selected );
-		items.add( item );
+
+		const menu = new UIPanel();
+		menu.setClass( 'menu' );
+
+		const head = new UIPanel();
+		head.setTextContent( 'Lines' );
+		head.setClass( 'head' );
+		menu.add( head );
+
+		const items = new UIPanel();
+		items.setClass( 'items' );
 		menu.add( items );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Line' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Arc' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Circle' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+
+		items.add( new UIHorizontalRule() );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Curve' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
 
 		return menu;
 
@@ -179,7 +248,7 @@ class Menubar extends UIElement {
 			const mat = buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
 
-			switch ( item.textContent ) {
+			switch ( item.dom.textContent ) {
 
 				case 'Line':
 					Object.defineProperty( lines, 'curve', { value: new Line() } );
@@ -208,96 +277,19 @@ class Menubar extends UIElement {
 
 	surface() {
 
-		const menu = new Menu();
-		menu.add( new MenuHeader( 'Surface' ) );
-		const items = new MenuItems();
+		const menu = new UIPanel();
+		menu.setClass( 'menu' );
+
+		const head = new UIPanel();
+		head.setTextContent( 'Surface' );
+		head.setClass( 'head' );
+		menu.add( head );
+
+		const items = new UIPanel();
+		items.setClass( 'items' );
 		menu.add( items );
 
 		return menu;
-
-	}
-
-}
-
-class Menu extends UIElement {
-
-	constructor() {
-
-		super( 'div' );
-		this.setClass( 'menu' );
-
-	}
-
-}
-
-class MenuHeader extends UIElement {
-
-	constructor( name ) {
-
-		super( 'div' );
-		this.setClass( 'head' );
-		this.setTextContent( name );
-
-	}
-
-}
-
-class MenuItems extends UIElement {
-
-	constructor() {
-
-		super( 'div' );
-		this.setClass( 'items' );
-
-	}
-
-}
-
-class MenuItem extends UIElement {
-
-	constructor( name ) {
-
-		super( 'div' );
-		this.setClass( 'item' );
-		this.setTextContent( name );
-
-	}
-
-}
-
-class MenuDivider extends UIElement {
-
-	constructor() {
-
-		super( 'hr' );
-		this.setClass( 'divider' );
-
-	}
-
-}
-
-class SelectFile extends UIElement {
-
-	constructor() {
-
-		super( 'input' );
-		this.setClass( 'item' );
-		this.dom.type = 'file';
-
-	}
-
-	onLoad( func ) {
-
-		this.dom.onchange = function () {
-
-			const file = this.files[ 0 ];
-			const reader = new FileReader();
-
-			reader.onload = func;
-
-			reader.readAsText( file );
-
-		};
 
 	}
 

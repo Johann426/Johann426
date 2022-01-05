@@ -18,15 +18,17 @@ class UIElement {
 
 			const argument = arguments[ i ];
 
-			if ( argument instanceof UIElement ) {
+			this.dom.appendChild( argument.dom );
 
-				this.dom.appendChild( argument.dom );
+			// if ( argument instanceof UIElement ) {
 
-			} else {
+			// 	this.dom.appendChild( argument.dom );
 
-				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
+			// } else {
 
-			}
+			// 	console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
+
+			// }
 
 		}
 
