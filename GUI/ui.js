@@ -266,9 +266,9 @@ class UIFile extends UIElement {
 
 	}
 
-	onLoad( func ) {
+	onChange( func ) {
 
-		this.dom.onchange = function () {
+		this.dom.addEventListener( 'change', function () {
 
 			const file = this.files[ 0 ];
 			const reader = new FileReader();
@@ -277,7 +277,13 @@ class UIFile extends UIElement {
 
 			reader.readAsText( file );
 
-		};
+		} );
+
+	}
+
+	onClick() {
+
+		this.dom.click();
 
 	}
 

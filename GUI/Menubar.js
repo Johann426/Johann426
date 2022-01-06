@@ -4,7 +4,6 @@ import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
 import { updateProp, drawProp } from '../cad_curves.js';
-import { UIElement } from './UIElement.js';
 import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
 class Menubar extends UIPanel {
@@ -45,7 +44,7 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Hull :' );
 
 		file = new UIFile();
-		file.onLoad( function ( e ) {
+		file.onChange( function ( e ) {
 
 			const txt = e.target.result;
 			console.log( txt );
@@ -63,7 +62,7 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Propeller :' );
 
 		file = new UIFile();
-		file.onLoad( function ( e ) {
+		file.onChange( function ( e ) {
 
 			const NoBlade = prop.NoBlade;
 			const txt = e.target.result;

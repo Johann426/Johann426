@@ -9,6 +9,7 @@ import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './Propeller.js';
 import { Hull } from './Hull.js';
 import { Command } from './commands/Command.js';
+import { History } from './commands/History.js';
 
 const MAX_POINTS = 500;
 const MAX_SEG = 200;
@@ -79,7 +80,7 @@ function init() {
 		if ( e.code == 'KeyZ' && e.ctrlKey ) {
 
 			console.log( 'ctrl + z' );
-			command.undo();
+			history.undo();
 			const curve = selected.lines.curve;
 			updateCurveBuffer( curve, buffer );
 			updateLines( curve, selected.lines );
@@ -307,7 +308,7 @@ function init() {
 
 			case 'Remove':
 
-				command.excute( 'Remove', intPoints );
+				history.excute( new Command( selected, intPoints ) );
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
 				// if ( intPoints.length > 0 ) {
@@ -402,7 +403,7 @@ function init() {
 	const buffer = preBuffer();
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
-	const command = new Command( selected );
+	const history = new History();
 
 	// Create model and menubar
 	const geometry = new THREE.SphereGeometry( 0.02 );

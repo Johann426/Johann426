@@ -1,28 +1,24 @@
 class Command {
 
-	constructor( selected ) {
+	constructor( selected, points ) {
 
 		this.selected = selected;
+		this.points = points;
 
 	}
 
-	excute( action, points ) {
+	excute() {
 
 		const curve = this.selected.lines.curve;
+		const points = this.points;
 
-		switch ( action ) {
+		// 'Remove'
 
-			case 'Remove':
+		if ( points.length > 0 ) {
 
-				if ( points.length > 0 ) {
-
-					this.point = points[ 0 ].point;
-					this.index = points[ 0 ].index;
-					curve.remove( this.index );
-
-				}
-
-				break;
+			this.point = points[ 0 ].point;
+			this.index = points[ 0 ].index;
+			curve.remove( this.index );
 
 		}
 
