@@ -28,7 +28,6 @@ class Command {
 
 		const curve = this.selected.lines.curve;
 		curve.incert( this.index, this.point );
-		console.log( this.point );
 
 	}
 
