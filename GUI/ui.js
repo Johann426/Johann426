@@ -266,6 +266,12 @@ class UIFile extends UIElement {
 
 	}
 
+	get files() {
+
+		return this.dom.files;
+
+	}
+
 	onChange( func ) {
 
 		this.dom.addEventListener( 'change', function () {
