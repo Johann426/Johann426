@@ -744,7 +744,7 @@ function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
 	geo.setDrawRange( 0, pts.length );
 	geo.computeBoundingBox();
 	geo.computeBoundingSphere();
-	pos = geo.attributes.position;
+	pos = geo.getAttribute( 'position' ); // geo.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
 	index = 0;
