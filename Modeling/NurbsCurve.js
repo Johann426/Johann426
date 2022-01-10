@@ -47,9 +47,15 @@ class NurbsCurve extends Parametric {
 
 	}
 
-	add ( v ) {
+	add( v ) {
 
 		this.ctrlp.push( weightedCtrlp( v, 1.0 ) );
+
+	}
+
+	mov( i, v ) {
+
+		this.ctrlp[ i ] = v;
 
 	}
 
