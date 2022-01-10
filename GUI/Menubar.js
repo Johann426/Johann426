@@ -235,6 +235,18 @@ class Menubar extends UIPanel {
 		this.curveItemClick( item, buffer, pickable, selected );
 		items.add( item );
 
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Nurbs' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+		
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Bezier' );
+		this.curveItemClick( item, buffer, pickable, selected );
+		items.add( item );
+
 		return menu;
 
 	}
@@ -243,11 +255,12 @@ class Menubar extends UIPanel {
 
 		item.onClick( ( ) => {
 
+			const txt = item.dom.textContent;
 			const geo = buffer.lines.geometry.clone();
 			const mat = buffer.lines.material.clone();
 			const lines = new THREE.Line( geo, mat );
 
-			switch ( item.dom.textContent ) {
+			switch ( txt ) {
 
 				case 'Line':
 					Object.defineProperty( lines, 'curve', { value: new Line() } );
@@ -260,6 +273,12 @@ class Menubar extends UIPanel {
 					break;
 				case 'Curve':
 					Object.defineProperty( lines, 'curve', { value: new IntBspline( 3 ) } );
+					break;
+				case 'Nurbs':
+					Object.defineProperty( lines, 'curve', { value: new NurbsCurve( 3 ) } );
+					break;
+				case 'Bezier':
+					Object.defineProperty( lines, 'curve', { value: new BezierCurve() } );
 					break;
 
 			}
