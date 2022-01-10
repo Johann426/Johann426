@@ -6,6 +6,8 @@ class BezierCurve extends Parametric {
 	constructor() {
 
 		super();
+		
+		this.ctrlp = [];
 
 	}
 
@@ -24,6 +26,12 @@ class BezierCurve extends Parametric {
 	add( v ) {
 		
 		this.ctrlp.push( v );
+
+	}
+
+	mod( i, v ) {
+
+		this.ctrlp[ i ] =v;
 
 	}
 	
