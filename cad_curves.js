@@ -8,7 +8,8 @@ import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './Propeller.js';
 import { Hull } from './Hull.js';
-import { Command } from './commands/Command.js';
+import { RemovePointCommand } from './commands/RemovePointCommand.js';
+import { AddPointCommand } from './commands/AddPointCommand.js';
 import { History } from './commands/History.js';
 
 const MAX_POINTS = 500;

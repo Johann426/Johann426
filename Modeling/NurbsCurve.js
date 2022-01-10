@@ -1,4 +1,4 @@
-import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville, knotsInsert } from './NurbsLib.js';
+import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville, knotsInsert, parameterize, deBoorKnots } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class NurbsCurve extends Parametric {
@@ -28,12 +28,21 @@ class NurbsCurve extends Parametric {
 
 	get designPoints() {
 
-		const prm = calcGreville( this.deg, this.knots );
+
+		const ctrlp = this.ctrlPoints;
+
+		if ( this.needsUpdate ) {
+
+			this.prm = parameterize( ctrlp, 'Chordal' );
+			this.knots = calcKnots( this.deg, this.prm );
+
+		}
+
 		const pts = [];
 
-		for ( let i = 0; i < prm.length; i ++ ) {
+		for ( let i = 0; i < this.prm.length; i ++ ) {
 
-			pts.push( this.getPointAt( prm[ i ] ) );
+			pts.push( this.getPointAt( this.prm[ i ] ) );
 
 		}
 
@@ -50,18 +59,21 @@ class NurbsCurve extends Parametric {
 	add( v ) {
 
 		this.ctrlp.push( weightedCtrlp( v, 1.0 ) );
+		this.needsUpdate = true;
 
 	}
 
 	mov( i, v ) {
 
 		this.ctrlp[ i ] = v;
+		this.needsUpdate = true;
 
 	}
 
 	insertKnotAt( t = 0.5 ) {
 
 		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlpw, t );
+		this.needsUpdate = true;
 
 	}
 
@@ -76,6 +88,13 @@ class NurbsCurve extends Parametric {
 		return nurbsCurveDers( this.deg, this.knots, this.ctrlpw, t, k );
 
 	}
+
+}
+
+
+function calcKnots( deg, prm ) {
+
+	return deBoorKnots( deg, prm );
 
 }
 

@@ -1,4 +1,4 @@
-class Command {
+class AddPointCommand {
 
 	constructor( selected, points ) {
 
@@ -11,8 +11,6 @@ class Command {
 
 		const curve = this.selected.lines.curve;
 		const points = this.points;
-
-		// 'Remove'
 
 		if ( points.length > 0 ) {
 
@@ -33,4 +31,4 @@ class Command {
 
 }
 
-export { Command };
+export { AddPointCommand };
