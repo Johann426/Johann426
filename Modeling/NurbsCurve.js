@@ -1,4 +1,4 @@
-import { nurbsCurvePoint, nurbsCurveDers, deWeight, calcGreville, knotsInsert } from './NurbsLib.js';
+import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville, knotsInsert } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class NurbsCurve extends Parametric {
@@ -44,6 +44,12 @@ class NurbsCurve extends Parametric {
 	get weight() {
 
 		return this.ctrlpw.map( e => e.w );
+
+	}
+
+	add ( v ) {
+
+		this.ctrlp.push( weightedCtrlp( v, 1.0 ) );
 
 	}
 
