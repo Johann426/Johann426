@@ -167,7 +167,7 @@ function allBernstein( n, t ) {
 		for ( let i = 0; i < j; i ++ ) {
 
 			const tmp = arr[ i ];
-			arr[ i ] = saved * t1 * tmp;
+			arr[ i ] = saved + t1 * tmp;
 			saved = t * tmp;
 
 		}
