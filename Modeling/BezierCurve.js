@@ -15,6 +15,12 @@ class BezierCurve extends Parametric {
 
 	}
 	
+	add( v ) {
+		
+		this.ctrlp.push( v );
+
+	}
+	
 	getPoints( n ) {
 
 		const p = [];
