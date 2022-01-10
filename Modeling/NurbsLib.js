@@ -1461,4 +1461,4 @@ class Quaternion {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
+export { curvePoint, curveDers, surfacePoint, pointOnBezierCurve, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
