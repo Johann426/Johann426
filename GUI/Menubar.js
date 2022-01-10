@@ -1,5 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
+import { NurbsCurve } from '../Modeling/NurbsCurve.js';
+import { BezierCurve } from '../Modeling/BezierCurve.js';
 import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
