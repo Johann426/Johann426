@@ -1,0 +1,39 @@
+import { pointOnBezierCurve } from './NurbsLib.js';
+import { Parametric } from './Parametric.js';
+
+class BezierCurve extends Parametric {
+
+	constructor() {
+
+		super();
+
+	}
+
+	get ctrlPoints() {
+	
+		return this.ctrlp;
+
+	}
+	
+	getPoints( n ) {
+
+		const p = [];
+		
+		fpr ( let i =0; i < n; i ++ ) {
+
+			const t = i / ( n - 1 );
+			p[ i ] = this.getPointAt( t );
+
+		}
+		
+		return p;
+
+	}
+
+	getPointAt ( t ) {
+
+		return pointOnBezierCurve( this.ctrlp, t );
+
+	}
+
+}
