@@ -15,6 +15,12 @@ class BezierCurve extends Parametric {
 
 	}
 	
+	get designPoints() {
+		
+		return this.ctrlp;
+
+	}
+	
 	add( v ) {
 		
 		this.ctrlp.push( v );
