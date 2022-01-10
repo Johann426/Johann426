@@ -19,7 +19,7 @@ class BezierCurve extends Parametric {
 
 		const p = [];
 		
-		fpr ( let i =0; i < n; i ++ ) {
+		for ( let i =0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
 			p[ i ] = this.getPointAt( t );
@@ -37,3 +37,5 @@ class BezierCurve extends Parametric {
 	}
 
 }
+
+export { BezierCurve };
