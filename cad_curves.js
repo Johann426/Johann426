@@ -82,9 +82,10 @@ function init() {
 
 			console.log( 'ctrl + z' );
 			history.undo();
-			const curve = selected.lines.curve;
+			selected = pickable.selected;
+			const curve = selected.curve;
 			updateCurveBuffer( curve, buffer );
-			updateLines( curve, selected.lines );
+			updateLines( curve, selected );
 
 		}
 
@@ -148,7 +149,8 @@ function init() {
 		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = selected.lines.curve;
+		selected = pickable.selected;
+		const curve = selected.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -180,7 +182,7 @@ function init() {
 				}
 
 				updateCurveBuffer( curve, buffer ); // fps drop !!! why ???
-				updateLines( curve, selected.lines );
+				updateLines( curve, selected );
 
 				break;
 
@@ -197,7 +199,7 @@ function init() {
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
+						updateLines( curve, selected );
 
 					}
 
@@ -215,7 +217,7 @@ function init() {
 						raycaster.ray.intersectPlane( plane, intersect );
 						curve.addKnuckle( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
+						updateLines( curve, selected );
 
 					}
 
@@ -239,7 +241,7 @@ function init() {
 						curve.mod( index, intersect );
 						updateSelectedPoint( buffer.point, intersect );
 						updateCurveBuffer( curve, buffer );
-						updateLines( curve, selected.lines );
+						updateLines( curve, selected );
 						sidebar.position.dom.children[ 1 ].value = intersect.x;
 						sidebar.position.dom.children[ 2 ].value = intersect.y;
 						sidebar.position.dom.children[ 3 ].value = intersect.z;
@@ -263,7 +265,8 @@ function init() {
 		//dragging = true;
 
 		raycaster.setFromCamera( pointer, camera );
-		const curve = selected.lines.curve;
+		selected = pickable.selected;
+		const curve = selected.curve;
 		const intersect = new THREE.Vector3();
 		const plane = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ), 0 );
 
@@ -276,8 +279,8 @@ function init() {
 				const intersects = raycaster.intersectObjects( pickable.children, true );
 				if ( intersects.length > 0 ) {
 
-					selected.lines = intersects[ 0 ].object;
-					updateCurveBuffer( selected.lines.curve, buffer );
+					selected = intersects[ 0 ].object;
+					updateCurveBuffer( selected.curve, buffer );
 					menubar.state = 'curve';
 					[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
@@ -302,7 +305,7 @@ function init() {
 				// raycaster.ray.intersectPlane( plane, intersect );
 				// curve.add( intersect );
 				// updateCurveBuffer( curve, buffer );
-				// updateLines( curve, selected.lines );
+				// updateLines( curve, selected );
 				isAdd = true;
 
 				break;
@@ -311,12 +314,12 @@ function init() {
 
 				history.excute( new RemovePointCommand( selected, intPoints ) );
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.lines );
+				updateLines( curve, selected );
 				// if ( intPoints.length > 0 ) {
 
 				// 	curve.remove( intPoints[ 0 ].index );
 				// 	updateCurveBuffer( curve, buffer );
-				// 	updateLines( curve, selected.lines );
+				// 	updateLines( curve, selected );
 
 				// }
 
@@ -332,7 +335,7 @@ function init() {
 
 					curve.removeTangent( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
+					updateLines( curve, selected );
 
 				}
 
@@ -344,7 +347,7 @@ function init() {
 				const t = curve.closestPosition( intersect )[ 0 ];
 				curve.insertKnotAt( t );
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.lines );
+				updateLines( curve, selected );
 
 				break;
 
@@ -358,7 +361,7 @@ function init() {
 
 					curve.removeKnuckle( intPoints[ 0 ].index );
 					updateCurveBuffer( curve, buffer );
-					updateLines( curve, selected.lines );
+					updateLines( curve, selected );
 
 				}
 
@@ -371,7 +374,7 @@ function init() {
 				//curve.incertPointAt( p[ 0 ], p[ 1 ] );
 				curve.addressPoint( intersect );
 				updateCurveBuffer( curve, buffer );
-				updateLines( curve, selected.lines );
+				updateLines( curve, selected );
 
 				break;
 
@@ -399,7 +402,7 @@ function init() {
 
 	} );
 
-	const selected = new Object();
+	var selected;
 	const pickable = new THREE.Object3D();
 	const buffer = preBuffer();
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
@@ -446,8 +449,8 @@ function init() {
 	for ( let j = 0; j < 10; j ++ ) {
 
 		menubar.dom.children[ 2 ].children[ 1 ].children[ 4 ].click();
-		const curve = selected.lines.curve;
-
+		selected = pickable.selected;
+		const curve = selected.curve;
 		for ( let i = 0; i < 10; i ++ ) {
 
 			const p = pts[ i + 10 * j ];
@@ -456,7 +459,7 @@ function init() {
 		}
 
 		menubar.state = 'view';
-		updateLines( curve, selected.lines );
+		updateLines( curve, selected );
 		renderer.render( scene, camera );
 
 	}

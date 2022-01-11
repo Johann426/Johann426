@@ -114,7 +114,7 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Add point' );
 		item.onClick( () => {
 
-			selected.lines.curve.add( new THREE.Vector3() );
+			selected.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
 		} );
@@ -287,7 +287,7 @@ class Menubar extends UIPanel {
 
 			mat.color.set( 0x808080 );
 			pickable.add( lines );
-			selected.lines = lines;
+			pickable.selected = lines;
 			this.state = 'Add';
 			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 
