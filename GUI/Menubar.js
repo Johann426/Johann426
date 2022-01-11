@@ -15,7 +15,7 @@ class Menubar extends UIPanel {
 		super();
 		this.setId( 'menubar' );
 		this.add( this.file( scene, hull, prop ) );
-		this.add( this.edit( pickable.selected ) );
+		this.add( this.edit( pickable ) );
 		this.add( this.curve( buffer, pickable ) );
 		this.add( this.surface() );
 		this.state = 'view';
@@ -93,7 +93,7 @@ class Menubar extends UIPanel {
 
 	}
 
-	edit( selected ) {
+	edit( pickable ) {
 
 		var item;
 
@@ -114,7 +114,7 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Add point' );
 		item.onClick( () => {
 
-			selected.curve.add( new THREE.Vector3() );
+			pickable.selected.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
 		} );
