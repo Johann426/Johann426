@@ -309,7 +309,7 @@ function init() {
 
 			case 'Remove':
 
-				history.excute( new Command( selected, intPoints ) );
+				history.excute( new RemovePointCommand( selected, intPoints ) );
 				updateCurveBuffer( curve, buffer );
 				updateLines( curve, selected.lines );
 				// if ( intPoints.length > 0 ) {
