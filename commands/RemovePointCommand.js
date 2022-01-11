@@ -2,15 +2,14 @@ class RemovePointCommand {
 
 	constructor( selected, points ) {
 
-		//this.selected = selected;
-		this.curve = selected.lines.curve;
+		this.curve = selected.curve;
 		this.points = points;
 
 	}
 
 	excute() {
 
-		const curve = this.curve; //selected.lines.curve;
+		const curve = this.curve;
 		const points = this.points;
 
 		if ( points.length > 0 ) {
@@ -24,7 +23,7 @@ class RemovePointCommand {
 
 	undo() {
 
-		const curve = this.curve; //.selected.lines.curve;
+		const curve = this.curve;
 		curve.incert( this.index, this.point );
 
 	}
