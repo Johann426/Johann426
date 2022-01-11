@@ -10,13 +10,13 @@ import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
 class Menubar extends UIPanel {
 
-	constructor( scene, buffer, pickable, selected, hull, prop ) {
+	constructor( scene, buffer, pickable, hull, prop ) {
 
 		super();
 		this.setId( 'menubar' );
 		this.add( this.file( scene, hull, prop ) );
-		this.add( this.edit( selected ) );
-		this.add( this.curve( buffer, pickable, selected ) );
+		this.add( this.edit( pickable.selected ) );
+		this.add( this.curve( buffer, pickable ) );
 		this.add( this.surface() );
 		this.state = 'view';
 
@@ -195,7 +195,7 @@ class Menubar extends UIPanel {
 
 	}
 
-	curve( buffer, pickable, selected ) {
+	curve( buffer, pickable ) {
 
 		var item;
 
@@ -214,19 +214,19 @@ class Menubar extends UIPanel {
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Line' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Arc' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Circle' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		items.add( new UIHorizontalRule() );
@@ -234,26 +234,26 @@ class Menubar extends UIPanel {
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Curve' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Nurbs' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Bezier' );
-		this.curveItemClick( item, buffer, pickable, selected );
+		this.curveItemClick( item, buffer, pickable );
 		items.add( item );
 
 		return menu;
 
 	}
 
-	curveItemClick( item, buffer, pickable, selected ) {
+	curveItemClick( item, buffer, pickable ) {
 
 		item.onClick( ( ) => {
 
