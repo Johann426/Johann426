@@ -242,7 +242,7 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Nurbs' );
 		this.curveItemClick( item, buffer, pickable, selected );
 		items.add( item );
-		
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Bezier' );

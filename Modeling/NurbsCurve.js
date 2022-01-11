@@ -22,14 +22,7 @@ class NurbsCurve extends Parametric {
 
 	get ctrlPoints() {
 
-		return deWeight( this.ctrlpw );
-
-	}
-
-	get designPoints() {
-
-
-		const ctrlp = this.ctrlPoints;
+		const ctrlp = deWeight( this.ctrlpw );
 
 		if ( this.needsUpdate ) {
 
@@ -37,6 +30,12 @@ class NurbsCurve extends Parametric {
 			this.knots = calcKnots( this.deg, this.prm );
 
 		}
+
+		return deWeight( this.ctrlpw );
+
+	}
+
+	get designPoints() {
 
 		return deWeight( this.ctrlpw );
 
@@ -54,7 +53,7 @@ class NurbsCurve extends Parametric {
 		this.needsUpdate = true;
 
 	}
-	
+
 	remove( i ) {
 
 		const removed = this.ctrlpw.splice( i, 1 );
@@ -69,19 +68,19 @@ class NurbsCurve extends Parametric {
 		this.needsUpdate = true;
 
 	}
-	
+
 	incert( i, v ) {
 
 		this.ctrlpw.splice( i, 0, weightedCtrlp( v, 1.0 ) );
 		this.needsUpdate = true;
 
 	}
-	
+
 	incertPointAt( t, v ) {
 
 		if ( t > 0.0 && t < 1.0 ) {
 
-			const i = this.prm.findIndex( e => e  > t );
+			const i = this.prm.findIndex( e => e > t );
 			this.incert( i, v );
 
 		}
@@ -91,7 +90,7 @@ class NurbsCurve extends Parametric {
 	insertKnotAt( t = 0.5 ) {
 
 		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlpw, t );
-		this.needsUpdate = true;
+		console.log( this.knots );
 
 	}
 
