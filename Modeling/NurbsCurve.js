@@ -33,8 +33,8 @@ class NurbsCurve extends Parametric {
 
 		if ( this.needsUpdate ) {
 
-			this.prm = parameterize( ctrlp, 'Chordal' );
-			this.knots = calcKnots( this.deg, this.prm );
+			const prm = parameterize( ctrlp, 'chordal' );
+			this.knots = calcKnots( this.deg, prm );
 
 		}
 
