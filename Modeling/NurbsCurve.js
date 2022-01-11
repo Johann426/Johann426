@@ -57,8 +57,9 @@ class NurbsCurve extends Parametric {
 	
 	remove( i ) {
 
-		this.ctrlpw.splice( i, 1 );
+		const removed = this.ctrlpw.splice( i, 1 );
 		this.needsUpdate = true;
+		return deWeight( removed[ 0 ] );
 
 	}
 
