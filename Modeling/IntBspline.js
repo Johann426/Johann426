@@ -49,8 +49,9 @@ class IntBspline extends Parametric {
 
 	remove( i ) {
 
-		this.pole.splice( i, 1 );
+		const removed = this.pole.splice( i, 1 );
 		this.needsUpdate = true;
+		return removed[ 0 ].point;
 
 	}
 
