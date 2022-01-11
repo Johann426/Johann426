@@ -38,15 +38,7 @@ class NurbsCurve extends Parametric {
 
 		}
 
-		const pts = [];
-
-		for ( let i = 0; i < this.prm.length; i ++ ) {
-
-			pts.push( this.getPointAt( this.prm[ i ] ) );
-
-		}
-
-		return pts;
+		return deWeight( this.ctrlpw );
 
 	}
 
@@ -58,14 +50,14 @@ class NurbsCurve extends Parametric {
 
 	add( v ) {
 
-		this.ctrlp.push( weightedCtrlp( v, 1.0 ) );
+		this.ctrlpw.push( weightedCtrlp( v, 1.0 ) );
 		this.needsUpdate = true;
 
 	}
 
-	mov( i, v ) {
+	mod( i, v ) {
 
-		this.ctrlp[ i ] = v;
+		this.ctrlpw[ i ] = weightedCtrlp( v, 1.0 );
 		this.needsUpdate = true;
 
 	}
