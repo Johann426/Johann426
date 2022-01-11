@@ -14,9 +14,8 @@ class RemovePointCommand {
 
 		if ( points.length > 0 ) {
 
-			this.point = points[ 0 ].point;
 			this.index = points[ 0 ].index;
-			curve.remove( this.index );
+			this.point = curve.remove( this.index );
 
 		}
 
