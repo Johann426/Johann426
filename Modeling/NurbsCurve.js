@@ -33,8 +33,8 @@ class NurbsCurve extends Parametric {
 
 		if ( this.needsUpdate ) {
 
-			const prm = parameterize( ctrlp, 'chordal' );
-			this.knots = calcKnots( this.deg, prm );
+			this.prm = parameterize( ctrlp, 'chordal' );
+			this.knots = calcKnots( this.deg, this.prm );
 
 		}
 
@@ -54,11 +54,36 @@ class NurbsCurve extends Parametric {
 		this.needsUpdate = true;
 
 	}
+	
+	remove( i ) {
+
+		this.ctrlpw.splice( i, 1 );
+		this.needsUpdate = true;
+
+	}
 
 	mod( i, v ) {
 
 		this.ctrlpw[ i ] = weightedCtrlp( v, 1.0 );
 		this.needsUpdate = true;
+
+	}
+	
+	incert( i, v ) {
+
+		this.ctrlpw.splice( i, 0, weightedCtrlp( v, 1.0 ) );
+		this.needsUpdate = true;
+
+	}
+	
+	incertPointAt( t, v ) {
+
+		if ( t > 0.0 && t < 1.0 ) {
+
+			const i = this.prm.findIndex( e => e  > t );
+			this.incert( i, v );
+
+		}
 
 	}
 
