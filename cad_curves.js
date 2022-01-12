@@ -8,12 +8,9 @@ import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './loaders/Propeller.js';
 import { Hull } from './loaders/Hull.js';
-import { RemovePointCommand } from './commands/RemovePointCommand.js';
 import { AddPointCommand } from './commands/AddPointCommand.js';
 import { History } from './commands/History.js';
-
-const MAX_POINTS = 500;
-const MAX_SEG = 200;
+import { Editor, getLocalCoordinates, preBuffer, updateCurveBuffer, updateCurvePoints, updateLines, updateCurvature, updateDistance, updateSelectedPoint } from './Editor.js';
 
 init();
 
@@ -81,10 +78,14 @@ function init() {
 		if ( e.code == 'KeyZ' && e.ctrlKey ) {
 
 			console.log( 'ctrl + z' );
-			history.undo();
-			const curve = pickable.selected.curve;
-			updateCurveBuffer( curve, buffer );
-			updateLines( curve, pickable.selected );
+			editor.undo();
+
+		}
+
+		if ( e.code == 'KeyY' && e.ctrlKey ) {
+
+			console.log( 'ctrl + y' );
+			editor.redo();
 
 		}
 
@@ -309,9 +310,8 @@ function init() {
 
 			case 'Remove':
 
-				history.excute( new RemovePointCommand( pickable.selected, intPoints ) );
-				updateCurveBuffer( curve, buffer );
-				updateLines( curve, pickable.selected );
+				editor.removePoint( intPoints );
+
 				// if ( intPoints.length > 0 ) {
 
 				// 	curve.remove( intPoints[ 0 ].index );
@@ -403,7 +403,8 @@ function init() {
 	const buffer = preBuffer();
 	scene.add( pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 
-	const history = new History();
+	//const history = new History();
+	const editor = new Editor( scene, buffer, pickable );
 
 	// Create model and menubar
 	const geometry = new THREE.SphereGeometry( 0.02 );
@@ -462,7 +463,6 @@ function init() {
 	drawProp( prop ).map( e => scene.add( e ) );
 
 }
-
 
 
 
@@ -592,7 +592,6 @@ function updateProp( meshList, prop ) {
 
 function updateGeo( surface, geo ) {
 
-	//const geo = mesh.geometry;
 	geo.computeBoundingBox();
 	geo.computeBoundingSphere();
 	const pos = geo.attributes.position;
@@ -641,239 +640,5 @@ function updateGeo( surface, geo ) {
 
 
 
-
-function getLocalCoordinates( dom, x, y ) {
-
-	const rect = dom.getBoundingClientRect();
-	const pointer = new THREE.Vector2();
-	pointer.x = ( x - rect.x ) / window.innerWidth * 2 - 1;
-	pointer.y = - ( y - rect.y ) / window.innerHeight * 2 + 1;
-
-	return pointer;
-
-}
-
-function preBuffer() {
-
-	let geo, pos, mat;
-
-	geo = new THREE.BufferGeometry();
-	mat = new THREE.ShaderMaterial( {
-
-		transparent: true,
-		uniforms: {
-			size: { value: 10 },
-			scale: { value: 1 },
-			color: { value: new THREE.Color( 'Yellow' ) }
-		},
-		vertexShader: THREE.ShaderLib.points.vertexShader,
-		fragmentShader: `
-				uniform vec3 color;
-				void main() {
-					vec2 xy = gl_PointCoord.xy - vec2(0.5);
-					float ll = length(xy);
-					gl_FragColor = vec4(color, step(ll, 0.5));
-			}
-			`
-
-	} );
-
-	geo.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) );
-	const point = new THREE.Points( geo.clone(), mat.clone() );
-
-	pos = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
-	geo.setDrawRange( 0, 0 );
-
-	mat.uniforms.color = { value: new THREE.Color( 'DimGray' ) };
-	const ctrlPoints = new THREE.Points( geo.clone(), mat.clone() );
-
-	mat.uniforms.color = { value: new THREE.Color( 'Aqua' ) };
-	const points = new THREE.Points( geo.clone(), mat.clone() );
-
-	mat = new THREE.LineBasicMaterial( { color: 0x808080 } );
-	const polygon = new THREE.Line( geo.clone(), mat.clone() );
-
-	mat.color.set( 0xffff00 );
-	const lines = new THREE.Line( geo.clone(), mat.clone() );
-
-	pos = new Float32Array( MAX_SEG * 2 * 3 ); // x 2 points per line segment x 3 vertices per point
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
-	mat.color.set( 0x800000 );
-	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
-
-	pos = new Float32Array( 2 * 3 );
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
-	geo.setDrawRange( 0, 2 );
-	mat.color.set( 0x006000 );
-	const distance = new THREE.Line( geo, mat );
-
-	point.renderOrder = 100;
-	lines.renderOrder = 100;
-
-	return {
-
-		point: point,
-		points: points,
-		ctrlPoints: ctrlPoints,
-		lines: lines,
-		polygon: polygon,
-		curvature: curvature,
-		distance: distance
-
-	};
-
-}
-
-function updateCurveBuffer( curve, buffer ) {
-
-	updateCurvePoints( curve, buffer.points, buffer.ctrlPoints, buffer.polygon );
-	updateLines( curve, buffer.lines );
-	updateCurvature( curve, buffer.curvature );
-
-}
-
-function updateCurvePoints( curve, points, ctrlPoints, polygon ) {
-
-	let pts, geo, pos, arr, index;
-
-	//update design points
-	pts = curve.designPoints;
-	geo = points.geometry;
-	geo.setDrawRange( 0, pts.length );
-	geo.computeBoundingBox();
-	geo.computeBoundingSphere();
-	pos = geo.getAttribute( 'position' ); // geo.attributes.position;
-	pos.needsUpdate = true;
-	arr = pos.array;
-	index = 0;
-
-	for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-		arr[ index ++ ] = i < l ? pts[ i ].x : null;
-		arr[ index ++ ] = i < l ? pts[ i ].y : null;
-		arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-	}
-
-	//update control points
-	pts = curve.ctrlPoints;
-	geo = ctrlPoints.geometry;
-	geo.setDrawRange( 0, pts.length );
-	pos = geo.attributes.position;
-	pos.needsUpdate = true;
-	arr = pos.array;
-	index = 0;
-
-	for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-		arr[ index ++ ] = i < l ? pts[ i ].x : null;
-		arr[ index ++ ] = i < l ? pts[ i ].y : null;
-		arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-	}
-
-	geo = polygon.geometry;
-	geo.setDrawRange( 0, pts.length );
-	pos = geo.attributes.position;
-	pos.needsUpdate = true;
-	arr = pos.array;
-	index = 0;
-
-	for ( let i = 0, l = pts.length; i < MAX_POINTS; i ++ ) {
-
-		arr[ index ++ ] = i < l ? pts[ i ].x : null;
-		arr[ index ++ ] = i < l ? pts[ i ].y : null;
-		arr[ index ++ ] = i < l ? pts[ i ].z : null;
-
-	}
-
-}
-
-function updateLines( curve, lines ) {
-
-	//update curve
-	const geo = lines.geometry;
-	geo.setDrawRange( 0, MAX_POINTS );
-	geo.computeBoundingBox();
-	geo.computeBoundingSphere();
-	const pos = geo.attributes.position;
-	const pts = curve.getPoints( MAX_POINTS );
-	pos.needsUpdate = true;
-	const arr = pos.array;
-	let index = 0;
-
-	for ( let i = 0; i < MAX_POINTS; i ++ ) {
-
-		arr[ index ++ ] = pts[ i ].x;
-		arr[ index ++ ] = pts[ i ].y;
-		arr[ index ++ ] = pts[ i ].z;
-
-	}
-
-}
-
-function updateCurvature( curve, curvature ) {
-
-	//update curvature
-	if ( curvature !== undefined ) {
-
-		const geo = curvature.geometry;
-		geo.setDrawRange( 0, MAX_SEG * 2 );
-		const pos = geo.attributes.position;
-		const pts = curve.interrogating( MAX_SEG );
-		pos.needsUpdate = true;
-		const arr = pos.array;
-		let index = 0;
-
-		for ( let i = 0; i < MAX_SEG; i ++ ) {
-
-			arr[ index ++ ] = pts[ i ].point.x;
-			arr[ index ++ ] = pts[ i ].point.y;
-			arr[ index ++ ] = pts[ i ].point.z;
-
-			const crvt = pts[ i ].normal.clone().negate().mul( pts[ i ].curvature );
-			const tuft = pts[ i ].point.clone().add( crvt );
-
-			arr[ index ++ ] = tuft.x;
-			arr[ index ++ ] = tuft.y;
-			arr[ index ++ ] = tuft.z;
-
-		}
-
-	}
-
-}
-
-function updateDistance( curve, distance, v ) {
-
-	let pts, pos, arr, index;
-	pts = [ v, curve.closestPoint( v ) ];
-	//console.log( "distance=", v.clone().sub( curve.closestPoint( v ) ).length() );
-	pos = distance.geometry.attributes.position;
-	pos.needsUpdate = true;
-	arr = pos.array;
-	index = 0;
-
-	for ( let i = 0; i < 2; i ++ ) {
-
-		arr[ index ++ ] = pts[ i ].x;
-		arr[ index ++ ] = pts[ i ].y;
-		arr[ index ++ ] = pts[ i ].z;
-
-	}
-
-}
-
-function updateSelectedPoint( point, v ) {
-
-	const pos = point.geometry.attributes.position;
-	pos.needsUpdate = true;
-	const arr = pos.array;
-	arr[ 0 ] = v.x;
-	arr[ 1 ] = v.y;
-	arr[ 2 ] = v.z;
-
-}
 
 export { updateProp, drawProp };

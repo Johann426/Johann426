@@ -4,7 +4,7 @@ class Propeller {
 
 		this.ids = [];
 
-		this.isNondimensional = true; //Non-dimensional properties
+		this.isNondimensional = true;
 
 		this.NoBlade = 4;
 
