@@ -11,7 +11,7 @@ class History {
 
 		this.undos.push( cmd );
 		this.redos = [];
-		cmd.excute();
+		cmd.execute();
 
 	}
 

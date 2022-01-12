@@ -16,11 +16,11 @@ class Editor {
 	removePoint( point ) {
 
 		const selected = this.pickable.selected;
-		this.excute( new RemovePointCommand( selected, point ) );
+		this.execute( new RemovePointCommand( selected, point ) );
 
 	}
 
-	excute( cmd ) {
+	execute( cmd ) {
 
 		this.history.excute( cmd );
 		const buffer = this.buffer;
@@ -45,6 +45,11 @@ class Editor {
 	redo() {
 
 		this.history.redo();
+		const buffer = this.buffer;
+		const selected = this.pickable.selected;
+		const curve = selected.curve;
+		updateBuffer( curve, buffer );
+		updateLines( curve, selected );
 
 	}
 

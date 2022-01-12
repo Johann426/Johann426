@@ -7,7 +7,7 @@ class RemovePointCommand {
 
 	}
 
-	excute() {
+	execute() {
 
 		const curve = this.curve;
 		const points = this.points;
