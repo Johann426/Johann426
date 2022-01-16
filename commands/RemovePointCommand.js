@@ -1,21 +1,26 @@
+import { updateBuffer, updateLines } from '../Editor.js';
+
 class RemovePointCommand {
 
-	constructor( selected, points ) {
+	constructor( buffer, points ) {
 
-		this.curve = selected.curve;
+		this.buffer = buffer;
 		this.points = points;
 
 	}
 
 	execute() {
 
-		const curve = this.curve;
-		const points = this.points;
+		const buffer = this.buffer;
+		const curve = buffer.pickable.selected.curve;
 
-		if ( points.length > 0 ) {
+		if ( this.points.length > 0 ) {
 
-			this.index = points[ 0 ].index;
+			this.index = this.points[ 0 ].index;
 			this.point = curve.remove( this.index );
+
+			updateBuffer( curve, buffer );
+			updateLines( curve, buffer.pickable.selected );
 
 		}
 
@@ -23,8 +28,12 @@ class RemovePointCommand {
 
 	undo() {
 
-		const curve = this.curve;
+		const buffer = this.buffer;
+		const curve = buffer.pickable.selected.curve;
 		curve.incert( this.index, this.point );
+
+		updateBuffer( curve, buffer );
+		updateLines( curve, buffer.pickable.selected );
 
 	}
 

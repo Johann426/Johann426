@@ -1,31 +1,27 @@
+import { updateBuffer, updateLines } from '../Editor.js';
+
 class AddPointCommand {
 
-	constructor( selected, points ) {
+	constructor( buffer, points ) {
 
-		this.selected = selected;
+		this.buffer = buffer;
 		this.points = points;
 
 	}
 
 	excute() {
 
-		const curve = this.selected.lines.curve;
+		const buffer = this.buffer;
 		const points = this.points;
+		const curve = buffer.pickable.selected.curve;
 
 		if ( points.length > 0 ) {
-
-			this.point = points[ 0 ].point;
-			this.index = points[ 0 ].index;
-			curve.remove( this.index );
 
 		}
 
 	}
 
 	undo() {
-
-		const curve = this.selected.lines.curve;
-		curve.incert( this.index, this.point );
 
 	}
 

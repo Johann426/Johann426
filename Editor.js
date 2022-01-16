@@ -1,55 +1,65 @@
 import * as THREE from './Rendering/three.module.js';
 import { History } from './commands/History.js';
 import { RemovePointCommand } from './commands/RemovePointCommand.js';
+import { IncertPointCommand } from './commands/IncertPointCommand.js';
+import { RemoveTangentCommand } from './commands/RemoveTangentCommand.js';
+import { RemoveKnuckleCommand } from './commands/RemoveKnuckleCommand.js';
+import { AddTangentCommand } from './commands/AddTangentCommand.js';
 
 class Editor {
 
-	constructor( scene, buffer, pickable ) {
+	constructor( scene ) {
 
 		this.scene = scene;
-		this.buffer = buffer;
-		this.pickable = pickable;
 		this.history = new History();
 
 	}
 
-	removePoint( point ) {
+	removePoint( buffer, point ) {
 
-		const selected = this.pickable.selected;
-		this.execute( new RemovePointCommand( selected, point ) );
+		this.execute( new RemovePointCommand( buffer, point ) );
+
+	}
+
+	incertPoint( buffer, point ) {
+
+		this.execute( new IncertPointCommand( buffer, point ) );
+
+	}
+
+	RemoveTangentCommand( buffer, point ) {
+
+		this.execute( new RemoveTangentCommand( buffer, point ) );
+
+	}
+
+	RemoveKnuckleCommand( buffer, point ) {
+
+		this.execute( new RemoveKnuckleCommand( buffer, point ) );
+
+	}
+
+	AddTangentCommand( buffer, point ) {
+
+		// not implemented!
 
 	}
 
 	execute( cmd ) {
 
 		this.history.excute( cmd );
-		const buffer = this.buffer;
-		const selected = this.pickable.selected;
-		const curve = selected.curve;
-		updateBuffer( curve, buffer );
-		updateLines( curve, selected );
 
 	}
 
 	undo() {
 
 		this.history.undo();
-		const buffer = this.buffer;
-		const selected = this.pickable.selected;
-		const curve = selected.curve;
-		updateBuffer( curve, buffer );
-		updateLines( curve, selected );
 
 	}
 
 	redo() {
 
 		this.history.redo();
-		const buffer = this.buffer;
-		const selected = this.pickable.selected;
-		const curve = selected.curve;
-		updateBuffer( curve, buffer );
-		updateLines( curve, selected );
 
 	}
 
@@ -137,7 +147,8 @@ function preBuffer() {
 		lines: lines,
 		polygon: polygon,
 		curvature: curvature,
-		distance: distance
+		distance: distance,
+		pickable: new THREE.Object3D()
 
 	};
 
@@ -293,4 +304,4 @@ function updateSelectedPoint( point, v ) {
 
 }
 
-export { Editor, getLocalCoordinates, preBuffer, updateBuffer as updateCurveBuffer, updatePoints as updateCurvePoints, updateLines, updateCurvature, updateDistance, updateSelectedPoint };
+export { Editor, getLocalCoordinates, preBuffer, updateBuffer, updatePoints, updateLines, updateCurvature, updateDistance, updateSelectedPoint };

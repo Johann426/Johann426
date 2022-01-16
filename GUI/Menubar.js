@@ -10,13 +10,13 @@ import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
 class Menubar extends UIPanel {
 
-	constructor( scene, buffer, pickable, hull, prop ) {
+	constructor( scene, buffer, hull, prop ) {
 
 		super();
 		this.setId( 'menubar' );
 		this.add( this.file( scene, hull, prop ) );
-		this.add( this.edit( pickable ) );
-		this.add( this.curve( buffer, pickable ) );
+		this.add( this.edit( buffer.pickable ) );
+		this.add( this.curve( buffer ) );
 		this.add( this.surface() );
 		this.state = 'view';
 
@@ -195,7 +195,7 @@ class Menubar extends UIPanel {
 
 	}
 
-	curve( buffer, pickable ) {
+	curve( buffer ) {
 
 		var item;
 
@@ -214,19 +214,19 @@ class Menubar extends UIPanel {
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Line' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Arc' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Circle' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		items.add( new UIHorizontalRule() );
@@ -234,26 +234,26 @@ class Menubar extends UIPanel {
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Curve' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Nurbs' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Bezier' );
-		this.curveItemClick( item, buffer, pickable );
+		this.curveItemClick( item, buffer );
 		items.add( item );
 
 		return menu;
 
 	}
 
-	curveItemClick( item, buffer, pickable ) {
+	curveItemClick( item, buffer ) {
 
 		item.onClick( ( ) => {
 
@@ -286,8 +286,8 @@ class Menubar extends UIPanel {
 			}
 
 			mat.color.set( 0x808080 );
-			pickable.add( lines );
-			pickable.selected = lines;
+			buffer.pickable.add( lines );
+			buffer.pickable.selected = lines;
 			this.state = 'Add';
 			[ buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = true );
 

@@ -40,6 +40,12 @@ class IntBspline extends Parametric {
 
 	}
 
+	get parameter() {
+
+		return this.prm;
+
+	}
+
 	add( v ) {
 
 		this.pole.push( { point: v } );
@@ -101,6 +107,8 @@ class IntBspline extends Parametric {
 
 		}
 
+		return t;
+
 	}
 
 	addTangent( i, v ) {
@@ -139,15 +147,19 @@ class IntBspline extends Parametric {
 
 	removeKnuckle( i ) {
 
+		const removed = this.pole[ i ].knuckle;
 		this.pole[ i ].knuckle = undefined;
 		this.needsUpdate = true;
+		return removed;
 
 	}
 
 	removeTangent( i ) {
 
+		const removed = this.pole[ i ].slope;
 		this.pole[ i ].slope = undefined;
 		this.needsUpdate = true;
+		return removed;
 
 	}
 
