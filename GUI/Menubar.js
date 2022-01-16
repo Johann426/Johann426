@@ -5,7 +5,7 @@ import { BezierCurve } from '../Modeling/BezierCurve.js';
 import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
-import { updateProp, drawProp } from '../cad_curves.js';
+import { updateProp, drawProp } from '../Editor.js';
 import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
 class Menubar extends UIPanel {

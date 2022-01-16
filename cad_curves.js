@@ -2,15 +2,12 @@ import * as THREE from './Rendering/three.module.js';
 import { OrbitControls } from './Rendering/OrbitControls.js';
 import { Menubar } from './GUI/Menubar.js';
 import { UITabbedPanel } from './GUI/Sidebar.js';
-import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
 import { Rhino3dmLoader } from './loaders/3DMLoader.js';
 import { GUI } from './libs/dat.gui.module.js';
 import { wigleyHull } from './wigleyHull.js';
 import { Propeller } from './loaders/Propeller.js';
 import { Hull } from './loaders/Hull.js';
-import { AddPointCommand } from './commands/AddPointCommand.js';
-import { History } from './commands/History.js';
-import { Editor, getLocalCoordinates, preBuffer, updateBuffer, updatePoints, updateLines, updateCurvature, updateDistance, updateSelectedPoint } from './Editor.js';
+import { Editor, getLocalCoordinates, preBuffer, updateBuffer, updatePoints, updateLines, updateCurvature, updateDistance, updateSelectedPoint, drawProp } from './Editor.js';
 
 init();
 
@@ -197,9 +194,15 @@ function init() {
 					if ( distance < 0.2 ) {
 
 						raycaster.ray.intersectPlane( plane, intersect );
-						curve.addTangent( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
+						const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
+						curve.addTangent( i, dir );
 						updateBuffer( curve, buffer );
 						updateLines( curve, buffer.pickable.selected );
+
+						const ori = curve.designPoints[ i ];
+						console.log( ori );
+						buffer.tangent.position.copy( ori );
+						buffer.tangent.setDirection( dir );
 
 					}
 
@@ -322,7 +325,7 @@ function init() {
 
 				if ( intPoints.length > 0 ) {
 
-					editor.RemoveTangentCommand( buffer, intPoints );
+					editor.removeTangent( buffer, intPoints );
 
 				}
 
@@ -331,10 +334,7 @@ function init() {
 			case 'Knot insert':
 
 				raycaster.ray.intersectPlane( plane, intersect );
-				const t = curve.closestPosition( intersect )[ 0 ];
-				curve.insertKnotAt( t );
-				updateBuffer( curve, buffer );
-				updateLines( curve, buffer.pickable.selected );
+				editor.incertKnot( buffer, intersect );
 
 				break;
 
@@ -346,7 +346,7 @@ function init() {
 
 				if ( intPoints.length > 0 ) {
 
-					editor.RemoveKnuckleCommand( buffer, intPoints );
+					editor.removeKnuckle( buffer, intPoints );
 
 				}
 
@@ -385,6 +385,7 @@ function init() {
 
 	const buffer = preBuffer();
 	scene.add( buffer.pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
+	scene.add( buffer.tangent );
 
 	//const history = new History();
 	const editor = new Editor( scene, buffer );
@@ -446,182 +447,3 @@ function init() {
 	drawProp( prop ).map( e => scene.add( e ) );
 
 }
-
-
-
-
-
-
-function drawProp( prop ) {
-
-	const nk = prop.NoBlade;
-	const nj = prop.rbyR.length;
-	const ni = prop.meanline.xc.length;
-	const blade = prop.getXYZ();
-	const points = [];
-
-	for ( let j = 0; j < nj; j ++ ) {
-
-		points[ j ] = [];
-
-		for ( let i = 0; i < ni; i ++ ) {
-
-			const x = blade[ 0 ].back.x[ i ][ j ];
-			const y = blade[ 0 ].back.y[ i ][ j ];
-			const z = blade[ 0 ].back.z[ i ][ j ];
-			points[ j ][ i ] = new THREE.Vector3( x, y, z );
-
-		}
-
-	}
-
-	const geo = new THREE.BufferGeometry();
-	const pos = new Float32Array( 200 * 200 * 3 * 6 ); // 200 x 200 x 3 vertices per point x 6 points per surface
-	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
-	const mat = new THREE.MeshBasicMaterial();
-	mat.side = THREE.DoubleSide;
-	const propMeshs = [];
-
-	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
-
-	// loop over no. of blade
-	for ( let k = 1; k <= nk; k ++ ) {
-
-		const phi = 2 * Math.PI * ( k - 1 ) / nk;
-		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
-
-	}
-
-
-	for ( let j = 0; j < nj; j ++ ) {
-
-		points[ j ] = [];
-
-		for ( let i = 0; i < ni; i ++ ) {
-
-			const x = blade[ 0 ].face.x[ i ][ j ];
-			const y = blade[ 0 ].face.y[ i ][ j ];
-			const z = blade[ 0 ].face.z[ i ][ j ];
-			points[ j ][ i ] = new THREE.Vector3( x, y, z );
-
-		}
-
-	}
-
-	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
-
-	// loop over no. of blade
-	for ( let k = 1; k <= nk; k ++ ) {
-
-		const phi = 2 * Math.PI * ( k - 1 ) / nk;
-		propMeshs.push( new THREE.Mesh( geo.clone().rotateX( phi ), mat ) );
-
-	}
-
-	prop.ids.length = 0;
-	propMeshs.map( e => prop.ids.push( e.id ) );
-
-	return propMeshs;
-
-}
-
-function updateProp( meshList, prop ) {
-
-	const nk = prop.NoBlade;
-	const nj = prop.rbyR.length;
-	const ni = prop.meanline.xc.length;
-	const blade = prop.getXYZ();
-	const points = [];
-
-	for ( let k = 0; k < nk; k ++ ) {
-
-		for ( let j = 0; j < nj; j ++ ) {
-
-			points[ j ] = [];
-
-			for ( let i = 0; i < ni; i ++ ) {
-
-				const x = blade[ k ].back.x[ i ][ j ];
-				const y = blade[ k ].back.y[ i ][ j ];
-				const z = blade[ k ].back.z[ i ][ j ];
-				points[ j ][ i ] = new THREE.Vector3( x, y, z );
-
-			}
-
-		}
-
-		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ k ].geometry );
-
-		for ( let j = 0; j < nj; j ++ ) {
-
-			points[ j ] = [];
-
-			for ( let i = 0; i < ni; i ++ ) {
-
-				const x = blade[ k ].face.x[ i ][ j ];
-				const y = blade[ k ].face.y[ i ][ j ];
-				const z = blade[ k ].face.z[ i ][ j ];
-				points[ j ][ i ] = new THREE.Vector3( x, y, z );
-
-			}
-
-		}
-
-		updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), meshList[ nk + k ].geometry );
-
-	}
-
-}
-
-function updateGeo( surface, geo ) {
-
-	geo.computeBoundingBox();
-	geo.computeBoundingSphere();
-	const pos = geo.attributes.position;
-	pos.needsUpdate = true;
-
-	const MAX_RADIAL_POINTS = 200;
-	const MAX_CHORDAL_POINTS = 200;
-
-	const surf = surface.getPoints( MAX_CHORDAL_POINTS, MAX_RADIAL_POINTS );
-
-	const arr = pos.array;
-	let index = 0;
-	for ( let j = 0; j < MAX_RADIAL_POINTS - 1; j ++ ) {
-
-		for ( let i = 0; i < MAX_CHORDAL_POINTS - 1; i ++ ) {
-
-			arr[ index ++ ] = surf[ j ][ i ].x;
-			arr[ index ++ ] = surf[ j ][ i ].y;
-			arr[ index ++ ] = surf[ j ][ i ].z;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
-
-			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].x;
-			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].y;
-			arr[ index ++ ] = surf[ j + 1 ][ i + 1 ].z;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].x;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].y;
-			arr[ index ++ ] = surf[ j + 1 ][ i ].z;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].x;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].y;
-			arr[ index ++ ] = surf[ j ][ i + 1 ].z;
-
-		}
-
-	}
-
-}
-
-
-
-
-
-
-
-
-export { updateProp, drawProp };
