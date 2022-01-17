@@ -47,9 +47,9 @@ class Editor {
 
 	}
 
-	addTangent( buffer, point ) {
+	addTangent( buffer, index, tangent ) {
 
-		// not implemented!
+		this.execute( new AddTangentCommand( buffer, index, tangent ) );
 
 	}
 
