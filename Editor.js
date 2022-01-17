@@ -7,6 +7,7 @@ import { IncertKnotCommand } from './commands/IncertKnotCommand.js';
 import { RemoveTangentCommand } from './commands/RemoveTangentCommand.js';
 import { RemoveKnuckleCommand } from './commands/RemoveKnuckleCommand.js';
 import { AddTangentCommand } from './commands/AddTangentCommand.js';
+import { AddKnuckleCommand } from './commands/AddKnuckleCommand.js';
 
 class Editor {
 
@@ -50,6 +51,12 @@ class Editor {
 	addTangent( buffer, index, tangent ) {
 
 		this.execute( new AddTangentCommand( buffer, index, tangent ) );
+
+	}
+	
+	addKnuckle( buffer, index, knuckle ) {
+
+		this.execute( new AddKnuckleCommand( buffer, index, knuckle ) );
 
 	}
 
