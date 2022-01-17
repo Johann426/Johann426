@@ -1,6 +1,6 @@
-import * as THREE from './Rendering/three.module.js';
+import * as THREE from '../Rendering/three.module.js';
 import { IntBspline } from '../Modeling/IntBspline.js';
-import { updateLines } from './Editor.js';
+import { updateLines } from '../Editor.js';
 
 class Hull {
 
@@ -81,7 +81,7 @@ class Hull {
 			
 			mat.color.set( 0x808080 );
 			buffer.pickable.add( lines );
-			updatelines( curve, lines );
+			updateLines( curve, lines );
 			
 		}
 		
