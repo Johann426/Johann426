@@ -53,7 +53,7 @@ class Editor {
 		this.execute( new AddTangentCommand( buffer, index, tangent ) );
 
 	}
-	
+
 	addKnuckle( buffer, index, knuckle ) {
 
 		this.execute( new AddKnuckleCommand( buffer, index, knuckle ) );
@@ -151,22 +151,22 @@ function preBuffer() {
 	mat.color.set( 0x006000 );
 	const distance = new THREE.Line( geo, mat );
 
-	const arrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3(), 1, 0xffff00 );
-
 	point.renderOrder = 1;
 	lines.renderOrder = 1;
+
+	const arrow = new THREE.ArrowHelper( new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3(), 1, 0xffff00 );
 
 	return {
 
 		point: point,
 		points: points,
 		ctrlPoints: ctrlPoints,
-		tangent: arrow,
 		lines: lines,
 		polygon: polygon,
 		curvature: curvature,
 		distance: distance,
-		pickable: new THREE.Object3D()
+		pickable: new THREE.Object3D(),
+		tangent: arrow
 
 	};
 

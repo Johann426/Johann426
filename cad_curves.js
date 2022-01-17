@@ -57,6 +57,9 @@ function init() {
 	const gridHelper = new THREE.GridHelper( 30, 30, 0x303030, 0x303030 );
 	gridHelper.geometry.rotateX( 0.5 * Math.PI );
 	scene.add( gridHelper );
+	const gridHelper2 = new THREE.PolarGridHelper( 5, 16, 8, 64, 0x303030, 0x303030 );
+	gridHelper2.geometry.rotateZ( 0.5 * Math.PI );
+	scene.add( gridHelper2 );
 
 	window.addEventListener( 'resize', () => {
 
@@ -179,7 +182,7 @@ function init() {
 
 				}
 
-				updateBuffer( curve, buffer ); // fps drop !!! why ???
+				updateBuffer( curve, buffer );
 				updateLines( curve, buffer.pickable.selected );
 
 				break;
@@ -190,17 +193,17 @@ function init() {
 			case 'Tangent':
 
 				if ( isTangent ) {
-					
+
 					const v = curve.designPoints[ index ];
 					raycaster.ray.intersectPlane( plane, intersect );
 					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
 					curve.addTangent( index, dir );
 					updateBuffer( curve, buffer );
 					updateLines( curve, buffer.pickable.selected );
-					
-					//buffer.tangent.position.copy( ori );
-					//buffer.tangent.setDirection( dir );
-					
+
+					buffer.tangent.position.copy( v );
+					buffer.tangent.setDirection( dir.normalize() );
+
 				}
 
 				break;
@@ -208,14 +211,14 @@ function init() {
 			case 'Knuckle':
 
 				if ( isKnuckle ) {
-					
+
 					const v = curve.designPoints[ index ];
 					raycaster.ray.intersectPlane( plane, intersect );
 					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
 					curve.addKnuckle( index, dir );
 					updateBuffer( curve, buffer );
 					updateLines( curve, buffer.pickable.selected );
-					
+
 				}
 
 				break;
@@ -311,48 +314,48 @@ function init() {
 
 			case 'Tangent':
 
-				if( isTangent ) {
-					
+				if ( isTangent ) {
+
 					const v = curve.designPoints[ index ];
 					raycaster.ray.intersectPlane( plane, intersect );
 					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
 					editor.addTangent( buffer, index, dir );
 					isTangent = false;
-					
+
 				} else {
-					
+
 					if ( intPoints.length > 0 ) {
 
 						isTangent = true;
 						index = intPoints[ 0 ].index;
 
 					}
-					
+
 				}
-				
+
 				break;
 
 			case 'Knuckle':
 
-				if( isKnuckle ) {
-					
+				if ( isKnuckle ) {
+
 					const v = curve.designPoints[ index ];
 					raycaster.ray.intersectPlane( plane, intersect );
 					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
 					editor.addKnuckle( buffer, index, dir );
 					isKnuckle = false;
-					
+
 				} else {
-					
+
 					if ( intPoints.length > 0 ) {
 
 						isKnuckle = true;
 						index = intPoints[ 0 ].index;
 
 					}
-					
+
 				}
-				
+
 				break;
 
 			case 'Remove tangent':
@@ -399,10 +402,6 @@ function init() {
 
 	document.addEventListener( 'pointerup', e => {
 
-		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
-
-		//dragging = false;
-
 		buffer.point.visible = false;
 
 		if ( menubar.state == 'editting' ) {
@@ -417,7 +416,6 @@ function init() {
 	scene.add( buffer.pickable, buffer.point, buffer.lines, buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature, buffer.distance );
 	scene.add( buffer.tangent );
 
-	//const history = new History();
 	const editor = new Editor( scene, buffer );
 
 	// Create model and menubar
