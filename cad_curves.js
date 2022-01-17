@@ -141,6 +141,7 @@ function init() {
 	let index = 0;
 	let isAdd = false;
 	let isTangent = false;
+	let isKnuckle = false;
 
 	document.addEventListener( 'pointermove', e => {
 
@@ -205,19 +206,16 @@ function init() {
 				break;
 
 			case 'Knuckle':
-				for ( let i = 0; i < curve.designPoints.length; i ++ ) {
 
-					const v = curve.designPoints[ i ];
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.2 ) {
-
-						raycaster.ray.intersectPlane( plane, intersect );
-						curve.addKnuckle( i, intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) ) );
-						updateBuffer( curve, buffer );
-						updateLines( curve, buffer.pickable.selected );
-
-					}
-
+				if ( isKnuckle ) {
+					
+					const v = curve.designPoints[ index ];
+					raycaster.ray.intersectPlane( plane, intersect );
+					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
+					curve.addKnuckle( index, dir );
+					updateBuffer( curve, buffer );
+					updateLines( curve, buffer.pickable.selected );
+					
 				}
 
 				break;
@@ -334,6 +332,29 @@ function init() {
 				
 				break;
 
+			case 'Knuckle':
+
+				if( isKnuckle ) {
+					
+					const v = curve.designPoints[ index ];
+					raycaster.ray.intersectPlane( plane, intersect );
+					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
+					editor.addKnuckle( buffer, index, dir );
+					isKnuckle = false;
+					
+				} else {
+					
+					if ( intPoints.length > 0 ) {
+
+						isKnuckle = true;
+						index = intPoints[ 0 ].index;
+
+					}
+					
+				}
+				
+				break;
+
 			case 'Remove tangent':
 
 				if ( intPoints.length > 0 ) {
@@ -348,10 +369,6 @@ function init() {
 
 				raycaster.ray.intersectPlane( plane, intersect );
 				editor.incertKnot( buffer, intersect );
-
-				break;
-
-			case 'Knuckle':
 
 				break;
 
