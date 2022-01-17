@@ -140,6 +140,7 @@ function init() {
 
 	let index = 0;
 	let isAdd = false;
+	let isTangent = false;
 
 	document.addEventListener( 'pointermove', e => {
 
@@ -187,25 +188,18 @@ function init() {
 
 			case 'Tangent':
 
-				for ( let i = 0; i < curve.designPoints.length; i ++ ) {
-
-					const v = curve.designPoints[ i ];
-					const distance = raycaster.ray.distanceToPoint( v );
-					if ( distance < 0.2 ) {
-
-						raycaster.ray.intersectPlane( plane, intersect );
-						const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
-						curve.addTangent( i, dir );
-						updateBuffer( curve, buffer );
-						updateLines( curve, buffer.pickable.selected );
-
-						const ori = curve.designPoints[ i ];
-						console.log( ori );
-						buffer.tangent.position.copy( ori );
-						buffer.tangent.setDirection( dir );
-
-					}
-
+				if ( isTangent ) {
+					
+					const v = curve.designPoints[ index ];
+					raycaster.ray.intersectPlane( plane, intersect );
+					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
+					curve.addTangent( index, dir );
+					updateBuffer( curve, buffer );
+					updateLines( curve, buffer.pickable.selected );
+					
+					//buffer.tangent.position.copy( ori );
+					//buffer.tangent.setDirection( dir );
+					
 				}
 
 				break;
@@ -319,6 +313,25 @@ function init() {
 
 			case 'Tangent':
 
+				if( isTangent ) {
+					
+					const v = curve.designPoints[ index ];
+					raycaster.ray.intersectPlane( plane, intersect );
+					const dir = intersect.sub( new THREE.Vector3( v.x, v.y, v.z ) );
+					editor.addTangent( buffer, index, dir );
+					isTangent = false;
+					
+				} else {
+					
+					if ( intPoints.length > 0 ) {
+
+						isTangent = true;
+						index = intPoints[ 0 ].index;
+
+					}
+					
+				}
+				
 				break;
 
 			case 'Remove tangent':
