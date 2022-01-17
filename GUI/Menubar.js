@@ -14,7 +14,7 @@ class Menubar extends UIPanel {
 
 		super();
 		this.setId( 'menubar' );
-		this.add( this.file( scene, hull, prop ) );
+		this.add( this.file( scene, buffer, hull, prop ) );
 		this.add( this.edit( buffer.pickable ) );
 		this.add( this.curve( buffer ) );
 		this.add( this.surface() );
@@ -22,7 +22,7 @@ class Menubar extends UIPanel {
 
 	}
 
-	file( scene, hull, prop ) {
+	file( scene, buffer, hull, prop ) {
 
 		var item;
 		var file;
@@ -49,8 +49,8 @@ class Menubar extends UIPanel {
 		file.onChange( function ( e ) {
 
 			const txt = e.target.result;
-			console.log( txt );
 			hull.readTxt( txt );
+			hull.drawHull( buffer );
 
 		} );
 
