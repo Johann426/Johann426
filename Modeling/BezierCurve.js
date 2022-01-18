@@ -29,9 +29,22 @@ class BezierCurve extends Parametric {
 
 	}
 
+	remove( i ) {
+
+		const removed = this.ctrlp.splice( i, 1 );
+		return removed[ 0 ];
+
+	}
+
 	mod( i, v ) {
 
 		this.ctrlp[ i ] = v;
+
+	}
+
+	incert( i, v ) {
+
+		this.ctrlp.splice( i, 0, v );
 
 	}
 

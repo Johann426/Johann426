@@ -35,7 +35,7 @@ function init() {
 			case 'editting' :
 				controls.enabled = false;
 				break;
-				
+
 			default :
 
 		}
@@ -79,7 +79,7 @@ function init() {
 	document.addEventListener( 'keydown', e => {
 
 		const curve = buffer.pickable.selected.curve;
-		
+
 		if ( e.code == 'KeyZ' && e.ctrlKey ) {
 
 			console.log( 'ctrl + z' );

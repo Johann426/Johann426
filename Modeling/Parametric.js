@@ -7,6 +7,18 @@ class Parametric {
 
 	}
 
+	get ctrlPoints() {
+
+		console.warn( 'ctrlPoints() not implemented.' );
+
+	}
+
+	get designPoints() {
+
+		console.warn( 'designPoints() not implemented.' );
+
+	}
+
 	getPointAt() {
 
 		console.warn( 'getPointAt() not implemented.' );
