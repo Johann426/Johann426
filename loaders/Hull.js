@@ -15,6 +15,9 @@ class Hull {
 		const arr = txt.split( '\r\n' );
 		let n, m, row, isNew, isPts, curve;
 		let i = 0;
+		
+		const tangent = [];
+		const knuckle = [];
 
 		while ( arr[ i ] != undefined ) {
 
@@ -36,27 +39,42 @@ class Hull {
 					isNew = false;
 					isPts = true;
 					m = row[ 2 ];
-					// 0 : ordinary
-					// 1 : tangent
-					// 2 : knuckle
 
 				}
 
 			}
 
 			if ( isPts ) {
-
-				if ( row.length == 5 && n > 0 ) {
-
-					const x = Number( row[ 1 ] );
-					const y = Number( row[ 2 ] );
-					const z = Number( row[ 3 ] );
-					curve.add( new THREE.Vector3( x, y, z ) );
-					n --;
-
+				
+				// 0 : ordinary
+				// 1 : tangent
+				// 2 : knuckle
+				
+				if ( row.length == 6 && m > 0 ) {
+				
+					knuckle.push( row[ 4 ] );
+					tangent.push( row[ 4 ] );
+					m --;
 				}
 
-				n == 0 ? isPts = false : null;
+				if ( row.length == 5 ) {
+
+					for ( let j = 0; j < n; j ++ ) {
+						
+						row = arr[ i ].split( /\s+/ );
+						const x = Number( row[ 1 ] );
+						const y = Number( row[ 2 ] );
+						const z = Number( row[ 3 ] );
+						const s = Number( row[ 4 ] );
+						curve.add( new THREE.Vector3( x, y, z ) );
+						if ( s != 0 ) curve.addKnuckle( j, true );
+						i ++;
+
+					}
+					
+					isPts = false;
+
+				}
 
 			}
 
