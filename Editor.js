@@ -15,6 +15,7 @@ class Editor {
 
 		this.scene = scene;
 		this.history = new History();
+		this.alpha = 1.0;
 
 	}
 
@@ -207,6 +208,8 @@ function updatePoints( curve, points, ctrlPoints, polygon ) {
 	pts = curve.ctrlPoints;
 	geo = ctrlPoints.geometry;
 	geo.setDrawRange( 0, pts.length );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
 	pos = geo.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
@@ -222,6 +225,8 @@ function updatePoints( curve, points, ctrlPoints, polygon ) {
 
 	geo = polygon.geometry;
 	geo.setDrawRange( 0, pts.length );
+	geo.computeBoundingBox();
+	geo.computeBoundingSphere();
 	pos = geo.attributes.position;
 	pos.needsUpdate = true;
 	arr = pos.array;
@@ -260,13 +265,15 @@ function updateLines( curve, lines ) {
 
 }
 
-function updateCurvature( curve, curvature ) {
+function updateCurvature( curve, curvature, optional ) {
 
 	// update curvature
 	if ( curvature !== undefined ) {
 
 		const geo = curvature.geometry;
 		geo.setDrawRange( 0, MAX_LINES_SEG * 2 );
+		geo.computeBoundingBox();
+		geo.computeBoundingSphere();
 		const pos = geo.attributes.position;
 		const pts = curve.interrogating( MAX_LINES_SEG );
 		pos.needsUpdate = true;
@@ -280,6 +287,7 @@ function updateCurvature( curve, curvature ) {
 			arr[ index ++ ] = pts[ i ].point.z;
 
 			const crvt = pts[ i ].normal.clone().negate().mul( pts[ i ].curvature );
+			if ( optional ) crvt.mul( optional );
 			const tuft = pts[ i ].point.clone().add( crvt );
 
 			arr[ index ++ ] = tuft.x;
