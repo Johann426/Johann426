@@ -130,6 +130,7 @@ class IntBspline extends Parametric {
 
 	addKnuckle( i, v ) {
 
+		/*
 		if ( i == 0 || i == this.pole.length - 1 ) {
 
 			v.length() == 0 ? null : this.addTangent( i, v );
@@ -142,6 +143,17 @@ class IntBspline extends Parametric {
 			this.needsUpdate = true;
 
 		}
+		*/
+		
+		if ( typeof v !== 'boolean' ) {
+
+			const chordL = getChordLength( this.pole.map( e => e.point ) );
+			v.normalize().multiplyScalar( chordL * 0.5 );
+
+		}
+
+		this.pole[ i ].knuckle = v;
+		this.needsUpdate = true;
 
 	}
 
