@@ -24,6 +24,12 @@ class Line extends Bspline {
 
 	}
 
+	get parameter() {
+
+		return this.prm;
+
+	}
+
 	add( v ) {
 
 		this.pole.push( { point: v } );
@@ -33,8 +39,9 @@ class Line extends Bspline {
 
 	remove( i ) {
 
-		this.pole.splice( i, 1 );
+		const removed = this.pole.splice( i, 1 );
 		this.needsUpdate = true;
+		return removed[ 0 ].point;
 
 	}
 
@@ -56,18 +63,41 @@ class Line extends Bspline {
 
 		if ( t > 0.0 && t < 1.0 ) {
 
-			const pts = this.pole.map( e => e.point );
-			const prm = parameterize( pts, 'chordal' );
-			const i = prm.findIndex( e => e > t );
+			const i = this.prm.findIndex( e => e > t );
 			this.incert( i, v );
 
 		}
 
 	}
 
+	incertClosestPoint( v ) {
+
+		const e = this.closestPosition( v );
+		const t = e[ 0 ];
+		const p = e[ 1 ];
+
+		if ( t > 0.0 && t < 1.0 ) {
+
+			const i = this.prm.findIndex( e => e > t );
+			this.incert( i, p );
+
+		} else if ( t == 0 ) {
+
+			this.incert( 0, v );
+
+		} else if ( t == 1 ) {
+
+			this.add( v );
+
+		}
+
+		return t;
+
+	}
+
 	getPointAt( t ) {
 
-		this.needsUpdate ? this._calcCtrlPoints() : null;
+		if ( this.needsUpdate ) this._calcCtrlPoints();
 		return super.getPointAt( t );
 
 	}
@@ -75,8 +105,8 @@ class Line extends Bspline {
 	_calcCtrlPoints() {
 
 		const pts = this.pole.map( e => e.point );
-		const prm = parameterize( pts, 'chordal' );
-		this.knots = deBoorKnots( this.deg, prm );
+		this.prm = parameterize( pts, 'chordal' );
+		this.knots = deBoorKnots( this.deg, this.prm );
 		this.ctrlp = pts;
 		this.needsUpdate = false;
 

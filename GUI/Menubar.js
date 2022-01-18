@@ -265,7 +265,7 @@ class Menubar extends UIPanel {
 			switch ( txt ) {
 
 				case 'Line':
-					Object.defineProperty( lines, 'curve', { value: new Line() } );
+					Object.defineProperty( lines, 'curve', { value: new IntBspline( 1 ) } );
 					break;
 				case 'Arc':
 					Object.defineProperty( lines, 'curve', { value: new Arc() } );

@@ -1,33 +1,21 @@
-import { nurbsCurvePoint, nurbsCurveDers, weightedCtrlp, deWeight, calcGreville, knotsInsert, parameterize, deBoorKnots } from './NurbsLib.js';
-import { Parametric } from './Parametric.js';
+import { weightedCtrlp, deWeight, parameterize, deBoorKnots } from './NurbsLib.js';
+import { Nurbs } from './Nurbs.js';
 
-class NurbsCurve extends Parametric {
+class NurbsCurve extends Nurbs {
 
 	constructor( deg ) {
 
-		super();
-
-		this.dmax = deg;
-
-		this.ctrlpw = [];
-
-	}
-
-	get deg() {
-
-		const nm1 = this.ctrlpw.length - 1;
-		return ( nm1 > this.dmax ? this.dmax : nm1 );
+		super( deg );
 
 	}
 
 	get ctrlPoints() {
 
-		const ctrlp = deWeight( this.ctrlpw );
-
 		if ( this.needsUpdate ) {
 
+			const ctrlp = deWeight( this.ctrlpw );
 			this.prm = parameterize( ctrlp, 'chordal' );
-			this.knots = calcKnots( this.deg, this.prm );
+			this.knots = deBoorKnots( this.deg, this.prm );
 
 		}
 
@@ -41,9 +29,9 @@ class NurbsCurve extends Parametric {
 
 	}
 
-	get weight() {
+	get parameter() {
 
-		return this.ctrlpw.map( e => e.w );
+		return this.prm;
 
 	}
 
@@ -87,31 +75,35 @@ class NurbsCurve extends Parametric {
 
 	}
 
-	insertKnotAt( t = 0.5 ) {
+	incertClosestPoint( v ) {
 
-		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlpw, t );
-		console.log( this.knots );
+		const e = this.closestPosition( v );
+		const t = e[ 0 ];
+		//const p = e[ 1 ];
+
+		if ( t > 0.0 && t < 1.0 ) {
+
+			const i = this.prm.findIndex( e => e > t );
+			this.incert( i, v );
+			return i;
+
+		} else if ( t == 0 ) {
+
+			this.incert( 0, v );
+			return 0;
+
+		} else if ( t == 1 ) {
+
+			this.add( v );
+			return this.prm.length;
+
+		} else {
+
+			console.warn( 'Parametric position is out of range' );
+
+		}
 
 	}
-
-	getPointAt( t ) {
-
-		return nurbsCurvePoint( this.deg, this.knots, this.ctrlpw, t );
-
-	}
-
-	getDerivatives( t, k ) {
-
-		return nurbsCurveDers( this.deg, this.knots, this.ctrlpw, t, k );
-
-	}
-
-}
-
-
-function calcKnots( deg, prm ) {
-
-	return deBoorKnots( deg, prm );
 
 }
 

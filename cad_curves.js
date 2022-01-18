@@ -236,6 +236,9 @@ function init() {
 					updateBuffer( curve, buffer );
 					updateLines( curve, buffer.pickable.selected );
 
+					buffer.tangent.position.copy( v );
+					buffer.tangent.setDirection( dir.normalize() );
+
 				}
 
 				break;
@@ -485,8 +488,8 @@ function init() {
 		}
 
 		menubar.state = 'view';
+		updateBuffer( curve, buffer );
 		updateLines( curve, buffer.pickable.selected );
-		renderer.render( scene, camera );
 
 	}
 

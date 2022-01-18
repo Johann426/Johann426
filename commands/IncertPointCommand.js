@@ -15,8 +15,7 @@ class IncertPointCommand {
 		const curve = buffer.pickable.selected.curve;
 		// const p = curve.closestPosition( this.point );
 		// curve.incertPointAt( p[ 0 ], p[ 1 ] );
-		const t = curve.addressPoint( this.point );
-		this.index = t == 0 ? 0 : curve.parameter.findIndex( e => e > t );
+		this.index = curve.incertClosestPoint( this.point );
 
 		updateBuffer( curve, buffer );
 		updateLines( curve, buffer.pickable.selected );

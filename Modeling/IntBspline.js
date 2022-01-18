@@ -3,16 +3,14 @@
  * and a global algorithm to solve the linear equations finding unknown control points.
  * code by Johann426
  */
-import { curvePoint, curveDers, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, knotsInsert } from './NurbsLib.js';
-import { Parametric } from './Parametric.js';
+import { parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt } from './NurbsLib.js';
+import { Bspline } from './Bspline.js';
 
-class IntBspline extends Parametric {
+class IntBspline extends Bspline {
 
 	constructor( deg, type = 'chordal' ) {
 
-		super();
-
-		this.dmax = deg;
+		super( deg );
 
 		this.type = type;
 
@@ -86,7 +84,7 @@ class IntBspline extends Parametric {
 
 	}
 
-	addressPoint( v ) {
+	incertClosestPoint( v ) {
 
 		const e = this.closestPosition( v );
 		const t = e[ 0 ];
@@ -96,18 +94,23 @@ class IntBspline extends Parametric {
 
 			const i = this.prm.findIndex( e => e > t );
 			this.incert( i, p );
+			return i;
 
 		} else if ( t == 0 ) {
 
 			this.incert( 0, v );
+			return 0;
 
 		} else if ( t == 1 ) {
 
 			this.add( v );
+			return this.prm.length;
+
+		} else {
+
+			console.warn( 'Parametric position is out of range' );
 
 		}
-
-		return t;
 
 	}
 
@@ -144,7 +147,7 @@ class IntBspline extends Parametric {
 
 		}
 		*/
-		
+
 		if ( typeof v !== 'boolean' ) {
 
 			const chordL = getChordLength( this.pole.map( e => e.point ) );
@@ -175,23 +178,17 @@ class IntBspline extends Parametric {
 
 	}
 
-	insertKnotAt( t = 0.5 ) {
-
-		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
-
-	}
-
 	getPointAt( t ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
-		return curvePoint( this.deg, this.knots, this.ctrlp, t );
+		return super.getPointAt( t );
 
 	}
 
 	getDerivatives( t, k ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
-		return curveDers( this.deg, this.knots, this.ctrlp, t, k );
+		return super.getDerivatives( t, k );
 
 	}
 

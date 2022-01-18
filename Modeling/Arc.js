@@ -1,7 +1,7 @@
 import { Vector3, makeNurbsCircle } from './NurbsLib.js';
-import { NurbsCurve } from './NurbsCurve.js';
+import { Nurbs } from './Nurbs.js';
 
-class Arc extends NurbsCurve {
+class Arc extends Nurbs {
 
 	constructor() {
 
