@@ -32,8 +32,11 @@ function init() {
 				controls.enabled = true;
 				break;
 
-			default :
+			case 'editting' :
 				controls.enabled = false;
+				break;
+				
+			default :
 
 		}
 
@@ -75,6 +78,8 @@ function init() {
 
 	document.addEventListener( 'keydown', e => {
 
+		const curve = buffer.pickable.selected.curve;
+		
 		if ( e.code == 'KeyZ' && e.ctrlKey ) {
 
 			console.log( 'ctrl + z' );
@@ -90,6 +95,16 @@ function init() {
 		}
 
 		switch ( e.code ) {
+
+			case 'ArrowUp':
+				editor.alpha *= 1.2;
+				updateCurvature( curve, buffer, editor.alpha );
+				break;
+
+			case 'ArrowDown
+				editor.alpha / 1.2;
+				updateCurvature( curve, buffer, editor.alpha );
+				break;
 
 			case 'ShiftLeft':
 
@@ -108,6 +123,8 @@ function init() {
 				break;
 
 			case 'Enter':
+				break;
+
 			case 'Space':
 
 				menubar.state = 'curve';
