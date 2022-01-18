@@ -349,8 +349,9 @@ function init() {
 
 					if ( intPoints.length > 0 ) {
 
-						isKnuckle = true;
 						index = intPoints[ 0 ].index;
+						editor.addKnuckle( buffer, index, true );
+						isKnuckle = true;
 
 					}
 
