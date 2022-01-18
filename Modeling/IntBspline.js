@@ -218,7 +218,7 @@ class IntBspline extends Parametric {
 		const index = []; // index array of corner points
 		index.push( 0 ); // the first into index
 
-		for ( let i = 1; i < n; i ++ ) {
+		for ( let i = 1; i < n - 1; i ++ ) {
 
 			this.pole[ i ].knuckle ? index.push( i ) : null; // knuckle into index
 
@@ -278,7 +278,7 @@ class IntBspline extends Parametric {
 
 				} else {
 
-					if ( p1.knuckle.length() == 0.0 ) {
+					if ( typeof p1.knuckle === 'boolean' ) {
 
 						p1.slope = d1.normalize().mul( chordL );
 
