@@ -98,12 +98,12 @@ function init() {
 
 			case 'ArrowUp':
 				editor.alpha *= 1.2;
-				updateCurvature( curve, buffer, editor.alpha );
+				updateCurvature( curve, buffer.curvature, editor.alpha );
 				break;
 
-			case 'ArrowDown
-				editor.alpha / 1.2;
-				updateCurvature( curve, buffer, editor.alpha );
+			case 'ArrowDown':
+				editor.alpha /= 1.2;
+				updateCurvature( curve, buffer.curvature, editor.alpha );
 				break;
 
 			case 'ShiftLeft':
