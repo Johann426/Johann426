@@ -285,7 +285,7 @@ function updateCurvature( curve, curvature, optional ) {
 		const arr = pos.array;
 		let index = 0;
 
-		const geoPoly = curvature.children[ 0 ];
+		const geoPoly = curvature.children[ 0 ].geometry;
 		geoPoly.setDrawRange( 0, MAX_LINES_SEG );
 		geoPoly.computeBoundingBox();
 		geoPoly.computeBoundingSphere();
