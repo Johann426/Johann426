@@ -82,7 +82,7 @@ class Editor {
 }
 
 const MAX_POINTS = 500;
-const MAX_LINES_SEG = 200;
+const MAX_LINES_SEG = 500;
 
 function getLocalCoordinates( dom, x, y ) {
 
@@ -145,6 +145,10 @@ function preBuffer() {
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	mat.color.set( 0x800000 );
 	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
+	
+	pos = new Float32Array( MAX_LINES_SEG * 3 ); // 3 vertices per point
+	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
+	curvature.add( new THREE.Line( geo.clone(), mat.clone() ) );
 
 	pos = new Float32Array( 2 * 3 );
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
@@ -223,6 +227,7 @@ function updatePoints( curve, points, ctrlPoints, polygon ) {
 
 	}
 
+	// update control polygon
 	geo = polygon.geometry;
 	geo.setDrawRange( 0, pts.length );
 	geo.computeBoundingBox();
@@ -280,6 +285,15 @@ function updateCurvature( curve, curvature, optional ) {
 		const arr = pos.array;
 		let index = 0;
 
+		const geoPoly = curvature.children[ 0 ];
+		geoPoly.setDrawRange( 0, MAX_LINES_SEG );
+		geoPoly.computeBoundingBox();
+		geoPoly.computeBoundingSphere();
+		const posPoly = geoPoly.attributes.position;
+		posPoly.needsUpdate = true;
+		const arrPoly = posPoly.array;
+		let index2 = 0
+		
 		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
 			arr[ index ++ ] = pts[ i ].point.x;
@@ -293,6 +307,10 @@ function updateCurvature( curve, curvature, optional ) {
 			arr[ index ++ ] = tuft.x;
 			arr[ index ++ ] = tuft.y;
 			arr[ index ++ ] = tuft.z;
+			
+			arrPoly[ index2 ++ ] = tuft.x;
+			arrPoly[ index2 ++ ] = tuft.y;
+			arrPoly[ index2 ++ ] = tuft.z;
 
 		}
 
