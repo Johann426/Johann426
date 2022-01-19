@@ -134,26 +134,32 @@ class Parametric {
 
 	}
 
-	interrogating( n ) {
+	interrogationAt( t ) {
+
+		const ders = this.getDerivatives( t, 2 ); // 2nd-order interrogation to be implemented
+		const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
+		const normal = binormal.clone().cross( ders[ 1 ] );
+
+		return {
+
+			point: ders[ 0 ],
+			curvature: binormal.length() / ders[ 1 ].length() ** 3,
+			tangent: ders[ 1 ].normalize(),
+			normal: normal.normalize(),
+			binormal: binormal.normalize()
+
+		};
+
+	}
+
+	interrogations( n ) {
 
 		const p = [];
 
 		for ( let i = 0; i < n; i ++ ) {
 
 			const t = i / ( n - 1 );
-			const ders = this.getDerivatives( t, 2 );
-			const binormal = ders[ 1 ].clone().cross( ders[ 2 ] );
-			const normal = binormal.clone().cross( ders[ 1 ] );
-
-			p.push( {
-
-				point: ders[ 0 ],
-				curvature: binormal.length() / ders[ 1 ].length() ** 3,
-				tangent: ders[ 1 ].normalize(),
-				normal: normal.normalize(),
-				binormal: binormal.normalize()
-
-			} );
+			p.push( this.interrogationAt( t ) );
 
 		}
 

@@ -192,11 +192,11 @@ class IntBspline extends Bspline {
 
 	}
 
-	interrogating( n ) {
+	interrogations( n ) {
 
 		if ( this.needsUpdate ) this._calcCtrlPoints();
 
-		return super.interrogating( n );
+		return super.interrogations( n );
 
 	}
 
@@ -301,9 +301,14 @@ class IntBspline extends Bspline {
 
 		for ( let i = 1; i < nl; i ++ ) {
 
-			for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
+			for ( let j = 0; j < lPrm[ i ].length; j ++ ) {
 
 				lPrm[ i ][ j ] += i;
+
+			}
+
+			for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
+
 				lKnot[ i ][ j ] += i;
 
 			}

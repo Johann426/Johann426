@@ -128,6 +128,8 @@ function init() {
 			case 'Space':
 
 				menubar.state = 'curve';
+				isKnuckle = false;
+				isTangent = false;
 
 				break;
 
@@ -135,6 +137,8 @@ function init() {
 
 				menubar.state = 'view';
 				[ buffer.points, buffer.ctrlPoints, buffer.polygon, buffer.curvature ].map( e => e.visible = false );
+				isKnuckle = false;
+				isTangent = false;
 
 				break;
 

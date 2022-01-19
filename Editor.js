@@ -145,7 +145,7 @@ function preBuffer() {
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	mat.color.set( 0x800000 );
 	const curvature = new THREE.LineSegments( geo.clone(), mat.clone() );
-	
+
 	pos = new Float32Array( MAX_LINES_SEG * 3 ); // 3 vertices per point
 	geo.setAttribute( 'position', new THREE.BufferAttribute( pos, 3 ) );
 	curvature.add( new THREE.Line( geo.clone(), mat.clone() ) );
@@ -276,43 +276,59 @@ function updateCurvature( curve, curvature, optional ) {
 	if ( curvature !== undefined ) {
 
 		const geo = curvature.geometry;
-		geo.setDrawRange( 0, MAX_LINES_SEG * 2 );
+
 		geo.computeBoundingBox();
 		geo.computeBoundingSphere();
 		const pos = geo.attributes.position;
-		const pts = curve.interrogating( MAX_LINES_SEG );
+		//const pts = curve.interrogations( MAX_LINES_SEG );
+		const prm = curve.parameter;
 		pos.needsUpdate = true;
 		const arr = pos.array;
 		let index = 0;
 
 		const geoPoly = curvature.children[ 0 ].geometry;
-		geoPoly.setDrawRange( 0, MAX_LINES_SEG );
+
 		geoPoly.computeBoundingBox();
 		geoPoly.computeBoundingSphere();
 		const posPoly = geoPoly.attributes.position;
 		posPoly.needsUpdate = true;
 		const arrPoly = posPoly.array;
-		let index2 = 0
-		
-		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
+		let index2 = 0;
 
-			arr[ index ++ ] = pts[ i ].point.x;
-			arr[ index ++ ] = pts[ i ].point.y;
-			arr[ index ++ ] = pts[ i ].point.z;
+		for ( let j = 1; j < prm.length; j ++ ) {
 
-			const crvt = pts[ i ].normal.clone().negate().mul( pts[ i ].curvature );
-			if ( optional ) crvt.mul( optional );
-			const tuft = pts[ i ].point.clone().add( crvt );
+			const span = prm[ j ] - prm[ j - 1 ] - 1e-10;
+			const tmp = MAX_LINES_SEG / ( prm.length - 1 );
+			const n = tmp > 20 ? 20 : tmp;
+			console.log( n );
 
-			arr[ index ++ ] = tuft.x;
-			arr[ index ++ ] = tuft.y;
-			arr[ index ++ ] = tuft.z;
-			
-			arrPoly[ index2 ++ ] = tuft.x;
-			arrPoly[ index2 ++ ] = tuft.y;
-			arrPoly[ index2 ++ ] = tuft.z;
+			for ( let i = 0; i < n; i ++ ) {
+
+				const t = i * span / ( n - 1 ) + prm[ j - 1 ];
+				const pts = curve.interrogationAt( t );
+
+				arr[ index ++ ] = pts.point.x;
+				arr[ index ++ ] = pts.point.y;
+				arr[ index ++ ] = pts.point.z;
+
+				const crvt = pts.normal.clone().negate().mul( pts.curvature );
+				if ( optional ) crvt.mul( optional );
+				const tuft = pts.point.clone().add( crvt );
+
+				arr[ index ++ ] = tuft.x;
+				arr[ index ++ ] = tuft.y;
+				arr[ index ++ ] = tuft.z;
+
+				arrPoly[ index2 ++ ] = tuft.x;
+				arrPoly[ index2 ++ ] = tuft.y;
+				arrPoly[ index2 ++ ] = tuft.z;
+
+			}
 
 		}
+
+		geo.setDrawRange( 0, index / 3 );
+		geoPoly.setDrawRange( 0, index2 / 3 );
 
 	}
 
