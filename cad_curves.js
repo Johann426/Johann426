@@ -26,11 +26,9 @@ function init() {
 		controls.update();
 		renderer.render( scene, camera );
 
+		controls.enabled = true;
+		
 		switch ( menubar.state ) {
-
-			case 'view':
-				controls.enabled = true;
-				break;
 
 			case 'editting' :
 				controls.enabled = false;
@@ -223,7 +221,7 @@ function init() {
 					updateLines( curve, buffer.pickable.selected );
 
 					buffer.tangent.position.copy( v );
-					buffer.tangent.setDirection( dir.normalize() );
+					buffer.tangent.setDirection( dir.clone().normalize() );
 
 				}
 
@@ -241,7 +239,7 @@ function init() {
 					updateLines( curve, buffer.pickable.selected );
 
 					buffer.tangent.position.copy( v );
-					buffer.tangent.setDirection( dir.normalize() );
+					buffer.tangent.setDirection( dir.clone().normalize() );
 
 				}
 
