@@ -298,7 +298,7 @@ function updateCurvature( curve, curvature, optional ) {
 		
 		for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
 
-			this.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
+			curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
 
 		}
 		
