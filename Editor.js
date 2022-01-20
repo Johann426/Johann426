@@ -281,7 +281,6 @@ function updateCurvature( curve, curvature, optional ) {
 		geo.computeBoundingSphere();
 		const pos = geo.attributes.position;
 		//const pts = curve.interrogations( MAX_LINES_SEG );
-		const prm = curve.parameter;
 		pos.needsUpdate = true;
 		const arr = pos.array;
 		let index = 0;
@@ -295,14 +294,15 @@ function updateCurvature( curve, curvature, optional ) {
 		const arrPoly = posPoly.array;
 		let index2 = 0;
 
-// 		for ( let j = 1; j < prm.length; j ++ ) {
-
-// 			const span = prm[ j ] - prm[ j - 1 ] - 1e-10;
-// 			const tmp = MAX_LINES_SEG / ( prm.length - 1 );
-// 			const n = tmp > 20 ? 20 : tmp;
-// 			console.log( n );
+		const prm = [];
 		
-		let j = 1;
+		for ( let i = 1; i < n - 1; i ++ ) {
+
+			this.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
+
+		}
+		
+		let j = 0;
 
 		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
