@@ -273,7 +273,7 @@ function updateLines( curve, lines ) {
 function updateCurvature( curve, curvature, optional ) {
 
 	// update curvature
-	if ( curvature !== undefined ) {
+	if ( curve.designPoints.length > 2 && curvature !== undefined ) {
 
 		const geo = curvature.geometry;
 
@@ -295,16 +295,24 @@ function updateCurvature( curve, curvature, optional ) {
 		const arrPoly = posPoly.array;
 		let index2 = 0;
 
-		for ( let j = 1; j < prm.length; j ++ ) {
+// 		for ( let j = 1; j < prm.length; j ++ ) {
 
-			const span = prm[ j ] - prm[ j - 1 ] - 1e-10;
-			const tmp = MAX_LINES_SEG / ( prm.length - 1 );
-			const n = tmp > 20 ? 20 : tmp;
-			console.log( n );
+// 			const span = prm[ j ] - prm[ j - 1 ] - 1e-10;
+// 			const tmp = MAX_LINES_SEG / ( prm.length - 1 );
+// 			const n = tmp > 20 ? 20 : tmp;
+// 			console.log( n );
+		
+		let j = 1;
 
-			for ( let i = 0; i < n; i ++ ) {
+		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
-				const t = i * span / ( n - 1 ) + prm[ j - 1 ];
+			let t = i / ( MAX_LINES_SEG - 1 );
+			
+			if ( t > prm[ j ] ) {
+				
+				t = prm[ j ] - 1e-10;
+				index -= 6;
+				index2 -= 6;
 				const pts = curve.interrogationAt( t );
 
 				arr[ index ++ ] = pts.point.x;
@@ -322,8 +330,30 @@ function updateCurvature( curve, curvature, optional ) {
 				arrPoly[ index2 ++ ] = tuft.x;
 				arrPoly[ index2 ++ ] = tuft.y;
 				arrPoly[ index2 ++ ] = tuft.z;
-
+				arrPoly[ index2 ++ ] = pts.point.x;
+				arrPoly[ index2 ++ ] = pts.point.y;
+				arrPoly[ index2 ++ ] = pts.point.z;
+				
+				t = prm[ j ++ ];
 			}
+
+			const pts = curve.interrogationAt( t );
+
+			arr[ index ++ ] = pts.point.x;
+			arr[ index ++ ] = pts.point.y;
+			arr[ index ++ ] = pts.point.z;
+
+			const crvt = pts.normal.clone().negate().mul( pts.curvature );
+			if ( optional ) crvt.mul( optional );
+			const tuft = pts.point.clone().add( crvt );
+
+			arr[ index ++ ] = tuft.x;
+			arr[ index ++ ] = tuft.y;
+			arr[ index ++ ] = tuft.z;
+
+			arrPoly[ index2 ++ ] = tuft.x;
+			arrPoly[ index2 ++ ] = tuft.y;
+			arrPoly[ index2 ++ ] = tuft.z;
 
 		}
 
