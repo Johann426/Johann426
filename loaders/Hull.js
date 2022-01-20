@@ -1,5 +1,5 @@
 import * as THREE from '../Rendering/three.module.js';
-import { IntBspline } from '../Modeling/IntBspline.js';
+import { IntBspline } from '../modeling/IntBspline.js';
 import { updateBuffer, updateLines } from '../Editor.js';
 
 class Hull {
@@ -15,7 +15,7 @@ class Hull {
 		const arr = txt.split( '\r\n' );
 		let n, m, row, isNew, isPts, curve;
 		let i = 0;
-		
+
 		const tangent = [];
 		const knuckle = [];
 
@@ -45,22 +45,23 @@ class Hull {
 			}
 
 			if ( isPts ) {
-				
+
 				// 0 : ordinary
 				// 1 : tangent
 				// 2 : knuckle
-				
+
 				if ( row.length == 6 && m > 0 ) {
-				
+
 					knuckle.push( row[ 4 ] );
 					tangent.push( row[ 4 ] );
 					m --;
+
 				}
 
 				if ( row.length == 5 ) {
 
 					for ( let j = 0; j < n; j ++ ) {
-						
+
 						row = arr[ i ].split( /\s+/ );
 						const x = Number( row[ 1 ] );
 						const y = Number( row[ 2 ] );
@@ -71,7 +72,7 @@ class Hull {
 						i ++;
 
 					}
-					
+
 					isPts = false;
 
 				}

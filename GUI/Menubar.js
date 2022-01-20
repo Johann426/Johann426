@@ -1,6 +1,7 @@
 import * as THREE from '../Rendering/three.module.js';
-import { IntBspline } from '../Modeling/IntBspline.js';
-import { NurbsCurve } from '../Modeling/NurbsCurve.js';
+import { IntBspline } from '../modeling/IntBspline.js';
+import { NurbsCrvInt } from '../modeling/NurbsCrvInt.js';
+import { NurbsCrv } from '../modeling/NurbsCrv.js';
 import { BezierCurve } from '../Modeling/BezierCurve.js';
 import { Line } from '../modeling/Line.js';
 import { Circle } from '../Modeling/Circle.js';
@@ -275,9 +276,10 @@ class Menubar extends UIPanel {
 					break;
 				case 'Curve':
 					Object.defineProperty( lines, 'curve', { value: new IntBspline( 3 ) } );
+					//Object.defineProperty( lines, 'curve', { value: new NurbsCrvInt( 3 ) } );
 					break;
 				case 'Nurbs':
-					Object.defineProperty( lines, 'curve', { value: new NurbsCurve( 3 ) } );
+					Object.defineProperty( lines, 'curve', { value: new NurbsCrv( 3 ) } );
 					break;
 				case 'Bezier':
 					Object.defineProperty( lines, 'curve', { value: new BezierCurve() } );

@@ -27,7 +27,7 @@ function init() {
 		renderer.render( scene, camera );
 
 		controls.enabled = true;
-		
+
 		switch ( menubar.state ) {
 
 			case 'editting' :
@@ -442,7 +442,7 @@ function init() {
 	const editor = new Editor( scene, buffer );
 
 	// Create model and menubar
-	const geometry = new THREE.SphereGeometry( 0.02 );
+	const geometry = new THREE.SphereGeometry( 0.2 );
 	const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 	const sphereInter = new THREE.Mesh( geometry, material );
 	sphereInter.visible = false;

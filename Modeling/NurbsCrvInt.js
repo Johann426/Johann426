@@ -1,12 +1,7 @@
-/*
- * If the given data consists of points (and constraints), this class provides methods to evaluate parameterized values, knot vector,
- * and a global algorithm to solve the linear equations finding unknown control points.
- * code by Johann426
- */
-import { parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt } from './NurbsLib.js';
-import { Bspline } from './Bspline.js';
+import { parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp } from './NurbsLib.js';
+import { Nurbs } from './Nurbs.js';
 
-class IntBspline extends Bspline {
+class NurbsCrvInt extends Nurbs {
 
 	constructor( deg, type = 'chordal' ) {
 
@@ -188,6 +183,9 @@ class IntBspline extends Bspline {
 	_calcCtrlPoints() {
 
 		this._assignEndDers();
+
+		const weight = new Array( this.ctrlp.length ).fill( 1.0 );
+		this.ctrlpw = weightedCtrlp( this.ctrlp, weight );
 
 		this.needsUpdate = false;
 
@@ -416,4 +414,4 @@ function getChordLength( pts ) {
 
 }
 
-export { IntBspline };
+export { NurbsCrvInt };

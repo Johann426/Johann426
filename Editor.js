@@ -273,7 +273,7 @@ function updateLines( curve, lines ) {
 function updateCurvature( curve, curvature, optional ) {
 
 	// update curvature
-	if ( curve.designPoints.length > 2 && curvature !== undefined ) {
+	if ( curve.designPoints.length > 1 && curvature !== undefined ) {
 
 		const geo = curvature.geometry;
 
@@ -295,21 +295,21 @@ function updateCurvature( curve, curvature, optional ) {
 		let index2 = 0;
 
 		const prm = [];
-		
+
 		for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
 
 			curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
 
 		}
-		
+
 		let j = 0;
 
 		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
 			let t = i / ( MAX_LINES_SEG - 1 );
-			
+
 			if ( t > prm[ j ] ) {
-				
+
 				t = prm[ j ] - 1e-10;
 				index -= 6;
 				index2 -= 6;
@@ -333,8 +333,9 @@ function updateCurvature( curve, curvature, optional ) {
 				arrPoly[ index2 ++ ] = pts.point.x;
 				arrPoly[ index2 ++ ] = pts.point.y;
 				arrPoly[ index2 ++ ] = pts.point.z;
-				
+
 				t = prm[ j ++ ];
+
 			}
 
 			const pts = curve.interrogationAt( t );

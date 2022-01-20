@@ -1,7 +1,7 @@
 import { weightedCtrlp, deWeight, parameterize, deBoorKnots } from './NurbsLib.js';
 import { Nurbs } from './Nurbs.js';
 
-class NurbsCurve extends Nurbs {
+class NurbsCrv extends Nurbs {
 
 	constructor( deg ) {
 
@@ -107,4 +107,4 @@ class NurbsCurve extends Nurbs {
 
 }
 
-export { NurbsCurve };
+export { NurbsCrv };
