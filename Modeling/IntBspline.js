@@ -299,37 +299,41 @@ class IntBspline extends Bspline {
 		this.knots = lKnot[ 0 ];
 		this.ctrlp = lCtrl[ 0 ];
 
-		for ( let i = 1; i < nl; i ++ ) {
+		if( nl > 1 ) {
 
-			for ( let j = 0; j < lPrm[ i ].length; j ++ ) {
+			for ( let i = 1; i < nl; i ++ ) {
 
-				lPrm[ i ][ j ] += i;
+				for ( let j = 0; j < lPrm[ i ].length; j ++ ) {
+
+					lPrm[ i ][ j ] += i;
+
+				}
+
+				for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
+
+					lKnot[ i ][ j ] += i;
+
+				}
+
+				this.prm = this.prm.concat( lPrm[ i ].slice( 1 ) );
+				this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( this.deg + 1 ) );
+				this.ctrlp = this.ctrlp.concat( lCtrl[ i ].slice( 1 ) );
 
 			}
 
-			for ( let j = 0; j < lKnot[ i ].length; j ++ ) {
+			// normalize parameter 0 < t < 1
+			for ( let j = 0; j < this.prm.length; j ++ ) {
 
-				lKnot[ i ][ j ] += i;
+				this.prm[ j ] /= nl;
 
 			}
 
-			this.prm = this.prm.concat( lPrm[ i ].slice( 1 ) );
-			this.knots = this.knots.slice( 0, - 1 ).concat( lKnot[ i ].slice( this.deg + 1 ) );
-			this.ctrlp = this.ctrlp.concat( lCtrl[ i ].slice( 1 ) );
+			// normalize knot vector
+			for ( let j = 0; j < this.knots.length; j ++ ) {
 
-		}
+				this.knots[ j ] /= nl;
 
-		// normalize parameter 0 < t < 1
-		for ( let j = 0; j < this.prm.length; j ++ ) {
-
-			this.prm[ j ] /= nl;
-
-		}
-
-		// normalize knot vector
-		for ( let j = 0; j < this.knots.length; j ++ ) {
-
-			this.knots[ j ] /= nl;
+			}
 
 		}
 
