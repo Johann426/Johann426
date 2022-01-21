@@ -203,6 +203,66 @@ function pointOnBezierCurve( ctrl, t ) {
 
 }
 
+function dersBezier( ctrl, t ) {
+
+	const ders = [];
+	ders.push( pointOnBezierCurve( ctrl, t ) );
+
+	const n = ctrl.length;
+	const nm1 = n - 1;
+	const nm2 = n - 2;
+	const q = [];
+
+	for ( let j = 0; j < nm1; j ++ ) {
+
+		q[ j ] = new Vector( n, n, n );
+		q[ j ].x *= ctrl[ j + 1 ].x - ctrl[ j ].x;
+		q[ j ].y *= ctrl[ j + 1 ].y - ctrl[ j ].y;
+		q[ j ].z *= ctrl[ j + 1 ].z - ctrl[ j ].z;
+
+	}
+
+	let x, y, z;
+	x = y = z = 0;
+	let b = allBernstein( nm1, t );
+
+	for ( let j = 0; j < nm1; j ++ ) {
+
+		x += b[ j ] * q[ j ].x;
+		y += b[ j ] * q[ j ].y;
+		z += b[ j ] * q[ j ].z;
+
+	}
+	
+	ders.push( new Vector3( x, y, z ) );
+	
+	for ( let j = 0; j < nm2; j ++ ) {
+
+		const m = n * nm1
+		q[ j ] = new Vector( m, m, m );
+		q[ j ].x *= ctrl[ j + 2 ].x - 2 * ctrl[ j + 1 ].x + ctrl[ j ].x;
+		q[ j ].y *= ctrl[ j + 2 ].y - 2 * ctrl[ j + 1 ].y + ctrl[ j ].y;
+		q[ j ].z *= ctrl[ j + 2 ].z - 2 * ctrl[ j + 1 ].z + ctrl[ j ].z;
+
+	}
+
+	x = y = z = 0;
+	let b = allBernstein( nm2, t );
+
+	for ( let j = 0; j < nm2; j ++ ) {
+
+		x += b[ j ] * q[ j ].x;
+		y += b[ j ] * q[ j ].y;
+		z += b[ j ] * q[ j ].z;
+
+	}
+	
+	ders.push( new Vector3( x, y, z ) );
+	
+	return ders;
+
+}
+
 /*
  * Compute point on Bezier curve by deCasteljau algorithm. See The NURBS Book, page 24, algorithm A1.5
  * ctrl : control points
@@ -1461,4 +1521,4 @@ class Quaternion {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, pointOnBezierCurve, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
+export { curvePoint, curveDers, surfacePoint, pointOnBezierCurve, dersBezier, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
