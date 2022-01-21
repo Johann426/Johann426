@@ -167,6 +167,8 @@ function init() {
 
 	document.addEventListener( 'pointermove', e => {
 
+		const leftBtn = e.buttons == 1;
+
 		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		raycaster.setFromCamera( pointer, camera );
@@ -256,7 +258,7 @@ function init() {
 					sphereInter.visible = true;
 					sphereInter.position.copy( pos );
 
-					if ( menubar.state == 'editting' ) {
+					if ( menubar.state == 'editting' && leftBtn ) {
 
 						curve.mod( index, intersect );
 						updateSelectedPoint( buffer.point, intersect );
@@ -280,6 +282,8 @@ function init() {
 
 	document.addEventListener( 'pointerdown', e => {
 
+		const leftBtn = e.buttons == 1;
+		//e.altKey = e.ctrlKey = e.shiftKey = true
 		const pointer = getLocalCoordinates( renderer.domElement, e.clientX, e.clientY );
 
 		//dragging = true;
@@ -309,7 +313,7 @@ function init() {
 
 			case 'curve':
 
-				if ( intPoints.length > 0 ) {
+				if ( intPoints.length > 0 && leftBtn ) {
 
 					menubar.state = 'editting';
 					index = intPoints[ 0 ].index;

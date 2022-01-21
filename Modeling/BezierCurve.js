@@ -1,4 +1,4 @@
-import { pointOnBezierCurve,dersBezier } from './NurbsLib.js';
+import { pointOnBezierCurve, dersBezier } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class BezierCurve extends Parametric {

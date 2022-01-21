@@ -1,6 +1,6 @@
 import { Nurbs } from './Nurbs.js';
 
-class NurbsSrf extends Nurbs {
+class NurbsSurface extends Nurbs {
 
 	constructor( degU, degV, knotU, knotV, ctrlp ) {
 
@@ -8,4 +8,4 @@ class NurbsSrf extends Nurbs {
 
 }
 
-export { NurbsSrf };
+export { NurbsSurface };

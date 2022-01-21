@@ -1,6 +1,6 @@
 import { surfacePoint, deBoorKnots, globalCurveInterpTngt } from './NurbsLib.js';
 
-class IntBsplineSurf {
+class BsplineSurfaceInt {
 
 	constructor( ni, nj, points, degU, degV, type = 'chordal' ) {
 
@@ -199,4 +199,4 @@ class IntBsplineSurf {
 
 }
 
-export { IntBsplineSurf };
+export { BsplineSurfaceInt };

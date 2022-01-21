@@ -9,6 +9,8 @@ class Bspline extends Parametric {
 
 		this.dmax = deg;
 
+		this.knots = [];
+
 		this.ctrlp = [];
 
 	}

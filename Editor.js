@@ -1,5 +1,5 @@
 import * as THREE from './Rendering/three.module.js';
-import { IntBsplineSurf } from './Modeling/IntBsplineSurf.js';
+import { BsplineSurfaceInt } from './modeling/BsplineSurfaceInt.js';
 import { History } from './commands/History.js';
 import { RemovePointCommand } from './commands/RemovePointCommand.js';
 import { IncertPointCommand } from './commands/IncertPointCommand.js';
@@ -295,48 +295,53 @@ function updateCurvature( curve, curvature, optional ) {
 		let index2 = 0;
 
 		const prm = [];
+		let j = 0;
 
-// 		for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
+		if ( curve.pole != undefined ) {
 
-// 			curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
+			for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
 
-// 		}
+				curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
 
-// 		let j = 0;
+			}
+
+		}
+
+		const isEmpty = prm.length === 0;
 
 		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
 			let t = i / ( MAX_LINES_SEG - 1 );
 
-// 			if ( t > prm[ j ] ) {
+			if ( ! isEmpty && t > prm[ j ] ) {
 
-// 				t = prm[ j ] - 1e-10;
-// 				index -= 6;
-// 				index2 -= 6;
-// 				const pts = curve.interrogationAt( t );
+				t = prm[ j ] - 1e-10;
+				index -= 6;
+				index2 -= 6;
+				const pts = curve.interrogationAt( t );
 
-// 				arr[ index ++ ] = pts.point.x;
-// 				arr[ index ++ ] = pts.point.y;
-// 				arr[ index ++ ] = pts.point.z;
+				arr[ index ++ ] = pts.point.x;
+				arr[ index ++ ] = pts.point.y;
+				arr[ index ++ ] = pts.point.z;
 
-// 				const crvt = pts.normal.clone().negate().mul( pts.curvature );
-// 				if ( optional ) crvt.mul( optional );
-// 				const tuft = pts.point.clone().add( crvt );
+				const crvt = pts.normal.clone().negate().mul( pts.curvature );
+				if ( optional ) crvt.mul( optional );
+				const tuft = pts.point.clone().add( crvt );
 
-// 				arr[ index ++ ] = tuft.x;
-// 				arr[ index ++ ] = tuft.y;
-// 				arr[ index ++ ] = tuft.z;
+				arr[ index ++ ] = tuft.x;
+				arr[ index ++ ] = tuft.y;
+				arr[ index ++ ] = tuft.z;
 
-// 				arrPoly[ index2 ++ ] = tuft.x;
-// 				arrPoly[ index2 ++ ] = tuft.y;
-// 				arrPoly[ index2 ++ ] = tuft.z;
-// 				arrPoly[ index2 ++ ] = pts.point.x;
-// 				arrPoly[ index2 ++ ] = pts.point.y;
-// 				arrPoly[ index2 ++ ] = pts.point.z;
+				arrPoly[ index2 ++ ] = tuft.x;
+				arrPoly[ index2 ++ ] = tuft.y;
+				arrPoly[ index2 ++ ] = tuft.z;
+				arrPoly[ index2 ++ ] = pts.point.x;
+				arrPoly[ index2 ++ ] = pts.point.y;
+				arrPoly[ index2 ++ ] = pts.point.z;
 
-// 				t = prm[ j ++ ];
+				t = prm[ j ++ ];
 
-// 			}
+			}
 
 			const pts = curve.interrogationAt( t );
 
@@ -395,8 +400,6 @@ function updateSelectedPoint( point, v ) {
 
 }
 
-
-
 function drawProp( prop ) {
 
 	const nk = prop.NoBlade;
@@ -427,7 +430,7 @@ function drawProp( prop ) {
 	mat.side = THREE.DoubleSide;
 	const propMeshs = [];
 
-	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
+	updateGeo( new BsplineSurfaceInt( ni, nj, points, 3, 3 ), geo );
 
 	// loop over no. of blade
 	for ( let k = 1; k <= nk; k ++ ) {
@@ -453,7 +456,7 @@ function drawProp( prop ) {
 
 	}
 
-	updateGeo( new IntBsplineSurf( ni, nj, points, 3, 3 ), geo );
+	updateGeo( new BsplineSurfaceInt( ni, nj, points, 3, 3 ), geo );
 
 	// loop over no. of blade
 	for ( let k = 1; k <= nk; k ++ ) {

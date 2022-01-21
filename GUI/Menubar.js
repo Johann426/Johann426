@@ -1,11 +1,12 @@
 import * as THREE from '../Rendering/three.module.js';
-import { IntBspline } from '../modeling/IntBspline.js';
-import { NurbsCrvInt } from '../modeling/NurbsCrvInt.js';
-import { NurbsCrv } from '../modeling/NurbsCrv.js';
-import { BezierCurve } from '../Modeling/BezierCurve.js';
 import { Line } from '../modeling/Line.js';
-import { Circle } from '../Modeling/Circle.js';
 import { Arc } from '../Modeling/Arc.js';
+import { Circle } from '../Modeling/Circle.js';
+import { BezierCurve } from '../Modeling/BezierCurve.js';
+import { BsplineCurve } from '../modeling/BsplineCurve.js';
+import { NurbsCurve } from '../modeling/NurbsCurve.js';
+import { BsplineCurveInt } from '../modeling/BsplineCurveInt.js';
+import { NurbsCurveInt } from '../modeling/NurbsCurveInt.js';
 import { updateProp, drawProp } from '../Editor.js';
 import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
 
@@ -234,7 +235,13 @@ class Menubar extends UIPanel {
 
 		item = new UIRow();
 		item.setClass( 'item' );
-		item.setTextContent( 'Curve' );
+		item.setTextContent( 'Bezier' );
+		this.curveItemClick( item, buffer );
+		items.add( item );
+
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Bspline' );
 		this.curveItemClick( item, buffer );
 		items.add( item );
 
@@ -246,7 +253,7 @@ class Menubar extends UIPanel {
 
 		item = new UIRow();
 		item.setClass( 'item' );
-		item.setTextContent( 'Bezier' );
+		item.setTextContent( 'Curve (generic)' );
 		this.curveItemClick( item, buffer );
 		items.add( item );
 
@@ -266,7 +273,7 @@ class Menubar extends UIPanel {
 			switch ( txt ) {
 
 				case 'Line':
-					Object.defineProperty( lines, 'curve', { value: new IntBspline( 1 ) } );
+					Object.defineProperty( lines, 'curve', { value: new BsplineCurveInt( 1 ) } );
 					break;
 				case 'Arc':
 					Object.defineProperty( lines, 'curve', { value: new Arc() } );
@@ -274,15 +281,17 @@ class Menubar extends UIPanel {
 				case 'Circle':
 					Object.defineProperty( lines, 'curve', { value: new Circle() } );
 					break;
-				case 'Curve':
-					Object.defineProperty( lines, 'curve', { value: new IntBspline( 3 ) } );
-					//Object.defineProperty( lines, 'curve', { value: new NurbsCrvInt( 3 ) } );
-					break;
-				case 'Nurbs':
-					Object.defineProperty( lines, 'curve', { value: new NurbsCrv( 3 ) } );
-					break;
 				case 'Bezier':
 					Object.defineProperty( lines, 'curve', { value: new BezierCurve() } );
+					break;
+				case 'Bspline':
+					Object.defineProperty( lines, 'curve', { value: new BsplineCurve( 3 ) } );
+					break;
+				case 'Nurbs':
+					Object.defineProperty( lines, 'curve', { value: new NurbsCurve( 3 ) } );
+					break;
+				case 'Curve (generic)':
+					Object.defineProperty( lines, 'curve', { value: new BsplineCurveInt( 3 ) } );
 					break;
 
 			}

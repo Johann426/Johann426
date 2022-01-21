@@ -203,15 +203,10 @@ function pointOnBezierCurve( ctrl, t ) {
 
 }
 
-function dersBezier( ctrl, t ) {
-
-	const ders = [];
-	ders.push( pointOnBezierCurve( ctrl, t ) );
+function derBezier( ctrl, t, q = [] ) {
 
 	const n = ctrl.length;
 	const nm1 = n - 1;
-	const nm2 = n - 2;
-	const q = [];
 
 	for ( let j = 0; j < nm1; j ++ ) {
 
@@ -222,43 +217,36 @@ function dersBezier( ctrl, t ) {
 
 	}
 
-	let x, y, z;
-	x = y = z = 0;
+	const v = new Vector3();
 	let b = allBernstein( nm1, t );
 
 	for ( let j = 0; j < nm1; j ++ ) {
 
-		x += b[ j ] * q[ j ].x;
-		y += b[ j ] * q[ j ].y;
-		z += b[ j ] * q[ j ].z;
-
-	}
-	
-	ders.push( new Vector3( x, y, z ) );
-	
-	for ( let j = 0; j < nm2; j ++ ) {
-
-		const m = n * nm1
-		q[ j ] = new Vector3( m, m, m );
-		q[ j ].x *= ctrl[ j + 2 ].x - 2 * ctrl[ j + 1 ].x + ctrl[ j ].x;
-		q[ j ].y *= ctrl[ j + 2 ].y - 2 * ctrl[ j + 1 ].y + ctrl[ j ].y;
-		q[ j ].z *= ctrl[ j + 2 ].z - 2 * ctrl[ j + 1 ].z + ctrl[ j ].z;
+		v.x += b[ j ] * q[ j ].x;
+		v.y += b[ j ] * q[ j ].y;
+		v.z += b[ j ] * q[ j ].z;
 
 	}
 
-	x = y = z = 0;
-	b = allBernstein( nm2, t );
+	return v;
 
-	for ( let j = 0; j < nm2; j ++ ) {
+}
 
-		x += b[ j ] * q[ j ].x;
-		y += b[ j ] * q[ j ].y;
-		z += b[ j ] * q[ j ].z;
+function dersBezier( ctrl, t, n = 2 ) {
+
+	const ders = [];
+	ders.push( pointOnBezierCurve( ctrl, t ) );
+
+	let p = ctrl;
+
+	for ( let j = 0; j < n; j ++ ) {
+
+		const q = [];
+		ders.push( derBezier( p, t, q ) );
+		p = q;
 
 	}
-	
-	ders.push( new Vector3( x, y, z ) );
-	
+
 	return ders;
 
 }
@@ -1124,35 +1112,6 @@ function tempCurveInterp( deg, prm, knot, pole ) {
 		}
 
 		return solve( arr, b );
-
-	}
-
-}
-
-// deprecated routine of lu backsubstitution
-function lubksbV3( n, arr, indx, pts ) {
-
-	console.warn( 'lubksbV3() has been deprecated' );
-
-	const x = [];
-	const y = [];
-	const z = [];
-
-	for ( let i = 0; i < n; i ++ ) {
-
-		x.push( pts[ i ].x );
-		y.push( pts[ i ].y );
-		z.push( pts[ i ].z );
-
-	}
-
-	lubksb( n, arr, indx, x );
-	lubksb( n, arr, indx, y );
-	lubksb( n, arr, indx, z );
-
-	for ( let i = 0; i < n; i ++ ) {
-
-		pts[ i ] = new Vector3( x[ i ], y[ i ], z[ i ] );
 
 	}
 

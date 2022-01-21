@@ -1,7 +1,7 @@
-import { weightedCtrlp, deWeight, parameterize, deBoorKnots } from './NurbsLib.js';
-import { Nurbs } from './Nurbs.js';
+import { parameterize, deBoorKnots } from './NurbsLib.js';
+import { Bspline } from './Bspline.js';
 
-class NurbsCrv extends Nurbs {
+class BsplineCurve extends Bspline {
 
 	constructor( deg ) {
 
@@ -13,19 +13,18 @@ class NurbsCrv extends Nurbs {
 
 		if ( this.needsUpdate ) {
 
-			const ctrlp = deWeight( this.ctrlpw );
-			this.prm = parameterize( ctrlp, 'chordal' );
+			this.prm = parameterize( this.ctrlp, 'chordal' );
 			this.knots = deBoorKnots( this.deg, this.prm );
 
 		}
 
-		return deWeight( this.ctrlpw );
+		return this.ctrlp;
 
 	}
 
 	get designPoints() {
 
-		return deWeight( this.ctrlpw );
+		return this.ctrlp;
 
 	}
 
@@ -37,29 +36,29 @@ class NurbsCrv extends Nurbs {
 
 	add( v ) {
 
-		this.ctrlpw.push( weightedCtrlp( v, 1.0 ) );
+		this.ctrlp.push( v );
 		this.needsUpdate = true;
 
 	}
 
 	remove( i ) {
 
-		const removed = this.ctrlpw.splice( i, 1 );
+		const removed = this.ctrlp.splice( i, 1 );
 		this.needsUpdate = true;
-		return deWeight( removed[ 0 ] );
+		return removed[ 0 ];
 
 	}
 
 	mod( i, v ) {
 
-		this.ctrlpw[ i ] = weightedCtrlp( v, 1.0 );
+		this.ctrlp[ i ] = v;
 		this.needsUpdate = true;
 
 	}
 
 	incert( i, v ) {
 
-		this.ctrlpw.splice( i, 0, weightedCtrlp( v, 1.0 ) );
+		this.ctrlp.splice( i, 0, v );
 		this.needsUpdate = true;
 
 	}
@@ -107,4 +106,4 @@ class NurbsCrv extends Nurbs {
 
 }
 
-export { NurbsCrv };
+export { BsplineCurve };

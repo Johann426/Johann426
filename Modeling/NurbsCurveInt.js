@@ -1,7 +1,7 @@
 import { parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp } from './NurbsLib.js';
 import { Nurbs } from './Nurbs.js';
 
-class NurbsCrvInt extends Nurbs {
+class NurbsCurveInt extends Nurbs {
 
 	constructor( deg, type = 'chordal' ) {
 
@@ -414,4 +414,4 @@ function getChordLength( pts ) {
 
 }
 
-export { NurbsCrvInt };
+export { NurbsCurveInt };

@@ -6,7 +6,7 @@
 import { parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt } from './NurbsLib.js';
 import { Bspline } from './Bspline.js';
 
-class IntBspline extends Bspline {
+class BsplineCurveInt extends Bspline {
 
 	constructor( deg, type = 'chordal' ) {
 
@@ -395,7 +395,7 @@ function calcKnotsMult( deg, prm, pole ) {
 
 	}
 
-	return knots; //.sort( ( a, b ) => { return a - b } );
+	return knots; //.sort( ( a, b ) => a - b );
 
 }
 
@@ -416,4 +416,4 @@ function getChordLength( pts ) {
 
 }
 
-export { IntBspline };
+export { BsplineCurveInt };

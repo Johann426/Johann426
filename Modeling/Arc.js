@@ -1,4 +1,4 @@
-import { Vector3, makeNurbsCircle } from './NurbsLib.js';
+import { Vector3, weightedCtrlp, makeNurbsCircle } from './NurbsLib.js';
 import { Nurbs } from './Nurbs.js';
 
 class Arc extends Nurbs {
@@ -8,7 +8,6 @@ class Arc extends Nurbs {
 		super( 2 );
 
 		this.pole = [];
-
 		this.normal = new Vector3( 0, 0, 1 );
 
 	}
@@ -138,13 +137,22 @@ class Arc extends Nurbs {
 
 		if ( this.needsUpdate ) {
 
-			if ( this.pole.length == 3 ) {
+			const n = this.pole.length;
+
+			if ( n == 3 ) {
 
 				this._calcCtrlPoints( this.p0, this.x, this.y, this.r, this.a0, this.a1 );
 
 			} else {
 
-				this._calcCtrlPoints( this.p0, this.p0, this.p0, 0.0, 0.0, 0.0 );
+				for ( let i = 0; i < n; i ++ ) {
+
+					this.knots[ 2 * i ] = 0.0;
+					this.knots[ 2 * i + 1 ] = 1.0;
+					this.knots.sort( ( a, b ) => a - b );
+					this.ctrlpw[ i ] = weightedCtrlp( this.pole[ i ].point, 1.0 );
+
+				}
 
 			}
 

@@ -9,6 +9,8 @@ class Nurbs extends Parametric {
 
 		this.dmax = deg;
 
+		this.knots = [];
+
 		this.ctrlpw = [];
 
 	}

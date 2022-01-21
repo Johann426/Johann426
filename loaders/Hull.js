@@ -1,5 +1,5 @@
 import * as THREE from '../Rendering/three.module.js';
-import { IntBspline } from '../modeling/IntBspline.js';
+import { BsplineCurveInt } from '../modeling/BsplineCurveInt.js';
 import { updateBuffer, updateLines } from '../Editor.js';
 
 class Hull {
