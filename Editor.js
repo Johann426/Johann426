@@ -296,47 +296,47 @@ function updateCurvature( curve, curvature, optional ) {
 
 		const prm = [];
 
-		for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
+// 		for ( let i = 1; i < curve.pole.length - 1; i ++ ) {
 
-			curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
+// 			curve.pole[ i ].knuckle ? prm.push( curve.parameter[ i ] ) : null;
 
-		}
+// 		}
 
-		let j = 0;
+// 		let j = 0;
 
 		for ( let i = 0; i < MAX_LINES_SEG; i ++ ) {
 
 			let t = i / ( MAX_LINES_SEG - 1 );
 
-			if ( t > prm[ j ] ) {
+// 			if ( t > prm[ j ] ) {
 
-				t = prm[ j ] - 1e-10;
-				index -= 6;
-				index2 -= 6;
-				const pts = curve.interrogationAt( t );
+// 				t = prm[ j ] - 1e-10;
+// 				index -= 6;
+// 				index2 -= 6;
+// 				const pts = curve.interrogationAt( t );
 
-				arr[ index ++ ] = pts.point.x;
-				arr[ index ++ ] = pts.point.y;
-				arr[ index ++ ] = pts.point.z;
+// 				arr[ index ++ ] = pts.point.x;
+// 				arr[ index ++ ] = pts.point.y;
+// 				arr[ index ++ ] = pts.point.z;
 
-				const crvt = pts.normal.clone().negate().mul( pts.curvature );
-				if ( optional ) crvt.mul( optional );
-				const tuft = pts.point.clone().add( crvt );
+// 				const crvt = pts.normal.clone().negate().mul( pts.curvature );
+// 				if ( optional ) crvt.mul( optional );
+// 				const tuft = pts.point.clone().add( crvt );
 
-				arr[ index ++ ] = tuft.x;
-				arr[ index ++ ] = tuft.y;
-				arr[ index ++ ] = tuft.z;
+// 				arr[ index ++ ] = tuft.x;
+// 				arr[ index ++ ] = tuft.y;
+// 				arr[ index ++ ] = tuft.z;
 
-				arrPoly[ index2 ++ ] = tuft.x;
-				arrPoly[ index2 ++ ] = tuft.y;
-				arrPoly[ index2 ++ ] = tuft.z;
-				arrPoly[ index2 ++ ] = pts.point.x;
-				arrPoly[ index2 ++ ] = pts.point.y;
-				arrPoly[ index2 ++ ] = pts.point.z;
+// 				arrPoly[ index2 ++ ] = tuft.x;
+// 				arrPoly[ index2 ++ ] = tuft.y;
+// 				arrPoly[ index2 ++ ] = tuft.z;
+// 				arrPoly[ index2 ++ ] = pts.point.x;
+// 				arrPoly[ index2 ++ ] = pts.point.y;
+// 				arrPoly[ index2 ++ ] = pts.point.z;
 
-				t = prm[ j ++ ];
+// 				t = prm[ j ++ ];
 
-			}
+// 			}
 
 			const pts = curve.interrogationAt( t );
 
