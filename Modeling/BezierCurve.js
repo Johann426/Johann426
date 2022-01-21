@@ -56,7 +56,7 @@ class BezierCurve extends Parametric {
 
 	getDerivatives( t ) {
 
-		return dersBezier( this.ctrl, t );
+		return dersBezier( this.ctrlp, t );
 
 	}
 
