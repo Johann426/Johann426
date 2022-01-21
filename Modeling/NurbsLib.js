@@ -247,7 +247,7 @@ function dersBezier( ctrl, t ) {
 	}
 
 	x = y = z = 0;
-	let b = allBernstein( nm2, t );
+	b = allBernstein( nm2, t );
 
 	for ( let j = 0; j < nm2; j ++ ) {
 
