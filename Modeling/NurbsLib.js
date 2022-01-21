@@ -215,7 +215,7 @@ function dersBezier( ctrl, t ) {
 
 	for ( let j = 0; j < nm1; j ++ ) {
 
-		q[ j ] = new Vector( n, n, n );
+		q[ j ] = new Vector3( n, n, n );
 		q[ j ].x *= ctrl[ j + 1 ].x - ctrl[ j ].x;
 		q[ j ].y *= ctrl[ j + 1 ].y - ctrl[ j ].y;
 		q[ j ].z *= ctrl[ j + 1 ].z - ctrl[ j ].z;
@@ -239,7 +239,7 @@ function dersBezier( ctrl, t ) {
 	for ( let j = 0; j < nm2; j ++ ) {
 
 		const m = n * nm1
-		q[ j ] = new Vector( m, m, m );
+		q[ j ] = new Vector3( m, m, m );
 		q[ j ].x *= ctrl[ j + 2 ].x - 2 * ctrl[ j + 1 ].x + ctrl[ j ].x;
 		q[ j ].y *= ctrl[ j + 2 ].y - 2 * ctrl[ j + 1 ].y + ctrl[ j ].y;
 		q[ j ].z *= ctrl[ j + 2 ].z - 2 * ctrl[ j + 1 ].z + ctrl[ j ].z;
