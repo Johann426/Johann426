@@ -121,6 +121,12 @@ function init() {
 				break;
 
 			case 'Enter':
+
+				curve.refineKnot();
+				updateBuffer( curve, buffer );
+				updateLines( curve, buffer.pickable.selected );
+				console.log('hello');
+
 				break;
 
 			case 'Space':

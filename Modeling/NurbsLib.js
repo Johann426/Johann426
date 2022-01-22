@@ -259,21 +259,22 @@ function dersBezier( ctrl, t, n = 2 ) {
 function deCasteljau1( ctrl, t ) {
 
 	const n = ctrl.length;
-	const sum = [];
+	const t1 = 1.0 - t;
+	const q = ctrl.map( e => new Vector3().copy( e ) ); // new Vector3() or clone() needs to be assigned to q.  ctrl.slice() doesn't seem to work as expected
 
 	for ( let j = 1; j < n; j ++ ) {
 
-		sum[ j ] = ctrl[ j ].clone();
-
 		for ( let i = 0; i < n - j; i ++ ) {
 
-			sum[ i ] = sum[ i ].clone().mul( 1.0 - t ).add( sum[ i + 1 ].clone().mul( t ) );
+			q[ i ].x = t1 * q[ i ].x + t * q[ i + 1 ].x;
+			q[ i ].y = t1 * q[ i ].y + t * q[ i + 1 ].y;
+			q[ i ].z = t1 * q[ i ].z + t * q[ i + 1 ].z;
 
 		}
 
 	}
 
-	return sum[ 0 ];
+	return q[ 0 ];
 
 }
 
@@ -744,6 +745,199 @@ function knotsInsert( deg, knot, ctrl, t ) {
 	knot.splice( span + 1, 0, t );
 
 }
+
+function knotsRefine( deg, knot, ctrl, arr ) {
+
+	if ( arr.length == 0 ) return knot;
+
+	const n = ctrl.length;
+	const nm1 = n - 1;
+	const t = Array.isArray( arr ) ? arr : [ arr ];
+	const r = t.length - 1;
+
+	let a = findIndexSpan( deg, knot, n, t[ 0 ] );
+	let b = findIndexSpan( deg, knot, n, t[ r ] );
+	b = b + 1;
+	const q = [];
+
+	for ( let j = 0; j <= a - deg; j ++ ) {
+
+		q[ j ] = ctrl[ j ].clone();
+
+	}
+
+	for ( let j = b - 1; j <= nm1; j ++ ) {
+
+		q[ j + r + 1 ] = ctrl[ j ].clone();
+
+	}
+
+	const knotBar = [];
+
+	for ( let j = 0; j <= a; j ++ ) {
+
+		knotBar[ j ] = knot[ j ];
+
+	}
+
+	for ( let j = b + deg; j <= n + deg; j ++ ) {
+
+		knotBar[ j + r + 1 ] = knot[ j ];
+
+	}
+
+	let i = b + deg - 1;
+	let k = b + deg + r;
+
+	for ( let j = r; j >= 0; j -- ) {
+
+		while ( t[ j ] <= knot[ i ] && i > a ) {
+
+			q[ k - deg - 1 ] = ctrl[ i - deg - 1 ].clone();
+			knotBar[ k ] = knot[ i ];
+			k --;
+			i --;
+
+		}
+
+		q[ k - deg - 1 ] = q[ k - deg ].clone();
+
+		for ( let l = 1; l <= deg; l ++ ) {
+
+			const ind = k - deg + l;
+			let alpha = knotBar[ k + 1 ] - t[ j ];
+
+			if ( alpha == 0 ) {
+
+				q[ ind - 1 ] = q[ ind ];
+
+			} else {
+
+				alpha /= knotBar[ k + l ] - knot[ i - deg + l ];
+				const a1 = 1.0 - alpha;
+				q[ ind - 1 ].x = alpha * q[ ind - 1 ].x + a1 * q[ ind ].x;
+				q[ ind - 1 ].y = alpha * q[ ind - 1 ].y + a1 * q[ ind ].y;
+				q[ ind - 1 ].z = alpha * q[ ind - 1 ].z + a1 * q[ ind ].z;
+
+			}
+
+		}
+
+		knotBar[ k ] = t[ j ];
+		k --;
+
+	}
+
+	return [ knotBar, q ];
+
+}
+
+
+function knotMultiplicities( knots ) {
+
+	var mults = [ new verb_eval_KnotMultiplicity( knots[ 0 ], 0 ) ];
+	var curr = mults[ 0 ];
+	var _g = 0;
+	while ( _g < knots.length ) {
+
+		var knot = knots[ _g ];
+		++ _g;
+		if ( Math.abs( knot - curr.knot ) > verb_core_Constants.EPSILON ) {
+
+			curr = new verb_eval_KnotMultiplicity( knot, 0 );
+			mults.push( curr );
+
+		}
+
+		curr.inc();
+
+	}
+
+	return mults;
+
+}
+
+
+
+// Decompose Nurbs curve into Bezier segments. See The NURBS Book, page 173, algorithm A5.6.
+function decomposeCurve( deg, knot, ctrl ) {
+
+	const n = ctrl.length;
+
+	var knotmults = verb_eval_Analyze.knotMultiplicities( knots );
+	var reqMult = deg + 1;
+	var _g = 0;
+	while ( _g < knotmults.length ) {
+
+		var knotmult = knotmults[ _g ];
+		++ _g;
+		if ( knotmult.mult < reqMult ) {
+
+			var knotsInsert = verb_core_Vec.rep( reqMult - knotmult.mult, knotmult.knot );
+			var res = verb_eval_Modify.curveKnotRefine( new verb_core_NurbsCurveData( degree, knots, controlPoints ), knotsInsert );
+			knots = res.knots;
+			controlPoints = res.controlPoints;
+
+		}
+
+	}
+
+	var numCrvs = knots.length / reqMult - 1;
+	var crvKnotLength = reqMult * 2;
+	var crvs = [];
+	var i = 0;
+	while ( i < controlPoints.length ) {
+
+		var kts = knots.slice( i, i + crvKnotLength );
+		var pts = controlPoints.slice( i, i + reqMult );
+		crvs.push( new verb_core_NurbsCurveData( degree, kts, pts ) );
+		i += reqMult;
+
+	}
+
+	return crvs;
+
+}
+
+// function decomposeCurve( curve ) {
+
+// 	var degree = curve.degree;
+// 	var controlPoints = curve.controlPoints;
+// 	var knots = curve.knots;
+// 	var knotmults = verb_eval_Analyze.knotMultiplicities( knots );
+// 	var reqMult = degree + 1;
+// 	var _g = 0;
+// 	while ( _g < knotmults.length ) {
+
+// 		var knotmult = knotmults[ _g ];
+// 		++ _g;
+// 		if ( knotmult.mult < reqMult ) {
+
+// 			var knotsInsert = verb_core_Vec.rep( reqMult - knotmult.mult, knotmult.knot );
+// 			var res = verb_eval_Modify.curveKnotRefine( new verb_core_NurbsCurveData( degree, knots, controlPoints ), knotsInsert );
+// 			knots = res.knots;
+// 			controlPoints = res.controlPoints;
+
+// 		}
+
+// 	}
+
+// 	var numCrvs = knots.length / reqMult - 1;
+// 	var crvKnotLength = reqMult * 2;
+// 	var crvs = [];
+// 	var i = 0;
+// 	while ( i < controlPoints.length ) {
+
+// 		var kts = knots.slice( i, i + crvKnotLength );
+// 		var pts = controlPoints.slice( i, i + reqMult );
+// 		crvs.push( new verb_core_NurbsCurveData( degree, kts, pts ) );
+// 		i += reqMult;
+
+// 	}
+
+// 	return crvs;
+
+// }
 
 /*
  * Create arbitrary Nurbs circular arc. See The NURBS Book, page 308, algorithm A7.1.
@@ -1480,4 +1674,4 @@ class Quaternion {
 
 }
 
-export { curvePoint, curveDers, surfacePoint, pointOnBezierCurve, dersBezier, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, knotsInsert, Vector3, calcGreville, makeNurbsCircle };
+export { deCasteljau1, dersBezier, curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, Vector3, calcGreville, makeNurbsCircle, knotsInsert, knotsRefine };

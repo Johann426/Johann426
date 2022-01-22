@@ -1,4 +1,4 @@
-import { pointOnBezierCurve, dersBezier } from './NurbsLib.js';
+import { deCasteljau1, dersBezier } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class BezierCurve extends Parametric {
@@ -50,7 +50,8 @@ class BezierCurve extends Parametric {
 
 	getPointAt( t ) {
 
-		return pointOnBezierCurve( this.ctrlp, t );
+		//return pointOnBezierCurve( this.ctrlp, t );
+		return deCasteljau1( this.ctrlp, t );
 
 	}
 

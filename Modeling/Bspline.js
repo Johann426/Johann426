@@ -1,4 +1,4 @@
-import { curvePoint, curveDers, calcGreville, knotsInsert } from './NurbsLib.js';
+import { curvePoint, curveDers, calcGreville, knotsInsert, knotsRefine } from './NurbsLib.js';
 import { Parametric } from './Parametric.js';
 
 class Bspline extends Parametric {
@@ -46,6 +46,12 @@ class Bspline extends Parametric {
 	insertKnotAt( t = 0.5 ) {
 
 		if ( t != 0.0 && t != 1.0 ) knotsInsert( this.deg, this.knots, this.ctrlp, t );
+
+	}
+
+	refineKnot() {
+
+		[ this.knots, this.ctrlp ] = knotsRefine( this.deg, this.knots, this.ctrlp, [ 0.3333, 0.6667, ] );
 
 	}
 
