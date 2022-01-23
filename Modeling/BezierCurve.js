@@ -23,6 +23,13 @@ class BezierCurve extends Parametric {
 
 	}
 
+	set( ctrlp ) {
+
+		this.ctrlp = ctrlp;
+		return this;
+
+	}
+
 	add( v ) {
 
 		this.ctrlp.push( v );

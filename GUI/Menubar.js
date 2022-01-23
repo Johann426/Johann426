@@ -7,18 +7,20 @@ import { BsplineCurve } from '../modeling/BsplineCurve.js';
 import { NurbsCurve } from '../modeling/NurbsCurve.js';
 import { BsplineCurveInt } from '../modeling/BsplineCurveInt.js';
 import { NurbsCurveInt } from '../modeling/NurbsCurveInt.js';
-import { updateProp, drawProp } from '../Editor.js';
+import { decomposeCurve } from '../modeling/NurbsLib.js';
+import { updateBuffer, updateProp, drawProp } from '../Editor.js';
 import { UIPanel, UIRow, UIHorizontalRule, UIFile } from './ui.js';
+import { AddBezierCurve } from '../commands/AddBezierCurve.js';
 
 class Menubar extends UIPanel {
 
-	constructor( scene, buffer, hull, prop ) {
+	constructor( editor, buffer, hull, prop ) {
 
 		super();
 		this.setId( 'menubar' );
-		this.add( this.file( scene, buffer, hull, prop ) );
-		this.add( this.edit( buffer.pickable ) );
-		this.add( this.curve( buffer ) );
+		this.add( this.file( editor.scene, buffer, hull, prop ) );
+		this.add( this.edit( editor, buffer ) );
+		this.add( this.curve( editor, buffer ) );
 		this.add( this.surface() );
 		this.state = 'view';
 
@@ -95,7 +97,7 @@ class Menubar extends UIPanel {
 
 	}
 
-	edit( pickable ) {
+	edit( editor, buffer ) {
 
 		var item;
 
@@ -116,12 +118,13 @@ class Menubar extends UIPanel {
 		item.setTextContent( 'Add point' );
 		item.onClick( () => {
 
-			pickable.selected.curve.add( new THREE.Vector3() );
+			buffer.pickable.selected.curve.add( new THREE.Vector3() );
 			this.state = 'Add';
 
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Add tangent' );
@@ -132,6 +135,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Remove point' );
@@ -142,6 +146,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Remove tangent' );
@@ -152,6 +157,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'knot insert' );
@@ -162,6 +168,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'add knuckle' );
@@ -172,6 +179,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'remove knuckle' );
@@ -182,6 +190,7 @@ class Menubar extends UIPanel {
 		} );
 
 		items.add( item );
+
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'incert point' );
@@ -193,11 +202,33 @@ class Menubar extends UIPanel {
 
 		items.add( item );
 
+		item = new UIRow();
+		item.setClass( 'item' );
+		item.setTextContent( 'Nurbs into Bezier' );
+		item.onClick( () => {
+
+			const c = buffer.pickable.selected.curve;
+
+			const arr = decomposeCurve( c.deg, c.knots, c.ctrlPoints );
+			//updateBuffer( c, buffer );
+
+			for ( let i = 0; i < arr.length; i ++ ) {
+
+				editor.addBezierCurve( buffer, arr[ i ] );
+
+			}
+
+			this.state = 'curve';
+
+		} );
+
+		items.add( item );
+
 		return menu;
 
 	}
 
-	curve( buffer ) {
+	curve( editor, buffer ) {
 
 		var item;
 
@@ -217,44 +248,56 @@ class Menubar extends UIPanel {
 		item.setClass( 'item' );
 		item.setTextContent( 'Line' );
 		this.curveItemClick( item, buffer );
+
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Arc' );
 		this.curveItemClick( item, buffer );
+
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Circle' );
 		this.curveItemClick( item, buffer );
-		items.add( item );
 
+		items.add( item );
 		items.add( new UIHorizontalRule() );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Bezier' );
-		this.curveItemClick( item, buffer );
+		//this.curveItemClick( item, buffer );
+		item.onClick( ( ) => {
+
+			editor.addBezierCurve( buffer );
+			this.state = 'Add';
+
+		} );
+
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Bspline' );
 		this.curveItemClick( item, buffer );
+
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Nurbs' );
 		this.curveItemClick( item, buffer );
+
 		items.add( item );
 
 		item = new UIRow();
 		item.setClass( 'item' );
 		item.setTextContent( 'Curve (generic)' );
 		this.curveItemClick( item, buffer );
+
 		items.add( item );
 
 		return menu;

@@ -122,11 +122,6 @@ function init() {
 
 			case 'Enter':
 
-				curve.refineKnot();
-				updateBuffer( curve, buffer );
-				updateLines( curve, buffer.pickable.selected );
-				console.log('hello');
-
 				break;
 
 			case 'Space':
@@ -460,7 +455,7 @@ function init() {
 
 	const prop = new Propeller();
 	const hull = new Hull();
-	const menubar = new Menubar( scene, buffer, hull, prop );
+	const menubar = new Menubar( editor, buffer, hull, prop );
 	document.body.appendChild( menubar.dom );
 	const sidebar = new UITabbedPanel();
 	document.body.appendChild( sidebar.dom );

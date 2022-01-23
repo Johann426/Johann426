@@ -746,110 +746,23 @@ function knotsInsert( deg, knot, ctrl, t ) {
 
 }
 
-function knotsRefine( deg, knot, ctrl, arr ) {
+// count multiplicities at each knot.
+function knotMults( knot ) {
 
-	if ( arr.length == 0 ) return knot;
+	const mults = [ { knot: knot[ 0 ], mult: 0 } ];
+	const EPSILON = Number.EPSILON;
+	let e = mults[ 0 ];
 
-	const n = ctrl.length;
-	const nm1 = n - 1;
-	const t = Array.isArray( arr ) ? arr : [ arr ];
-	const r = t.length - 1;
+	for ( let i = 0; i < knot.length; i ++ ) {
 
-	let a = findIndexSpan( deg, knot, n, t[ 0 ] );
-	let b = findIndexSpan( deg, knot, n, t[ r ] );
-	b = b + 1;
-	const q = [];
+		if ( Math.abs( knot[ i ] - e.knot ) > EPSILON ) {
 
-	for ( let j = 0; j <= a - deg; j ++ ) {
-
-		q[ j ] = ctrl[ j ].clone();
-
-	}
-
-	for ( let j = b - 1; j <= nm1; j ++ ) {
-
-		q[ j + r + 1 ] = ctrl[ j ].clone();
-
-	}
-
-	const knotBar = [];
-
-	for ( let j = 0; j <= a; j ++ ) {
-
-		knotBar[ j ] = knot[ j ];
-
-	}
-
-	for ( let j = b + deg; j <= n + deg; j ++ ) {
-
-		knotBar[ j + r + 1 ] = knot[ j ];
-
-	}
-
-	let i = b + deg - 1;
-	let k = b + deg + r;
-
-	for ( let j = r; j >= 0; j -- ) {
-
-		while ( t[ j ] <= knot[ i ] && i > a ) {
-
-			q[ k - deg - 1 ] = ctrl[ i - deg - 1 ].clone();
-			knotBar[ k ] = knot[ i ];
-			k --;
-			i --;
+			e = { knot: knot[ i ], mult: 0 };
+			mults.push( e );
 
 		}
 
-		q[ k - deg - 1 ] = q[ k - deg ].clone();
-
-		for ( let l = 1; l <= deg; l ++ ) {
-
-			const ind = k - deg + l;
-			let alpha = knotBar[ k + 1 ] - t[ j ];
-
-			if ( alpha == 0 ) {
-
-				q[ ind - 1 ] = q[ ind ];
-
-			} else {
-
-				alpha /= knotBar[ k + l ] - knot[ i - deg + l ];
-				const a1 = 1.0 - alpha;
-				q[ ind - 1 ].x = alpha * q[ ind - 1 ].x + a1 * q[ ind ].x;
-				q[ ind - 1 ].y = alpha * q[ ind - 1 ].y + a1 * q[ ind ].y;
-				q[ ind - 1 ].z = alpha * q[ ind - 1 ].z + a1 * q[ ind ].z;
-
-			}
-
-		}
-
-		knotBar[ k ] = t[ j ];
-		k --;
-
-	}
-
-	return [ knotBar, q ];
-
-}
-
-
-function knotMultiplicities( knots ) {
-
-	var mults = [ new verb_eval_KnotMultiplicity( knots[ 0 ], 0 ) ];
-	var curr = mults[ 0 ];
-	var _g = 0;
-	while ( _g < knots.length ) {
-
-		var knot = knots[ _g ];
-		++ _g;
-		if ( Math.abs( knot - curr.knot ) > verb_core_Constants.EPSILON ) {
-
-			curr = new verb_eval_KnotMultiplicity( knot, 0 );
-			mults.push( curr );
-
-		}
-
-		curr.inc();
+		e.mult ++;
 
 	}
 
@@ -857,45 +770,39 @@ function knotMultiplicities( knots ) {
 
 }
 
-
-
 // Decompose Nurbs curve into Bezier segments. See The NURBS Book, page 173, algorithm A5.6.
 function decomposeCurve( deg, knot, ctrl ) {
 
-	const n = ctrl.length;
+	const knotmults = knotMults( knot );
 
-	var knotmults = verb_eval_Analyze.knotMultiplicities( knots );
-	var reqMult = deg + 1;
-	var _g = 0;
-	while ( _g < knotmults.length ) {
+	for ( let i = 0; i < knotmults.length; i ++ ) {
 
-		var knotmult = knotmults[ _g ];
-		++ _g;
-		if ( knotmult.mult < reqMult ) {
+		var knotmult = knotmults[ i ];
 
-			var knotsInsert = verb_core_Vec.rep( reqMult - knotmult.mult, knotmult.knot );
-			var res = verb_eval_Modify.curveKnotRefine( new verb_core_NurbsCurveData( degree, knots, controlPoints ), knotsInsert );
-			knots = res.knots;
-			controlPoints = res.controlPoints;
+		if ( knotmult.mult < deg ) {
+
+			for ( let k = 0; k < deg - knotmult.mult; k ++ ) {
+
+				knotsInsert( deg, knot, ctrl, knotmult.knot );
+
+			}
 
 		}
 
 	}
 
-	var numCrvs = knots.length / reqMult - 1;
-	var crvKnotLength = reqMult * 2;
-	var crvs = [];
-	var i = 0;
-	while ( i < controlPoints.length ) {
+	const arr = [];
+	let j = 0;
 
-		var kts = knots.slice( i, i + crvKnotLength );
-		var pts = controlPoints.slice( i, i + reqMult );
-		crvs.push( new verb_core_NurbsCurveData( degree, kts, pts ) );
-		i += reqMult;
+	while ( j < ctrl.length - 1 ) {
+
+		const pts = ctrl.slice( j, j + deg + 1 );
+		arr.push( pts );
+		j += deg;
 
 	}
 
-	return crvs;
+	return arr;
 
 }
 
@@ -1053,7 +960,7 @@ function intersect3DLines( p0, d0, p1, d1 ) {
 	const c1 = p0.z + d0.z * x.data[ 0 ];
 	const c2 = p1.z + d1.z * x.data[ 1 ];
 
-	if ( c1 - c2 < 1e-20 ) {
+	if ( c1 - c2 < Number.EPSILON ) {
 
 		const res = p0.clone().add( d0.clone().mul( x.data[ 0 ] ) );
 		return res;
@@ -1674,4 +1581,4 @@ class Quaternion {
 
 }
 
-export { deCasteljau1, dersBezier, curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, Vector3, calcGreville, makeNurbsCircle, knotsInsert, knotsRefine };
+export { deCasteljau1, dersBezier, curvePoint, curveDers, surfacePoint, nurbsCurvePoint, nurbsCurveDers, nurbsSurfacePoint, parameterize, deBoorKnots, globalCurveInterp, globalCurveInterpTngt, weightedCtrlp, deWeight, Vector3, calcGreville, makeNurbsCircle, knotsInsert, knotMults, decomposeCurve };

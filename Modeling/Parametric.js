@@ -85,6 +85,7 @@ class Parametric {
 
 		}
 
+		const EPSILON = Number.EPSILON;
 		i = 0;
 		// Newton iteration
 		while ( i < 20 ) {
@@ -92,7 +93,7 @@ class Parametric {
 			const ders = this.getDerivatives( t, 2 );
 			pts = ders[ 0 ];
 			const sub = pts.clone().sub( v );
-			if ( sub.length() < 1E-9 ) break;
+			if ( sub.length() < EPSILON ) break;
 			// f =  C'(t) • ( C(t) - P )
 			const f = ders[ 1 ].clone().dot( sub );
 			// f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
@@ -104,10 +105,10 @@ class Parametric {
 			if ( t < 0.0 ) t = 0.0;
 
 			// t* - t  < e1
-			const cr1 = Math.abs( del ) < 1E-9; // is converged?
+			const cr1 = Math.abs( del ) < EPSILON; // is converged?
 
 			// C' • ( C - P ) < e2
-			const cr2 = Math.abs( f ) < 1E-9; // is orthogonal?
+			const cr2 = Math.abs( f ) < EPSILON; // is orthogonal?
 
 			if ( cr1 && cr2 ) {
 

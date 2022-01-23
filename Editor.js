@@ -8,6 +8,7 @@ import { RemoveTangentCommand } from './commands/RemoveTangentCommand.js';
 import { RemoveKnuckleCommand } from './commands/RemoveKnuckleCommand.js';
 import { AddTangentCommand } from './commands/AddTangentCommand.js';
 import { AddKnuckleCommand } from './commands/AddKnuckleCommand.js';
+import { AddBezierCurve } from './commands/AddBezierCurve.js';
 
 class Editor {
 
@@ -16,6 +17,13 @@ class Editor {
 		this.scene = scene;
 		this.history = new History();
 		this.alpha = 1.0;
+		//this.state = 'view';
+
+	}
+
+	addBezierCurve( buffer, points ) {
+
+		this.execute( new AddBezierCurve( buffer, points ) );
 
 	}
 
