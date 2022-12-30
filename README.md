@@ -7,7 +7,8 @@ Photosynthesis is the primary energy-storing process of plants. The light energy
 A general equation for photosynthesis is written as:
 
 
-6CO<sub>2</sub> + 12H<sub>2</sub>X + energy &rarr; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> 6H<sub>2</sub>O + 12X
+6CO<sub>2</sub> + 12H<sub>2</sub>X + energy &rarr; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6H<sub>2</sub>O + 12X
+
 carbon dioxide + hydrogen donor &rarr; glucose + water + water + X
 
 X can be oxygen(O), sulfur(S).
