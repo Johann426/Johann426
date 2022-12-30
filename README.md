@@ -2,7 +2,7 @@
 
 ### Respiration
 
-C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub> -> 6CO<sub>2</sub> + 6H<sub>2</sub>O + 686 kcal
+C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub> &rarr; 6CO<sub>2</sub> + 6H<sub>2</sub>O + 686 kcal
 
 ```markdown
 Syntax highlighted code block
