@@ -16,7 +16,7 @@ X can be oxygen(O), sulfur(S).
 Temperature-sensitive enaymatic reactions in the stroma
 using the adenosine triphosphate (ATP) or reduced nicotinamide adenine dinucleotide phosphate (NADPH).
 
-<img src = "./img/Chloroplast_mini.svg.png">
+<img src = "./img/Chloroplast_mini.jpg" width = "300">
 
 
 ### Respiration
