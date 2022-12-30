@@ -55,8 +55,11 @@ Temperature-sensitive enaymatic reactions in the stroma use the ATP and NADPH.
 
 <img src = "./img/Chloroplast_mini.jpg" height = "300">
 
+### Stroma
+Stroma is the colorless fluid surrounding the grana within the chloroplast.
+The series of biochemical redox reactions which take place in the stroma are collectively called the Calvin cycle or light-independent reactions. There are three phases: carbon fixation, reduction reactions, and ribulose 1,5-bisphosphate (RuBP) regeneration.
 
-### Respiration
+## Respiration
 
 C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub> &rarr; 6CO<sub>2</sub> + 6H<sub>2</sub>O + 686 kcal
 
