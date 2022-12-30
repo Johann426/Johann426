@@ -2,7 +2,7 @@
 
 ### Respiration
 
-r
+C<sub>6</sub>
 
 ```markdown
 Syntax highlighted code block
