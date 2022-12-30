@@ -2,7 +2,7 @@
 
 ### Photosynthesis
 
-Photosynthesis is the primary energy-storing process of plant. The light energy (mostly from sunlight) is stored as the chemical energy through a series of enzymatic reactions in the stroma using the adenosine triphosphate (ATP) or reduced nicotinamide adenine dinucleotide phosphate (NADPH).
+Photosynthesis is the primary energy-storing process of plants. The light energy (mostly from sunlight) is stored as the chemical energy through a series of enzymatic reactions in the stroma using the adenosine triphosphate (ATP) or reduced nicotinamide adenine dinucleotide phosphate (NADPH).
 
  6CO<sub>2</sub> + 6H<sub>2</sub>O + 686 kcal &rarr; C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub>
 
