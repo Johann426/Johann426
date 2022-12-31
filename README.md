@@ -2,58 +2,83 @@
 
 ## Photosynthesis
 
-Photosynthesis is the primary energy-storing process of plants. The light energy (mostly from sunlight) is stored as chemical energy through a series of biochemical reactions in the chloroplast.
+Photosynthesis is the primary energy-storing process by plants. The process convert light energy into chemical energy through a series of biochemical reactions inside chloroplast.
 
 A general equation for photosynthesis, as first proposed by Cornelis van Niel, can be written as:<br>
 
 $$
-\underbrace{ 6CO_2 }_\text{ carbon dioxide } + \underbrace{ 12H_2A }_\text{ hydrogen donor }
+\underbrace{ 6CO_2 }_\text{ carbon dioxide } \quad + \quad \underbrace{ 12H_2A }_\text{ hydrogen donor } \quad
+\xrightarrow[\text{ (light energy) }]{ photons } \quad
+\underbrace{ C_6H_{12}O_6 }_\text{ carbohydrate } \quad + \quad \underbrace{ 6H_2O }_\text{ water } \quad + \quad 12A
+$$
+
+H<sub>2</sub>A is generally H<sub>2</sub>O, however it can be any inorganic hydrogen donor such as H<sub>2</sub>S (in this case, A is sulfur). The hydrogen freed by splitting the donor is used to produce the carbohydrate.
+
+Since water is used as the hydrogen donor in oxygenic photosynthesis, the equation for this process is written as:
+
+$$
+\underbrace{ 6CO_2 }_\text{ carbon dioxide } \quad + \quad \underbrace{ 12H_2O }_\text{ water } \quad
+\xrightarrow[\text{ (light energy) }]{ photons } \quad
+\underbrace{ C_6H_{12}O_6 }_\text{ glucose } \quad + \quad \underbrace{ 6H_2O }_\text{ water } \quad + \quad 6O_2
+$$
+
+By glancing at the equation, carbon dioxide and water are converted into glucose and oxygen. Water is not only a reactant but a product of the reactions.
+
+The standard Gibbs free energy for the synthesis of glucose is 2,870 kJ/mol, whereas a mole of photons of 600-nm wavelength has an energy content of [209](./doc/EnergyPhoton.md) kJ/mol. The efficiency of photosynthesis can be estimated from the energy input of 8 moles of photons which lead to nominal efficiency of 30 % (Biochemistry by Stryer, Lubert). In actually, however, a maximum overall photosynthetic efficiency of 3 to 6% of total solar radiation due to reflection, optimal radiation level, valid wavelength range) "Renewable biological systems for unsustainable energy production (1997)".
+
+Photosynthesis occurs in [chloroplasts](https://en.wikipedia.org/wiki/Chloroplast) typically 5 μm long.
+
+<center>
+<img src = "./img/Chloroplast.jpg" width = "600"><br>
+Structure of a typical higher-plant chloroplast
+</center>
+<h5 style="text-align: center;">Kelvinsong, CC BY 3.0 <https://creativecommons.org/licenses/by/3.0>, via Wikimedia Commons</h5>
+
+The process of photosynthesis is composed of two stages: the light-dependent reactions and enzymatic reactions which are also called the *Calvin cycle*.
+
+### Stage 1. Light-dependent reactions
+
+In the light-dependent reactions, thylakoid membranes forming stacks of disks referred to as grana absorbs energy of light, liberate oxygen from water, and transport electron to make the energy-storage molecules, [ATP](./doc/ATP.md), and hydrogen carrier, [NADPH](./doc/NADPH.md).
+
+Chlorophylls, which are very effective photoreceptors in the visible region of the electromagnetic spectrum, are composed of magnesium ion bonds with organic pigments at the center of the structure.
+
+<img src = "./img/Chlorophyll.jpg">
+
+ Chlorophylls absorb light most strongly in the blue portion of the spectrum as well as the red portion. A measure of a its ability to absorb light, peak molar extinction coefficient (ɛ), is greater than 10<sup>5</sup> M<sup>−1</sup> cm<sup>−1</sup> for chlorophyll a, among the highest observed for organic compounds.
+ 
+<img src = "./img/Chlorophyll_a_light.jpg">
+
+An electron is excited by the energy from the light, and then it can be transferred to an acceptor through an electron transport chain which is a series of protein complexes that contain heme (hemoproteins) and other molecules.
+
+proteins containing a heme, with a central Fe atom at its core, as a cofactor. 
+
+
+
+The two currently accepted photosystem units are photosystem I and photosystem II, which have their own distinct reaction centres, named P700 and P680, respectively. These centres are named after the wavelength (in nanometers) of their red-peak absorption maximum.
+
+
+
+
+
+### Stage 2. Calvin cycle
+
+Temperature-sensitive enaymatic reactions occur in stroma. The colorless stroma contains water-soluble enzymes, captures carbon dioxide, and uses the energy of ATP and NADPH.
+
+The net reaction of the Calvin cycle:
+$$
+6CO_2 + 18ATP + 12NADPH + 12H_2O 
 \rightarrow
-\underbrace{ C_6H_{12}O_6 }_\text{ carbohydrate(glucose) } + \underbrace{ 6H_2O }_\text{ water } + 12A
+C_6H_{12}O_6 + 18ADP + 18P_i + 12NADP^+ + 6H^+
 $$
 
-A can be oxygen(O), sulfur(S).
-
-Photosynthesis occurs in two stages. In the light-dependent reactions, chlorophyll absorbs energy of light and use it to make the energy-storage molecules, ATP, and hydrogen carrier, NADPH.
-
-### ATP
-Adenosine 5′-triphosphate, abbreviated ATP and usually expressed without the 5′-, is an important energy carrier for biochemical reactions in the cell.
-
-<img src = "./img/adenosine-triphosphate-teaser.jpg" height = "300">
-
-ATP is comprised of the molecule adenosine bound to three phosphate groups. The two bonds between the phosphates are equal high-energy bonds (phosphoanhydride bonds) that, when broken, release sufficient energy to power a variety of cellular reactions and processes. The bond between the beta and gamma phosphate is considered "high-energy" because when the bond breaks, the products [adenosine diphosphate (ADP) and one inorganic phosphate group (Pi)] have a lower free energy than the reactants (ATP and a water molecule).
-
-$$ ATP + H_20 \rightarrow ADP + P_i + energy $$
-
-Like most chemical reactions, the hydrolysis of ATP to ADP is reversible. The reverse reaction combines ADP + Pi to regenerate ATP from ADP. Since ATP hydrolysis releases energy, ATP synthesis must require an input of free energy.
-
-Standard Gibbs energy and Enthalpy changes, ∆G and ∆H, for biochemical reactions (at 298 K, 1 atm, pH 7.0, pMg 3.0, and 0.25 M lonic strength)
-
-$$
-ATP + H_2O \rightleftharpoons ADP + P_i \qquad (∆G = −32.48,\ ∆H = −30.88 \ [kJ/mol] )
-\\
-ADP + H_2O \rightleftharpoons AMP + Pi \qquad (∆G = −32.80,\ ∆H = −28.86 \ [kJ/mol] )
-\\
-AMP + H_2O \rightleftharpoons adenosine + Pi \qquad (∆G = −13.55,\ ∆H = −1.22 \ [kJ/mol] )
-\\
-2ADP \rightleftharpoons ATP + AMP \qquad (∆G = −0.31,\ ∆H = +2.02 \ [kJ/mol] )
-\\
-G6P + H2O \rightleftharpoons Glu + Pi \qquad (∆G = −11.61,\ ∆H = −0.50 \ [kJ/mol] )
-\\
-ATP + Glu \rightleftharpoons ADP + G6P \qquad (∆G = −20.87,\ ∆H =  −30.39 \ [kJ/mol] )
-$$
-Data from R. A. Alberty, Arch. Biochem. Biophys. 353, 116 (1998).
-
- Standard Gibbs energy of one mole of ATP into ADP & Pi is −7.3 kcal/mole (−30.5 kJ/mol). However, this is only true under standard conditions, and the ∆G for the hydrolysis of one mole of ATP in a living cell is almost double the value at standard conditions: 14 kcal/mol (−57 kJ/mol).
 
 
 
-### NADPH
-reduced nicotinamide adenine dinucleotide phosphate (NADPH)
 
-Temperature-sensitive enaymatic reactions in the stroma use the ATP and NADPH.
 
-<img src = "./img/Chloroplast_mini.jpg" height = "300">
+
+
+
 
 ### Stroma
 Stroma is the colorless fluid surrounding the grana within the chloroplast.
