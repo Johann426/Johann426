@@ -5,26 +5,26 @@ Photosynthesis is the primary energy-storing process by plants. The process conv
 A general equation for photosynthesis, as first proposed by Cornelis van Niel, can be written as:<br>
 
 $$
-\underbrace{ 6CO_2 }_\text{ carbon dioxide } + \underbrace{ 12H_2A }_\text{ hydrogen donor }
-\xrightarrow[\text{ (light energy) }]{ photons } \
-\underbrace{ C_6H_{12}O_6 }_\text{ carbohydrate } \ + \ \underbrace{ 6H_2O }_\text{ water } \ + \ 12A
+\underbrace{ CO_2 }_\text{ carbon dioxide } + \underbrace{ 2 \ H_2A }_\text{ hydrogen donor }
+\xrightarrow[ (photons) ]{ \text{ light energy } } \
+\underbrace{ CH_2O }_\text{ carbohydrate } \ + \ \underbrace{ H_2O }_\text{ water } \ + \ 2 \ A
 $$
 
-H<sub>2</sub>A is generally H<sub>2</sub>O, however it can be any inorganic hydrogen donor such as H<sub>2</sub>S (in this case, A is sulfur). The hydrogen freed by splitting the donor is used to produce the carbohydrate.
+H<sub>2</sub>A is generally H<sub>2</sub>O, however it can be any inorganic hydrogen donor such as H<sub>2</sub>S (in this case, A is sulfur). Carbohydrate is synthesized from carbon dioxide as well as hydrogen freed by splitting the donor.
 
-Since water is used as the hydrogen donor in oxygenic photosynthesis, the equation for this process is written as:
+Since water is used as the hydrogen donor in oxygenic photosynthesis, the equation for this process can be written as:
 
 $$
-\underbrace{ 6CO_2 }_\text{ carbon dioxide } + \quad \underbrace{ 12H_2O }_\text{ water } \
-\xrightarrow[\text{ (light energy) }]{ photons } \
-\underbrace{ C_6H_{12}O_6 }_\text{ glucose } \ + \ \underbrace{ 6H_2O }_\text{ water } \ + \ 6O_2
+\underbrace{ 6 \ CO_2 }_\text{ carbon dioxide } + \quad \underbrace{ 12 \ H_2O }_\text{ water } \
+\xrightarrow[ (photons) ]{ \text{ light energy } } \
+\underbrace{ C_6H_{12}O_6 }_\text{ glucose } \ + \ \underbrace{ 6 \ H_2O }_\text{ water } \ + \ \underbrace{ 6 \ O_2 }_\text{ oxigen }
 $$
 
 where C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> is glucose (which is subsequently transformed into other sugars, starches, and cellulose).
 
 By glancing at the equation, carbon dioxide and water are converted into glucose and oxygen, and water is not only a reactant but a product of the reactions.
 
-The standard Gibbs free energy for this synthesis of glucose is 2,870 kJ/mol, whereas a mole of photons of 600-nm wavelength has an energy content of [209](./doc/EnergyPhoton.md) kJ/mol. The efficiency of photosynthesis can be estimated from the energy input of 8 moles of photons which lead to nominal efficiency of 30 % (Biochemistry by Stryer, Lubert). In actually, however, an overall photosynthetic efficiency of 3 to 6 % of total solar radiation is considered as the maximum value due to reflection of light, optimal radiation level, valid wavelength range (Renewable biological systems for unsustainable energy production, 1997).
+
 
 In plants and algae, photosynthesis occurs in [chloroplasts](https://en.wikipedia.org/wiki/Chloroplast) typically 3 to 10 μm in diameter.
 
@@ -103,7 +103,9 @@ $$
 
 
 
-
+The standard Gibbs free energy for this synthesis of glucose is 2,870 kJ/mol,
+The Gibbs free energy for converting a mole of CO2 to glucose is 114 kcal (476.976 kJ) 
+whereas a mole of photons of 600-nm wavelength has an energy content of [209](./doc/EnergyPhoton.md) kJ/mol. The efficiency of photosynthesis can be estimated from the energy input of 8 moles of photons which lead to nominal efficiency of abt. 30 % (= 477 / (209 x 8) ) (Biochemistry by Stryer, Lubert). In actually, however, an overall photosynthetic efficiency of 3 to 6 % of total solar radiation is considered as the maximum value due to reflection of light, optimal radiation level, valid wavelength range (Renewable biological systems for unsustainable energy production, 1997).
 
 
 ### Stroma
