@@ -1,6 +1,6 @@
 # Photosynthesis
 
-Photosynthesis is the primary energy-storing process by plants. The process convert light energy into chemical energy through a series of biochemical reactions by plants, algae and cyanobacteria.
+Photosynthesis is the primary energy-storing process by plants, algae and cyanobacteria. The process convert light energy into chemical energy through a series of biochemical reactions.
 
 A general equation for photosynthesis, as first proposed by Cornelis van Niel, can be written as:<br>
 
@@ -10,7 +10,7 @@ $$
 \underbrace{ CH_2O }_\text{ carbohydrate } \ + \ \underbrace{ H_2O }_\text{ water } \ + \ 2 \ A
 $$
 
-H<sub>2</sub>A is generally H<sub>2</sub>O, however it can be any inorganic hydrogen donor such as H<sub>2</sub>S (in this case, A is sulfur). Carbohydrate is synthesized from carbon dioxide as well as hydrogen freed by splitting the donor.
+H<sub>2</sub>A can be H<sub>2</sub>O or any inorganic hydrogen donor such as H<sub>2</sub>S (in this case, A is sulfur). Carbohydrate is synthesized from carbon dioxide and hydrogen freed by splitting the donor.
 
 Since water is used as the hydrogen donor in oxygenic photosynthesis, the equation for this process can be written as:
 
@@ -22,7 +22,7 @@ $$
 
 where C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> is glucose (which is subsequently transformed into other sugars, starches, and cellulose).
 
-By glancing at the equation, carbon dioxide and water are converted into glucose and oxygen, and water is not only a reactant but a product of the reactions.
+By glancing at the equation, carbon dioxide and water are converted into glucose and oxygen. Water is not only a reactant but a product of the reactions.
 
 
 
@@ -30,11 +30,11 @@ In plants and algae, photosynthesis occurs in [chloroplasts](https://en.wikipedi
 
 <center>
 <img src = "./img/Chloroplast.jpg" width = "600"><br>
-Structure of a typical higher-plant chloroplast
+Structure of a typical plant's chloroplast
 </center>
 <h5 style="text-align: center;">Kelvinsong, CC BY 3.0 <https://creativecommons.org/licenses/by/3.0>, via Wikimedia Commons</h5><br>
 
-Chloroplasts have three membrane systems: the outer membrane, the inner membrane, and the thylakoid system. Inside the outer and inner membranes, a colorless fluid referred to as stroma makes up much of a chloroplast's volume, and in which many proteins and the thylakoids forming stacks of disks referred to as grana can be found. The thylakoid membrane and the inner membrane are impermeable to most molecules and ions. The outer membrane is highly permeable to small molecules and ions.
+Chloroplast has three membrane systems: the outer membrane, the inner membrane, and the thylakoid system. Inside the inner membranes, a colorless fluid referred to as stroma makes up much of a chloroplast's volume, and in which many proteins and the thylakoids forming stacks of disks referred to as grana can be found. The thylakoid membrane and the inner membrane are impermeable to most molecules and ions(including H<sup>+</sup>). The outer membrane is highly permeable to small molecules and ions.
 
 The process of photosynthesis is composed of two stages: the light-dependent reactions and enzymatic reactions which are also called the *Calvin cycle*.
 
@@ -43,9 +43,9 @@ The process of photosynthesis is composed of two stages: the light-dependent rea
 The equation for the light-dependent reactions in green plants is:
 
 $$
-2H_2O + 2 NADP^+ + 3 ADP + 3P_i
-\xrightarrow[\text{ (light energy) }]{ photons } \
-O_2 + 2H^+ + 2NADPH + 3ATP
+2 \ H_2O + 2 \ NADP^+ + 3 \ ADP + 3 \ P_i
+\xrightarrow[ (photons) ]{ \text{ light energy } } \
+O_2 + 2 \ H^+ + 2 \ NADPH + 3 \ ATP
 $$
 
 In the light-dependent reactions, chlorophyll pigments embedded in thylakoid membranes absorbs energy of light. 
@@ -54,7 +54,7 @@ Chlorophylls, which are very effective photoreceptors, are composed of magnesium
 
 <img src = "./img/Chlorophyll.jpg"><br>
 
-Chlorophylls absorb light most strongly in the blue portion of the electromagnetic spectrum as well as the red portion. A measure of a its ability to absorb light, peak molar extinction coefficient (ɛ), is greater than 10<sup>5</sup> M<sup>−1</sup> cm<sup>−1</sup> for chlorophyll a, among the highest found in organic compounds.
+Chlorophylls absorb light most strongly in the blue portion of the electromagnetic spectrum as well as the red portion. A measure of its ability to absorb light, peak molar extinction coefficient (ɛ), is greater than 10<sup>5</sup> M<sup>−1</sup> cm<sup>−1</sup> for *chlorophyll a*, among the highest found in organic compounds.
  
 <img src = "./img/Chlorophyll_a_light.jpg"><br>
 
@@ -63,26 +63,40 @@ In thylakoid membraine of green plants, photosystem II, catalyzed by a redox-act
 <img src = "./img/Zscheme.jpg">
 <h5 style="text-align: center;">D. Shevela, L. O. Björn and G. Govindjee (2018), Z-Scheme of Electron Transport in Photosynthesis, doi: 10.13140/RG.2.2.22936.14081</h5><br>
 
-Photosystem II (also called P680 as it absorbs up to 680 nm wavelengths) consists of protein complexes with numerous bound of chlorophyll. It receives excitation energy either by directly absorbing a photon or indirectly from other chlorophylls. By positively charged, P680+ is highly oxidant (also called as oxidizer or electron acceptor) extracts an electron from water molecules bound at the water-oxidizing complex (WOC), also called the manganese center. By exciting an electron to a higher energy level, P680* donates an electron to plastoquinone cycles between an oxidized form (Q) and a reduced form (QH2, plastoquinol).
+Photosystem II (also called P680 as it absorbs up to 680 nm wavelengths) consists of protein complexes with numerous bound of chlorophylls. It receives excitation energy either by directly absorbing photons or indirectly from other chlorophylls. 
+By exciting an electron to a higher energy level, P680* donates an electron to acceptors such as plastoquinone that cycles between an oxidized form (Q) and a reduced form (QH<sub>2</sub>, plastoquinol).
+
+$$
+Q \ + \
+\underbrace{ 2 \ e^- }_\text{ electron } \ + \
+\underbrace{ 2 \ H^+ }_\text{ proton }
+\xrightarrow[ ]{ \text{   } } \
+QH_2
+$$
 
 <img src = "./img/Plastoquinone.jpg"><br>
 
+By positively charged, P680<sup>+</sup> is highly oxidant (also called as oxidizer or electron acceptor) extracts an electron from water molecules bound at the water-oxidizing complex (WOC), also called the manganese center. 
 
+$$
+\underbrace{ 2 \ H_2O }_\text{ water } \
+\xrightarrow[ ]{ \text{   } } \
+\underbrace{ O_2 }_\text{ oxigen } \ + \
+\underbrace{ 4 \ e^- }_\text{ electron } \ + \
+\underbrace{ 4 \ H^+ }_\text{ proton }
+$$
 
+Electrons flow from photosystem II to photosystem I through the
+cytochrome bf complex. This complex catalyzes the transfer of
+electrons from plastoquinol (QH<sub>2</sub>) to plastocyanin (Pc), a small, soluble copper protein in the thylakoid lumen. The two protons from plastoquinol are released into the thylakoid lumen.
 
+Two protons that are taken up to reduce Q to QH<sub>2</sub> come from the stroma, and the four protons that are liberated at WOC are released into the lumen. This make a proton gradient across the thylakoid membrane.
 
-The major difference between the bacterial system and
-photosystem II is the source of the electrons that are used to
-neutralize the positive charge formed on the special pair. P680+, a very strong oxidant, 
+Photosystem I absorbing up to 700 nm wavelengths can be positively charged into P700<sup>+</sup> and it captures an electron from Photosystem II. The electron is transferred to ferredoxin, Fd, a soluble protein containing a 2Fe–2S cluster. The electron is eventually used for reduction of NADP<sup>+</sup> to [NADPH](./doc/NADPH.md) catalyzed by ferredoxin–NADP<sup>+</sup> reductase which transfers two electrons and a proton to NADP<sup>+</sup> to form NADPH. Since a proton is taken up from the stroma, the proton gradient across the thylakoid membrane is increased further.
 
+The proton gradient across the thylakoid membrane is about 3.5 pH units, which corresponds to a proton-motive force of 0.20 V or a ΔG of −20.0 kJ/mol (Biochemistry by Lubert Stryer).
 
-
-Photosystem I absorbing up to 700 nm wavelengths uses electrons excited to create [NADPH](./doc/NADPH.md).
-
-The electrons travel from photosystem II to photosystem I through cytochrome bf. Cytochrome bf generates a proton gradient across the thylakoid membrane that drives the formation of [ATP](./doc/ATP.md).
-
-
-
+ATP synthase of chloroplasts referred to as CF<sub>1</sub> − CF<sub>0</sub> complex catalyzes the formation of [ATP](./doc/ATP.md) from ADP and Pi.
 
 <img src = "./img/16.-Thylakoid_membrane_2.jpg"><br>
 
