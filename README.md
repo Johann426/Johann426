@@ -92,7 +92,7 @@ electrons from plastoquinol (QH<sub>2</sub>) to plastocyanin (Pc), a small, solu
 
 Two protons that are taken up to reduce Q to QH<sub>2</sub> come from the stroma, and the four protons that are liberated at WOC are released into the lumen. This make a proton gradient across the thylakoid membrane.
 
-Photosystem I absorbing up to 700 nm wavelengths can be positively charged into P700<sup>+</sup> and it captures an electron from Photosystem II. The electron is transferred to ferredoxin, Fd, a soluble protein containing a 2Fe–2S cluster. The electron is eventually used for reduction of NADP<sup>+</sup> to [NADPH](./doc/NADPH.md) catalyzed by ferredoxin–NADP<sup>+</sup> reductase which transfers two electrons and a proton to NADP<sup>+</sup> to form NADPH. Since a proton is taken up from the stroma, the proton gradient across the thylakoid membrane is increased further.
+Photosystem I absorbing up to 700 nm wavelengths can be positively charged into P700<sup>+</sup> and it captures an electron from Photosystem II. The electron is transferred to ferredoxin, Fd, a soluble protein containing a 2Fe–2S cluster. The electron is eventually used for reduction of NADP<sup>+</sup> to [NADPH](./doc/NADPH.md) catalyzed by ferredoxin–NADP<sup>+</sup> reductase which transfers two electrons and a proton to NADP<sup>+</sup> to form NADPH. Since a proton is taken up from the stroma during the formation of NADPH, the proton gradient across the thylakoid membrane is increased further.
 
 The proton gradient across the thylakoid membrane is about 3.5 pH units, which corresponds to a proton-motive force of 0.20 V or a ΔG of −20.0 kJ/mol (Biochemistry by Lubert Stryer).
 
