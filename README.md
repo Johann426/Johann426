@@ -102,7 +102,15 @@ ATP synthase of chloroplasts referred to as CF<sub>1</sub> − CF<sub>0</sub> co
 
 ### Stage 2. Calvin cycle
 
-Temperature-sensitive enaymatic reactions occur in stroma. The colorless stroma contains water-soluble enzymes, captures carbon dioxide, and uses the energy of ATP and NADPH to convert CO<sub>2</sub> into sugar.
+The Calvin cycle is a series of biochemical reactions that convert carbon dioxide and hydrogen doner(usually H<sub>2</sub>O) into glucose, as elucidated in the early 1950s by Melvin Calvin, Andrew Benson, and James Bassham.
+
+This temperature-sensitive enaymatic reactions occurs in chloroplast's stroma that contains water-soluble enzymes ( the key enzyme of the cycle is called RuBisCO), 
+
+
+
+captures carbon dioxide, and uses the energy of ATP and NADPH to convert CO<sub>2</sub> into simple organic compound. This process is called CO<sub>2 assimilation or CO<sub>2 fixation, it means CO<sub>2 </sub> is incorporated (fixed) into a three-carbon organic compound, 3-phosphoglycerate. 
+
+ 
 
 The net reaction of the Calvin cycle:
 $$
