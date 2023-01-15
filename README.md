@@ -126,7 +126,7 @@ In the third stage, ribulose 1,5-bisphosphate, the acceptor of CO<sub>2</sub> is
 
 Formation of five-carbon sugars from six-carbon and three-carbon sugars.
 
-<img src = "./img/5carbonSugar.jpg"><br>
+<img src = "./img/5CarbonSugar.jpg"><br>
 
 Regeneration of ribulose 1,5-bisphosphate.
 
