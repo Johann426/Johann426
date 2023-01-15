@@ -116,7 +116,7 @@ There are three stages:
 
 <h5 style="text-align: center;">Overview of the Calvin cycle pathway. Black is carbon; White is hydrogen; Red is oxygen; Pink is phosphorus. Original work by Mike Jones.</h5><br>
 
-The first step in the Calvin cycle is the process called CO<sub>2 assimilation or CO<sub>2 fixation. The CO<sub>2</sub> molecule is incorporated (fixed) into two molecules of 3-phosphoglycerate by combining with a five-carbon acceptor ribulose-1,5-bisphosphate (RuBP) . This reaction is catalyzed by ribulose 1,5-bisphosphate carboxylase-oxygenase (usually called rubisco).Magnesium ion (Mg<sup>2+</sup>) is needed for enzymatic activity of rubisco.
+ The first step in the Calvin cycle is the process called CO<sub>2</sub> assimilation or CO<sub>2</sub> fixation. The CO<sub>2</sub> molecule is incorporated (fixed) into two molecules of 3-phosphoglycerate by combining with a five-carbon acceptor ribulose-1,5-bisphosphate (RuBP) . This reaction is catalyzed by ribulose 1,5-bisphosphate carboxylase-oxygenase (usually called rubisco).Magnesium ion (Mg<sup>2+</sup>) is needed for enzymatic activity of rubisco.
 
 <img src = "./img/RoleMgRubisco.jpg"><br>
 
