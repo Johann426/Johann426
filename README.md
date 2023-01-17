@@ -160,7 +160,6 @@ C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub> &rarr; 6CO<sub>2</sub>
 NPK in Plant Biochemistry
 
 
-Jin Woog Lee
 Explain the role of nitrogen, phosphorus, and potassium in plants biochemistry.
 
 Nitrogen, phosphorus, and potassium are essential elements for plant growth and development. They are commonly referred to as macronutrients because plants require them in relatively large quantities.
