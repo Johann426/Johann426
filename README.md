@@ -154,6 +154,29 @@ The series of biochemical redox reactions which take place in the stroma are col
 
 C<sub>6</sub>H<sub>12</sub>O<sub>6</sub> + 6O<sub>6</sub> &rarr; 6CO<sub>2</sub> + 6H<sub>2</sub>O + 686 kcal
 
+
+
+
+NPK in Plant Biochemistry
+
+
+Jin Woog Lee
+Explain the role of nitrogen, phosphorus, and potassium in plants biochemistry.
+
+Nitrogen, phosphorus, and potassium are essential elements for plant growth and development. They are commonly referred to as macronutrients because plants require them in relatively large quantities.
+
+Nitrogen is a key component of amino acids, which are the building blocks of proteins. Proteins are essential for the growth and development of all plant tissues. Nitrogen is also a component of chlorophyll, the molecule that allows plants to photosynthesize and produce their own food.
+
+Phosphorus is a component of nucleic acids, which are the building blocks of DNA and RNA. Phosphorus is also involved in the transfer of energy within plant cells, and it helps to regulate the growth and division of cells.
+
+Potassium is involved in many important plant processes, including the regulation of water balance, the synthesis of proteins, and the activation of enzymes. Potassium is also essential for the proper functioning of the stomata, the tiny openings on the surface of leaves through which plants take in carbon dioxide and release oxygen.
+
+These three elements are typically found in fertilizers and are often labeled with the NPK ratio, which indicates the relative amounts of nitrogen, phosphorus, and potassium in the fertilizer.
+
+
+
+
+
 ```markdown
 Syntax highlighted code block
 
