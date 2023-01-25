@@ -133,7 +133,7 @@ Regeneration of ribulose 1,5-bisphosphate.
 <img src = "./img/regeneration.jpg"><br>
 
 
-The net reaction of the Calvin cycle:
+The net reaction of the Calvin cycle:<br>
 $$
 6CO_2 + 18ATP + 12NADPH + 12H_2O 
 \rightarrow
