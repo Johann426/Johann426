@@ -15,7 +15,7 @@ H<sub>2</sub>A can be H<sub>2</sub>O or any inorganic hydrogen donor such as H<s
 Since water is used as the hydrogen donor in oxygenic photosynthesis, the equation for this process can be written as:
 
 $$
-\underbrace{ 6 \ CO_2 }_\text{ carbon dioxide } + \quad \underbrace{ 12 \ H_2O }_\text{ water } \
+\ underbrace{ 6 \ CO_2 }_\text{ carbon dioxide } + \quad \underbrace{ 12 \ H_2O }_\text{ water } \
 \xrightarrow[ (photons) ]{ \text{ light energy } } \
 \underbrace{ C_6H_{12}O_6 }_\text{ glucose } \ + \ \underbrace{ 6 \ H_2O }_\text{ water } \ + \ \underbrace{ 6 \ O_2 }_\text{ oxigen }
 $$
